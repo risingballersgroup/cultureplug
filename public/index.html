@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Pitch Room — Rising Ballers</title>
+<title>Culture Plug — Rising Ballers</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0d0b;
-    --surface: #141412;
-    --border: #252520;
+    --bg: #0e0e0c;
+    --surface: #161614;
+    --border: #272723;
     --accent: #00FFAA;
     --gold: #c9a84c;
-    --white: #f2f0eb;
-    --muted: #6b6960;
-    --muted2: #3a3933;
+    --white: #f0ede6;
+    --muted: #5a574f;
+    --muted2: #2e2d29;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,44 +39,45 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 32px;
-    border-bottom: 1px solid var(--border);
+    padding: 18px 40px;
     flex-shrink: 0;
   }
 
   .logo {
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
     font-weight: 500;
-    letter-spacing: 0.5px;
     color: var(--white);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    text-decoration: none;
+    cursor: pointer;
   }
-  .logo-sep { color: var(--border); font-weight: 300; }
-  .logo-sub { color: var(--muted); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
-
-  .header-right { display: flex; align-items: center; gap: 28px; }
-  .header-stat { text-align: right; }
-  .header-stat-n { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; color: var(--white); line-height: 1; }
-  .header-stat-l { font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
-
-  .status-pill {
-    display: flex; align-items: center; gap: 7px;
-    border: 1px solid var(--border);
-    padding: 5px 12px;
+  .logo:hover { opacity: 0.75; }
+  .logo-rule { width: 1px; height: 16px; background: var(--border); }
+  .logo-sub {
     font-family: 'DM Mono', monospace;
-    font-size: 10px; color: var(--white); letter-spacing: 0.5px;
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
   }
-  .status-dot {
-    width: 6px; height: 6px;
+
+  .header-right { display: flex; align-items: center; gap: 32px; }
+
+  .header-stat { display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+  .header-stat-n { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: var(--white); line-height: 1; }
+  .header-stat-l { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+  .live-dot {
+    width: 8px; height: 8px;
     background: var(--accent); border-radius: 50%;
     animation: pulse 2.5s ease-in-out infinite;
   }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
 
-  /* ── MAIN COLUMN ── */
+  /* ── MAIN ── */
   .main {
     flex: 1;
     overflow-y: auto;
@@ -89,60 +90,42 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 0 40px 140px;
-    text-align: center;
-    gap: 32px;
+    padding: 0 40px 120px;
+    max-width: 860px;
+    gap: 28px;
   }
 
   .landing-eyebrow {
     font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 2px;
+    font-size: 10px;
+    letter-spacing: 2.5px;
     color: var(--muted);
     text-transform: uppercase;
   }
 
   .landing-headline {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(40px, 5.5vw, 72px);
+    font-size: clamp(42px, 5vw, 66px);
     font-weight: 700;
-    line-height: 1.08;
+    line-height: 1.1;
     color: var(--white);
-    max-width: 720px;
   }
   .landing-headline em { color: var(--gold); font-style: italic; }
 
   .landing-sub {
     font-size: 14px;
     color: var(--muted);
-    letter-spacing: 0.3px;
-    line-height: 1.6;
+    letter-spacing: 0.2px;
+    line-height: 1.5;
   }
-
-  .mode-badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 5px 16px;
-    border: 1px solid rgba(0,255,170,0.35);
-    color: var(--accent);
-    background: rgba(0,255,170,0.05);
-    border-radius: 100px;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-  }
-  .mode-badge-dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; }
 
   .prompt-pills {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    max-width: 680px;
+    gap: 8px;
+    margin-top: 4px;
   }
 
   .pill {
@@ -151,32 +134,84 @@
     color: var(--muted);
     font-family: 'DM Sans', sans-serif;
     font-size: 13px;
-    padding: 9px 18px;
+    padding: 8px 18px;
     border-radius: 100px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: left;
-    line-height: 1.3;
+    transition: all 0.18s ease;
+    white-space: nowrap;
   }
-  .pill:hover { border-color: rgba(255,255,255,0.2); color: var(--white); background: rgba(255,255,255,0.03); }
+  .pill:hover { border-color: rgba(255,255,255,0.18); color: var(--white); }
 
-  /* ── CHAT VIEW ── */
+  /* ── MODE SELECTOR ── */
+  .mode-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .mode-selector-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .mode-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .mode-tab {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .mode-tab:hover { border-color: rgba(255,255,255,0.18); color: var(--white); }
+  .mode-tab.active { border-color: rgba(0,255,170,0.4); color: var(--accent); background: rgba(0,255,170,0.05); }
+
+  /* active mode indicator in chat */
+  .chat-mode-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid rgba(0,255,170,0.25);
+    padding: 4px 12px;
+    border-radius: 100px;
+    margin-bottom: 8px;
+  }
+
+  /* ── CHAT ── */
   .chat-view {
     display: none;
     flex-direction: column;
-    max-width: 800px;
     width: 100%;
-    margin: 0 auto;
-    padding: 40px 40px 160px;
-    gap: 32px;
+    max-width: 760px;
+    padding: 48px 40px 140px;
+    gap: 36px;
   }
   .chat-view.visible { display: flex; }
 
-  /* Messages */
-  .msg { display: flex; flex-direction: column; gap: 6px; animation: fadeUp 0.3s ease; }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+  .msg { display: flex; flex-direction: column; gap: 6px; animation: fadeUp 0.28s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(5px)} to{opacity:1;transform:translateY(0)} }
   .msg.user { align-items: flex-end; }
-  .msg.ai { align-items: flex-start; width: 100%; }
+  .msg.ai   { align-items: flex-start; width: 100%; }
 
   .msg-label {
     font-family: 'DM Mono', monospace;
@@ -187,110 +222,138 @@
     padding: 0 2px;
   }
 
-  .msg-bubble {
-    padding: 14px 18px;
+  .msg.user .msg-bubble {
+    border: 1px solid var(--border);
+    color: var(--white);
     font-size: 14px;
-    line-height: 1.7;
+    line-height: 1.65;
+    padding: 12px 18px;
+    max-width: 80%;
     border-radius: 2px;
   }
 
-  .msg.user .msg-bubble {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--white);
-    max-width: 85%;
-  }
-
   .msg.ai .msg-bubble {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--white);
     width: 100%;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--white);
   }
 
-  /* Typing indicator */
-  .typing-wrap {
-    background: var(--surface); border: 1px solid var(--border);
-    padding: 14px 18px; display: flex; gap: 5px; align-items: center; width: 76px;
-  }
-  .t-dot { width: 5px; height: 5px; background: var(--muted); border-radius: 50%; animation: tdot 1.2s ease-in-out infinite; }
-  .t-dot:nth-child(2){animation-delay:0.2s} .t-dot:nth-child(3){animation-delay:0.4s}
-  @keyframes tdot { 0%,60%,100%{transform:translateY(0);opacity:0.3} 30%{transform:translateY(-4px);opacity:1} }
+  /* Typing */
+  .typing-wrap { display: flex; gap: 5px; align-items: center; padding: 14px 0; }
+  .t-dot { width: 4px; height: 4px; background: var(--muted); border-radius: 50%; animation: tdot 1.2s ease-in-out infinite; }
+  .t-dot:nth-child(2){animation-delay:0.18s} .t-dot:nth-child(3){animation-delay:0.36s}
+  @keyframes tdot { 0%,60%,100%{opacity:0.25;transform:translateY(0)} 30%{opacity:1;transform:translateY(-3px)} }
 
-  /* ── RICH RESPONSE FORMATTING ── */
+  /* ── RICH RESPONSE ── */
   .resp-section-title {
     font-family: 'DM Mono', monospace;
     font-size: 9px;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: var(--accent);
-    padding: 18px 0 8px;
+    padding-bottom: 10px;
     border-bottom: 1px solid var(--border);
-    margin-bottom: 16px;
-    margin-top: 28px;
+    margin-bottom: 18px;
+    margin-top: 32px;
   }
-  .resp-section-title:first-child { margin-top: 0; padding-top: 0; }
+  .resp-section-title:first-child { margin-top: 0; }
 
-  .resp-para {
-    font-size: 14px;
-    line-height: 1.8;
-    color: var(--white);
-    margin-bottom: 14px;
-  }
+  .resp-para { font-size: 14px; line-height: 1.8; color: var(--white); margin-bottom: 12px; }
   .resp-para:last-child { margin-bottom: 0; }
+  .resp-spacer { height: 6px; }
 
-  .resp-spacer { height: 8px; }
-
-  /* Stat cards */
   .stat-card {
     display: grid;
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;
-    gap: 2px 16px;
-    padding: 14px 16px;
-    background: rgba(0,255,170,0.03);
-    border: 1px solid rgba(0,255,170,0.12);
-    border-left: 3px solid var(--accent);
-    margin-bottom: 10px;
+    gap: 1px 18px;
+    padding: 16px 18px;
+    background: rgba(0,255,170,0.025);
+    border: 1px solid rgba(0,255,170,0.1);
+    border-left: 2px solid var(--accent);
+    margin-bottom: 8px;
   }
   .stat-number {
     font-family: 'Playfair Display', serif;
-    font-size: 36px;
+    font-size: 38px;
     font-weight: 700;
     color: var(--accent);
     line-height: 1;
     grid-row: 1 / 3;
     align-self: center;
-    min-width: 90px;
+    min-width: 96px;
   }
   .stat-desc { font-size: 13px; color: var(--white); line-height: 1.4; align-self: end; }
-  .stat-source { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); align-self: start; letter-spacing: 0.3px; }
+  .stat-source { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); align-self: start; letter-spacing: 0.3px; margin-top: 2px; }
 
-  /* Lists */
-  .resp-list { list-style: none; padding: 0; margin: 0 0 14px; display: flex; flex-direction: column; gap: 8px; }
-  .resp-list li { font-size: 14px; line-height: 1.7; color: var(--white); padding-left: 18px; position: relative; }
+  .resp-list { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-direction: column; gap: 8px; }
+  .resp-list li { font-size: 14px; line-height: 1.7; color: var(--white); padding-left: 16px; position: relative; }
   .resp-list li::before { content: '—'; position: absolute; left: 0; color: var(--muted); }
   .resp-olist li { padding-left: 0; display: flex; gap: 14px; }
   .resp-olist li::before { display: none; }
-  .list-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); flex-shrink: 0; padding-top: 2px; }
+  .list-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); flex-shrink: 0; padding-top: 2px; min-width: 18px; }
 
-  /* Inline */
   .msg.ai .msg-bubble strong { color: var(--gold); font-weight: 600; }
-  .citation { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.2px; }
+  .citation { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 0.2px; }
 
-  /* ── INPUT BAR ── */
+  /* ── SOURCES TOGGLE ── */
+  .sources-toggle {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .sources-btn {
+    background: none; border: 1px solid var(--border);
+    color: var(--muted); font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 5px 12px; cursor: pointer; border-radius: 100px;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.15s;
+  }
+  .sources-btn:hover { border-color: rgba(255,255,255,0.15); color: var(--white); }
+  .sources-btn.active { border-color: rgba(0,255,170,0.3); color: var(--accent); }
+  .sources-btn svg { width: 10px; height: 10px; transition: transform 0.2s; }
+  .sources-btn.active svg { transform: rotate(180deg); }
+
+  .sources-panel {
+    display: none;
+    margin-top: 14px;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .sources-panel.visible { display: flex; }
+
+  .source-card {
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--muted2);
+  }
+  .source-card-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 5px;
+  }
+  .source-card-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px; color: var(--muted);
+    letter-spacing: 0.3px; line-height: 1.6;
+  }
+  .source-card-detail {
+    font-size: 12px; color: var(--white);
+    opacity: 0.65; line-height: 1.6; margin-top: 5px;
+  }
+
+  /* ── INPUT ── */
   .input-wrapper {
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    padding: 16px 40px 28px;
-    background: linear-gradient(to top, var(--bg) 70%, transparent);
+    padding: 0 40px 32px;
+    background: linear-gradient(to top, var(--bg) 65%, transparent);
   }
 
-  .input-inner {
-    max-width: 800px;
-    margin: 0 auto;
-    position: relative;
-  }
+  .input-inner { max-width: 760px; position: relative; }
 
   .input-box {
     width: 100%;
@@ -299,28 +362,74 @@
     color: var(--white);
     font-family: 'DM Sans', sans-serif;
     font-size: 15px;
-    padding: 16px 56px 16px 20px;
+    padding: 18px 60px 18px 24px;
     resize: none;
     outline: none;
-    min-height: 56px;
+    min-height: 58px;
     max-height: 130px;
     line-height: 1.5;
     transition: border-color 0.2s;
-    border-radius: 4px;
+    border-radius: 100px;
   }
-  .input-box:focus { border-color: rgba(255,255,255,0.2); }
+  .input-box:focus { border-color: rgba(255,255,255,0.15); }
   .input-box::placeholder { color: var(--muted); }
 
+  .upload-btn {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    width: 30px; height: 30px;
+    background: none; border: none;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: var(--muted); transition: color 0.15s; border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .upload-btn:hover { color: var(--white); }
+  .upload-btn.has-file { color: var(--accent); }
+  .upload-btn svg { width: 16px; height: 16px; }
+
+  .input-box {
+    padding-left: 52px !important;
+  }
+
+  .file-chip {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,255,170,0.06);
+    border: 1px solid rgba(0,255,170,0.2);
+    padding: 5px 10px 5px 12px;
+    border-radius: 100px;
+    margin-bottom: 8px;
+    width: fit-content;
+  }
+  .file-chip.visible { display: flex; }
+  .file-chip-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .file-chip-remove {
+    background: none; border: none; cursor: pointer;
+    color: var(--muted); display: flex; align-items: center;
+    padding: 0; transition: color 0.15s;
+  }
+  .file-chip-remove:hover { color: var(--white); }
+  .file-chip-remove svg { width: 12px; height: 12px; }
+
   .send-btn {
-    position: absolute; right: 10px; bottom: 10px;
-    width: 36px; height: 36px;
-    background: var(--gold); border: none; border-radius: 3px;
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    width: 38px; height: 38px;
+    background: var(--gold); border: none; border-radius: 50%;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
     transition: background 0.15s;
   }
   .send-btn:hover { background: #d4b060; }
   .send-btn:disabled { background: var(--muted2); cursor: not-allowed; }
-  .send-btn svg { width: 15px; height: 15px; fill: var(--bg); }
+  .send-btn svg { width: 14px; height: 14px; fill: var(--bg); margin-left: 1px; }
 
   .input-hint {
     text-align: center;
@@ -328,8 +437,8 @@
     font-size: 9px;
     color: var(--muted2);
     letter-spacing: 1px;
-    margin-top: 9px;
     text-transform: uppercase;
+    margin-top: 10px;
   }
 
   ::-webkit-scrollbar { width: 3px; }
@@ -340,13 +449,12 @@
 <body>
 <div class="app">
 
-  <!-- HEADER -->
   <header>
-    <div class="logo">
-      <span>The Pitch Room</span>
-      <span class="logo-sep">|</span>
-      <span class="logo-sub">Rising Ballers Intelligence</span>
-    </div>
+    <a class="logo" href="#" onclick="goHome(); return false;">
+      <span>Culture Plug</span>
+      <div class="logo-rule"></div>
+      <span class="logo-sub">Audience Intelligence</span>
+    </a>
     <div class="header-right">
       <div class="header-stat">
         <div class="header-stat-n">50K+</div>
@@ -356,61 +464,435 @@
         <div class="header-stat-n">5</div>
         <div class="header-stat-l">Data Sources</div>
       </div>
-      <div class="status-pill">
-        <span class="status-dot"></span>
-        LIVE DATA
+      <div class="header-stat">
+        <div class="header-stat-n">Jan 2023 – Aug 2025</div>
+        <div class="header-stat-l">Coverage</div>
       </div>
+      <div class="live-dot"></div>
     </div>
   </header>
 
-  <!-- SCROLLABLE BODY -->
   <div class="main" id="main">
 
-    <!-- LANDING -->
     <div class="landing" id="landing">
       <div class="landing-eyebrow">Rising Ballers × She's A Baller — Internal</div>
       <h1 class="landing-headline">What do you need to know<br><em>before you pitch?</em></h1>
-      <p class="landing-sub">Audience intelligence · pitch briefs · content strategy — grounded in your first-party data</p>
-      <div class="mode-badge"><span class="mode-badge-dot"></span>Pitch Brief</div>
-      <div class="prompt-pills">
-        <button class="pill" onclick="usePill(this)">Generate a Beats headphones pitch brief</button>
-        <button class="pill" onclick="usePill(this)">Nike women's football campaign — SAB audience brief</button>
-        <button class="pill" onclick="usePill(this)">World Cup 2026 — strongest commercial angles</button>
-        <button class="pill" onclick="usePill(this)">5 content series ideas for the SAB audience</button>
-        <button class="pill" onclick="usePill(this)">How does our Gen Z audience discover music?</button>
-        <button class="pill" onclick="usePill(this)">What does our audience think about mental health in football?</button>
+      <p class="landing-sub">Audience data · pitch briefs · content strategy — grounded in your first-party research</p>
+      <div class="mode-selector">
+        <div class="mode-selector-label">Mode</div>
+        <div class="mode-tabs">
+          <button class="mode-tab active" onclick="setMode('pitch', this)">Pitch Brief</button>
+          <button class="mode-tab" onclick="setMode('persona', this)">Audience Persona</button>
+          <button class="mode-tab" onclick="setMode('compare', this)">Audience Comparison</button>
+          <button class="mode-tab" onclick="setMode('campaign', this)">Campaign Naming</button>
+          <button class="mode-tab" onclick="setMode('calendar', this)">Seasonal Calendar</button>
+          <button class="mode-tab" onclick="setMode('exec', this)">Exec Summary</button>
+        </div>
+      </div>
+      <div class="prompt-pills" id="promptPills">
+        <button class="pill" onclick="usePill(this)">World Cup 2026 insights</button>
+        <button class="pill" onclick="usePill(this)">SAB thought-starters for music brand</button>
+        <button class="pill" onclick="usePill(this)">Mental health insights in football</button>
+        <button class="pill" onclick="usePill(this)">Pitch to Apple based on our insights</button>
+        <button class="pill" onclick="usePill(this)">Grassroots insights across men & women</button>
       </div>
     </div>
 
-    <!-- CHAT -->
     <div class="chat-view" id="chatView">
       <div id="messages"></div>
     </div>
 
   </div>
 
-  <!-- INPUT -->
   <div class="input-wrapper">
     <div class="input-inner">
-      <textarea
-        class="input-box"
-        id="inputBox"
-        placeholder="Name a brand or category — e.g. 'Build a pitch brief for Beats by Dre headphones'"
-        rows="1"
-        onkeydown="handleKey(event)"
-        oninput="autoResize(this)"
-      ></textarea>
-      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-        <svg viewBox="0 0 16 16"><path d="M2 8l12-6-5 6 5 6z"/></svg>
-      </button>
+      <div class="file-chip" id="fileChip">
+        <span class="file-chip-name" id="fileChipName"></span>
+        <button class="file-chip-remove" onclick="removeFile()" title="Remove file">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div style="position:relative">
+        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleFile(event)">
+        <button class="upload-btn" id="uploadBtn" onclick="document.getElementById('fileInput').click()" title="Upload a brief">
+          <svg viewBox="0 0 16 16" fill="none">
+            <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3M8 2v8M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <textarea
+          class="input-box"
+          id="inputBox"
+          placeholder="Ask about our audience, or upload a brand brief directly..."
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"
+        ></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg viewBox="0 0 16 16"><path d="M2 8l12-6-5 6 5 6z"/></svg>
+        </button>
+      </div>
     </div>
-    <div class="input-hint">Enter to send &nbsp;·&nbsp; Shift+Enter for new line &nbsp;·&nbsp; Rising Ballers × SAB Internal</div>
   </div>
 
 </div>
 <script>
 let isLoading = false;
 let conversationHistory = [];
+let attachedFile = null;
+let attachedFileContent = '';
+let currentMode = 'pitch';
+
+const MODES = {
+  pitch: {
+    label: 'Pitch Brief',
+    placeholder: "Name a brand or category — e.g. 'Pitch to Beats by Dre'",
+    pills: [
+      'World Cup 2026 insights',
+      'SAB thought-starters for music brand',
+      'Mental health insights in football',
+      'Pitch to Apple based on our insights',
+      'Grassroots insights across men & women'
+    ]
+  },
+  persona: {
+    label: 'Audience Persona',
+    placeholder: "Describe an audience — e.g. 'RB core audience' or 'SAB ultimate fan'",
+    pills: [
+      'RB core audience persona',
+      'SAB ultimate fan persona',
+      'Gen Z grassroots player persona',
+      'World Cup 2026 multi-national fan',
+      'Women\'s football superfan persona'
+    ]
+  },
+  compare: {
+    label: 'Audience Comparison',
+    placeholder: "What to compare — e.g. 'RB vs SAB audience on music'",
+    pills: [
+      'RB vs SAB on music consumption',
+      'RB vs SAB on brand attitudes',
+      'RB vs SAB on social media habits',
+      'Men\'s vs women\'s football fans on gaming',
+      'RB vs SAB on fashion and spending'
+    ]
+  },
+  campaign: {
+    label: 'Campaign Naming',
+    placeholder: "Describe the campaign — e.g. 'Nike women\'s football community activation'",
+    pills: [
+      'Nike women\'s grassroots tournament',
+      'Spotify x EA FC music discovery campaign',
+      'Mental health in football awareness push',
+      'World Cup 2026 multi-national fan series',
+      'Headphones brand tunnel walk content'
+    ]
+  },
+  calendar: {
+    label: 'Seasonal Calendar',
+    placeholder: "Name a brand or category — e.g. 'audio brand activation windows'",
+    pills: [
+      'Best windows for a gaming brand',
+      'Music brand activation calendar',
+      'Women\'s football brand moments 2026',
+      'World Cup 2026 activation timeline',
+      'Fashion brand calendar for RB audience'
+    ]
+  },
+  exec: {
+    label: 'Exec Summary',
+    placeholder: "Any query — response will be condensed to 3 bullets for a CMO",
+    pills: [
+      'Why partner with Rising Ballers',
+      'World Cup 2026 opportunity in 3 bullets',
+      'SAB audience value for a music brand',
+      'Mental health — the commercial case',
+      'RB audience vs mainstream sports media'
+    ]
+  }
+};
+
+const SOURCE_LIBRARY = {
+  'RB IG Insights': {
+    name: 'RB IG Insights Master File',
+    meta: 'Rising Ballers Instagram Newsletter Polls · 50+ topics · N = 10,000–34,000 per topic',
+    detail: 'Ongoing poll series sent to RB Instagram audience. Topics cover gaming, headphones, music, fashion, social media consumption, finance, travel, and more. Data collected 2023–2025.'
+  },
+  'SAB IG Insights': {
+    name: "SAB IG Insights — She's A Baller",
+    meta: "She's A Baller Instagram Newsletter Polls · N = 1,000–4,000 per topic",
+    detail: "Poll series run for the SAB audience. Women's football-skewed. Topics include streaming access, female leadership, brand attitudes, and menstrual health in sport. Data collected 2023–2025."
+  },
+  'Next Wave Vol.1': {
+    name: 'Next Wave Vol.1 — Gen Z Football Manual',
+    meta: 'Quant survey · N = 867 · Fielded 2023',
+    detail: 'In-depth survey of Gen Z football fans aged 16–24. Covers mental health, player relationships, gaming, music discovery, grassroots participation, and media consumption habits. Rising Ballers proprietary research.'
+  },
+  'World Cup Heartbeats': {
+    name: 'World Cup Heartbeats — WC 2026 Quant Study',
+    meta: 'Quant survey · N = 5,237 · Fielded August 2025',
+    detail: 'Pre-tournament study examining how the RB audience plans to engage with World Cup 2026. Covers platform usage, brand receptivity, content preferences, sponsorship attitudes, and multi-national fandom. Largest single RB study to date.'
+  },
+  "Women's Fandom Report": {
+    name: "Women's Fandom Report — SAB Survey",
+    meta: 'Quant survey · N = 1,153 · Fielded 2024',
+    detail: "Survey of women's football fans examining fandom depth, attendance, brand attitudes, ambassador preferences, and streaming behaviour."
+  }
+};
+
+const DATA_CORPUS = `
+RISING BALLERS — FIRST PARTY DATA CORPUS
+
+=== SOURCE 1: RB IG INSIGHTS MASTER FILE ===
+Rising Ballers Instagram newsletter polls. 50+ topics. 10,000–34,000 respondents per topic.
+
+CONSUMPTION & SOCIAL MEDIA:
+- Instagram is go-to platform for 73% to stay up-to-date with football
+- TikTok 14%, X 9%, YouTube 4%
+- 57% follow players more than clubs on social media
+- 58% scroll Instagram while watching a match live on TV
+- 30-second is the optimal video length (58%)
+- 87% prefer brands to do tournament-style events vs pop-up shops
+- 65% of Gen Z consume football content primarily on Instagram
+
+MUSIC & AUDIO:
+- 87% use Spotify (vs 13% Apple Music)
+- Top genres: Hip-hop, Rap, Drill, Afrobeats, Grime, R&B
+- 69% discovered a new song or artist through FIFA/EA FC soundtrack
+- 85% subscribe to a music platform
+- 64% pre-match rituals include music
+
+GAMING:
+- 71% PlayStation vs 29% Xbox
+- 80% play video games (38% daily, 42% a few times a week)
+- 66% game to socialise with friends
+- 59% enjoy watching gaming streamers
+- 85% would follow football if it merged with esports/streaming culture
+
+HEADPHONES:
+- 84% listen via headphones every day or most days
+- 67% say "I can't leave the house without my headphones"
+- 82% want headphones that are good quality AND stylish
+- 31% say player headphone choices influence their purchase
+- 78% say noise cancellation is important
+
+FASHION:
+- 89% buy Nike, adidas, or Puma footwear
+- 92% believe pro footballers express themselves through fashion
+- 56% wear kit tops as casual clothes
+- 36% fast fashion, 31% premium brands
+- 45% spend under £50/month on clothes
+
+FINANCE:
+- 41% use digital banking apps often
+- 39% learn about finances from friends/family; 28% from social media
+- 58% most value "easy transfers" in banking apps
+
+TRAVEL:
+- 56% travel overnight to away games sometimes or always
+- 55% decide next travel destination from friends/family recommendations
+
+SOCIAL:
+- 53% share highlight reels and goals most
+- 43% find polls about teams/players most engaging
+- 49% message friends via Snapchat; 43% Instagram DMs
+
+=== SOURCE 2: SAB INSIGHTS ===
+She's A Baller Instagram newsletter polls. Women's football audience. 1,000–4,000 per topic.
+
+- 58% are "ultimate fans" (follow both men's and women's football)
+- 26% men's-only fans, 16% women's-only fans
+- 73% say the menstrual cycle is DEFINITELY taboo in football
+- 77% say female players don't receive menstrual cycle support
+- ~94% say it's "very important" to see female leaders in football
+- ~92% agree seeing females in football careers shows they can do the same
+- ~87% wish they knew more about how to get involved beyond playing
+- ~87% say brands should do more events for women's football fans
+- ~76% want current female players as brand ambassadors
+- 42% use FA Player as go-to streaming; 29% DAZN
+- 24% met their partner at football
+
+=== SOURCE 3: NEXT WAVE VOL.1 (N=867, 2023) ===
+- 80% follow Rising Ballers — second only to their own club
+- 97.4% agree footballers experience life-impacting pressure
+- 93% believe footballers struggle to speak up about how they feel
+- 73.4% don't believe clubs do enough to support player mental health
+- 82.6% agree football has become more of a business than a sport
+- 57% play football themselves at some level
+- 55% follow their favourite player for personality/personal life — not matchday
+- 69% discovered a new artist through EA FC soundtrack
+- 92% think footballers should express themselves through fashion
+- 85.6% say streaming fees are too high
+- 63% support their club more than national team
+
+=== SOURCE 4: WORLD CUP HEARTBEATS (N=5,237, August 2025) ===
+- 81.1% are 16–24 years old; 85.4% male, 13.5% female
+- 70.1% plan to watch most or all WC 2026 games
+- 85.6% will use Instagram; 69.9% YouTube; 62.7% TikTok
+- 44.2% most engaged by on-pitch performance sponsorships
+- 39.3% most engaged by players in music campaigns
+- 38.6% say football x music is most exciting cross-industry collab for WC 2026
+- 7.1/10 avg: "I can tell when a brand collaboration is forced vs natural"
+- 7.6/10 avg: "Brands should support player wellbeing campaigns for WC 2026"
+- 65.6% want to see street/fan culture from host cities
+- 61.6% support more than one national team
+- 48.2% support a team based on heritage/family background
+- 68.2% more likely to watch because of emerging young talent
+- 16.5% would watch a creator before the official broadcaster
+
+=== SOURCE 5: WOMEN'S FANDOM REPORT (N=1,153, 2024) ===
+- 58% are "ultimate fans" who follow both men's and women's football
+- Arsenal dominates WSL support globally across every region
+- 8% of women's football fans NEVER attend games — vs 69% of men's fans
+- 76% want current female players as brand ambassadors
+- Nike seen as doing most for women's football by 53% of Gen Z
+
+=== DATA CONFIDENCE ===
+STRONG: Headphones, Gaming, Music/Spotify, Social Media, Fashion, Women's Football, Mental Health, World Cup 2026
+MODERATE: Finance, Travel, Nutrition, Streaming preferences
+DATA GAPS: Telecoms, Automotive, Alcohol/FMCG, Betting
+`;
+
+const MODE_PROMPTS = {
+  pitch: `Generate a sharp, data-backed pitch brief using this structure:
+
+## AUDIENCE SNAPSHOT
+3 lines on who the RB/SAB audience is, relevant to this brand.
+
+## KEY DATA
+5–7 stats. Format: - **84%** description [Source, N=xxx]
+
+## THE PITCH
+The argument for the client meeting. Confident prose, 3–5 sentences.
+
+## ACTIVATION ANGLES
+2–3 concrete ideas. Bold each title. 2 sentences max each.
+
+## DATA CONFIDENCE
+One line: STRONG / MODERATE / GAP and why.`,
+
+  persona: `Build a detailed, named audience persona from the data. Structure:
+
+## MEET [NAME]
+One vivid sentence introducing the persona. Make them feel real — name, age, city.
+
+## WHO THEY ARE
+5–6 bullet points on demographics, lifestyle, and football relationship. Cite every stat.
+
+## WHAT THEY CONSUME
+Platforms, formats, music, gaming. Specific and data-backed.
+
+## WHAT THEY BUY
+Spending habits, brand affinities, purchase influencers. Cite sources.
+
+## WHAT THEY BELIEVE
+Cultural values, attitudes to football, mental health, authenticity. Most resonant data points.
+
+## THE COMMERCIAL INSIGHT
+One paragraph: what this persona means for a brand wanting to reach them.`,
+
+  compare: `Compare the two audiences side-by-side. Structure:
+
+## WHAT WE'RE COMPARING
+One sentence on the two audiences and the topic.
+
+## SIDE BY SIDE
+Use this format for each data point — present at least 6 comparisons:
+**[Topic]**
+RB: [stat + source]
+SAB: [stat + source]
+Difference: [one-line interpretation]
+
+## WHAT THE GAP MEANS
+2–3 sentences on what the differences tell a brand about which audience to prioritise for this category, and why.
+
+## THE CALL
+One clear recommendation: which audience is stronger for this specific brand or campaign.`,
+
+  campaign: `Generate campaign name options grounded in the audience data. Structure:
+
+## THE DATA BRIEF
+2–3 stats that define what this campaign should feel like to this audience. Cite sources.
+
+## CAMPAIGN NAMES
+Generate 8–10 name options. For each:
+**[NAME]**
+One line on what it means and which data point it's rooted in.
+
+## TOP 3 RECOMMENDATIONS
+Which 3 names are strongest and why — based on audience resonance, brand fit, and cultural authenticity.
+
+## WHAT TO AVOID
+One short paragraph on naming directions that would feel forced or inauthentic to this audience, based on the data.`,
+
+  calendar: `Build a seasonal activation calendar grounded in the football calendar and audience data. Structure:
+
+## THE AUDIENCE CONTEXT
+2–3 stats on how this audience engages across the football season. Cite sources.
+
+## ACTIVATION WINDOWS
+Map the key moments across the year. For each window:
+**[MONTH/PERIOD — EVENT]**
+Audience mindset at this moment. Best activation format. Data justification.
+
+Cover at least 8 windows across: pre-season, transfer window, UCL/domestic season, international breaks, Women's Super League key moments, World Cup 2026 build-up, tournament, post-tournament.
+
+## PRIORITY TIER
+Rank the top 3 windows for this specific brand category and explain why.
+
+## WHAT TO AVOID
+Windows or moments where this brand would feel out of place with this audience.`,
+
+  exec: `Condense the answer into an executive summary for a CMO or CEO with 2 minutes to read it. Structure:
+
+## THE ONE THING
+One sentence. The single most important finding or argument.
+
+## THREE BULLETS
+Exactly 3 bullet points. Each one: one stat + one implication. No more.
+- **[Stat]** — [what it means for a brand]
+
+## THE ASK
+One sentence: what you want the exec to do or decide based on this.`
+};
+
+function getSystemPrompt(mode, fileCtx) {
+  return `You are Culture Plug — the internal commercial intelligence engine for Rising Ballers, a football media and production company. You have access to Rising Ballers' proprietary first-party data corpus below.
+
+${DATA_CORPUS}
+
+${fileCtx ? `The user has uploaded a brand brief for context:\n${fileCtx}\n` : ''}
+
+${MODE_PROMPTS[mode] || MODE_PROMPTS.pitch}
+
+UNIVERSAL RULES:
+- NEVER invent stats. If no data exists, say DATA GAP.
+- Cite every stat immediately after using it: [Source Name, N=xxx]
+- Bold stat numbers and key phrases using **markdown**
+- Write confidently — this is a culture company, not a research agency
+- Sharp and specific beats long and vague`;
+}
+
+function setMode(mode, btn) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  const m = MODES[mode];
+  document.getElementById('inputBox').placeholder = m.placeholder;
+
+  const pillsEl = document.getElementById('promptPills');
+  pillsEl.innerHTML = m.pills.map(p =>
+    `<button class="pill" onclick="usePill(this)">${p}</button>`
+  ).join('');
+}
+
+function detectSources(text) {
+  const found = [];
+  for (const key of Object.keys(SOURCE_LIBRARY)) {
+    if (text.includes(key)) found.push(key);
+  }
+  return found;
+}
 
 function autoResize(el) {
   el.style.height = 'auto';
@@ -427,6 +909,48 @@ function usePill(btn) {
   sendMessage();
 }
 
+function handleFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  attachedFile = file;
+  const chip = document.getElementById('fileChip');
+  document.getElementById('fileChipName').textContent = file.name;
+  chip.classList.add('visible');
+  document.getElementById('uploadBtn').classList.add('has-file');
+  const reader = new FileReader();
+  reader.onload = e => { attachedFileContent = e.target.result; };
+  if (file.type === 'application/pdf') {
+    attachedFileContent = `[PDF uploaded: ${file.name}]`;
+  } else {
+    reader.readAsText(file);
+  }
+  const inputBox = document.getElementById('inputBox');
+  if (!inputBox.value.trim()) {
+    inputBox.value = 'Build a pitch brief based on the uploaded brief';
+    autoResize(inputBox);
+  }
+  inputBox.focus();
+  event.target.value = '';
+}
+
+function removeFile() {
+  attachedFile = null;
+  attachedFileContent = '';
+  document.getElementById('fileChip').classList.remove('visible');
+  document.getElementById('fileChipName').textContent = '';
+  document.getElementById('uploadBtn').classList.remove('has-file');
+}
+
+function goHome() {
+  document.getElementById('landing').style.display = '';
+  document.getElementById('chatView').classList.remove('visible');
+  document.getElementById('messages').innerHTML = '';
+  conversationHistory = [];
+  document.getElementById('inputBox').value = '';
+  document.getElementById('inputBox').style.height = 'auto';
+  removeFile();
+}
+
 function showChat() {
   document.getElementById('landing').style.display = 'none';
   document.getElementById('chatView').classList.add('visible');
@@ -441,7 +965,7 @@ function addUserMsg(text) {
   showChat();
   const el = document.createElement('div');
   el.className = 'msg user';
-  el.innerHTML = `<div class="msg-label">You</div><div class="msg-bubble">${text.replace(/</g,'&lt;')}</div>`;
+  el.innerHTML = `<div class="msg-label">You</div><div class="msg-bubble">${text.replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>`;
   document.getElementById('messages').appendChild(el);
   scrollBottom();
 }
@@ -449,7 +973,7 @@ function addUserMsg(text) {
 function addTyping() {
   const el = document.createElement('div');
   el.className = 'msg ai'; el.id = 'typing';
-  el.innerHTML = `<div class="msg-label">The Pitch Room</div><div class="typing-wrap"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>`;
+  el.innerHTML = `<div class="chat-mode-badge">${MODES[currentMode].label}</div><div class="msg-label">Culture Plug</div><div class="typing-wrap"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>`;
   document.getElementById('messages').appendChild(el);
   scrollBottom();
 }
@@ -459,13 +983,41 @@ function removeTyping() {
   if (t) t.remove();
 }
 
-function addAIMsg(text) {
+function toggleSources(btn, panelId) {
+  btn.classList.toggle('active');
+  const panel = document.getElementById(panelId);
+  panel.classList.toggle('visible');
+}
+
+function buildSourcesPanel(text, panelId) {
+  const sources = detectSources(text);
+  if (!sources.length) return '';
+  const cards = sources.map(key => {
+    const s = SOURCE_LIBRARY[key];
+    return `<div class="source-card">
+      <div class="source-card-name">${s.name}</div>
+      <div class="source-card-meta">${s.meta}</div>
+      <div class="source-card-detail">${s.detail}</div>
+    </div>`;
+  }).join('');
+  return `<div class="sources-toggle">
+    <button class="sources-btn" onclick="toggleSources(this, '${panelId}')">
+      <svg viewBox="0 0 10 10" fill="none"><path d="M1 3l4 4 4-4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Show sources (${sources.length})
+    </button>
+    <div class="sources-panel" id="${panelId}">${cards}</div>
+  </div>`;
+}
+
+function addAIMsg(text, mode) {
   const el = document.createElement('div');
   el.className = 'msg ai';
   const bubble = document.createElement('div');
   bubble.className = 'msg-bubble';
-  bubble.innerHTML = renderMarkdown(text);
-  el.appendChild(Object.assign(document.createElement('div'), { className: 'msg-label', textContent: 'The Pitch Room' }));
+  const panelId = 'sources-' + Date.now();
+  const modeLabel = MODES[mode] ? `<div class="chat-mode-badge">${MODES[mode].label}</div>` : '';
+  bubble.innerHTML = modeLabel + renderMarkdown(text) + buildSourcesPanel(text, panelId);
+  el.appendChild(Object.assign(document.createElement('div'), { className: 'msg-label', textContent: 'Culture Plug' }));
   el.appendChild(bubble);
   document.getElementById('messages').appendChild(el);
   scrollBottom();
@@ -473,62 +1025,51 @@ function addAIMsg(text) {
 
 function renderMarkdown(text) {
   const lines = text.split('\n');
-  let html = '';
-  let inList = false;
-  let inOrderedList = false;
-
+  let html = '', inList = false, inOrderedList = false;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-
     if (line.startsWith('## ')) {
       if (inList) { html += '</ul>'; inList = false; }
       if (inOrderedList) { html += '</ol>'; inOrderedList = false; }
       html += `<div class="resp-section-title">${line.slice(3)}</div>`;
       continue;
     }
-
-    // Stat cards: - **X%** or - **X.X**
     if ((line.startsWith('- **') && line.includes('%')) || (line.startsWith('- **') && /\*\*\d+\.\d/.test(line))) {
       if (inList) { html += '</ul>'; inList = false; }
       if (inOrderedList) { html += '</ol>'; inOrderedList = false; }
-      const statMatch = line.match(/^- \*\*([^*]+)\*\*\s+(.+?)(?:\s+(\[.+?\]))?$/);
-      if (statMatch) {
-        const num = statMatch[1];
-        const desc = statMatch[2].replace(/\[.+?\]$/, '').trim();
-        const source = line.match(/\[([^\]]+)\]/)?.[0] || '';
-        const sourceText = source ? source.slice(1, -1) : '';
-        html += `<div class="stat-card"><div class="stat-number">${num}</div><div class="stat-desc">${formatInline(desc)}</div>${sourceText ? `<div class="stat-source">${sourceText}</div>` : ''}</div>`;
+      const m = line.match(/^- \*\*([^*]+)\*\*\s+(.+?)(?:\s+(\[.+?\]))?$/);
+      if (m) {
+        const num = m[1];
+        const desc = m[2].replace(/\[.+?\]$/, '').trim();
+        const src = (line.match(/\[([^\]]+)\]/) || ['',''])[0];
+        const srcText = src ? src.slice(1,-1) : '';
+        html += `<div class="stat-card"><div class="stat-number">${num}</div><div class="stat-desc">${formatInline(desc)}</div>${srcText ? `<div class="stat-source">${srcText}</div>` : ''}</div>`;
         continue;
       }
     }
-
     if (line.startsWith('- ')) {
       if (inOrderedList) { html += '</ol>'; inOrderedList = false; }
       if (!inList) { html += '<ul class="resp-list">'; inList = true; }
       html += `<li>${formatInline(line.slice(2))}</li>`;
       continue;
     }
-
-    const numMatch = line.match(/^(\d+)\. (.+)/);
-    if (numMatch) {
+    const nm = line.match(/^(\d+)\. (.+)/);
+    if (nm) {
       if (inList) { html += '</ul>'; inList = false; }
       if (!inOrderedList) { html += '<ol class="resp-list resp-olist">'; inOrderedList = true; }
-      html += `<li><span class="list-num">${numMatch[1]}.</span><span>${formatInline(numMatch[2])}</span></li>`;
+      html += `<li><span class="list-num">${nm[1]}.</span><span>${formatInline(nm[2])}</span></li>`;
       continue;
     }
-
     if (line.trim() === '') {
       if (inList) { html += '</ul>'; inList = false; }
       if (inOrderedList) { html += '</ol>'; inOrderedList = false; }
       html += '<div class="resp-spacer"></div>';
       continue;
     }
-
     if (inList) { html += '</ul>'; inList = false; }
     if (inOrderedList) { html += '</ol>'; inOrderedList = false; }
     html += `<p class="resp-para">${formatInline(line)}</p>`;
   }
-
   if (inList) html += '</ul>';
   if (inOrderedList) html += '</ol>';
   return html;
@@ -544,50 +1085,66 @@ async function sendMessage() {
   const inputBox = document.getElementById('inputBox');
   const sendBtn = document.getElementById('sendBtn');
   const userText = inputBox.value.trim();
-  if (!userText || isLoading) return;
+  if ((!userText && !attachedFile) || isLoading) return;
 
   isLoading = true;
   sendBtn.disabled = true;
+
+  const displayText = attachedFile
+    ? `${userText}${userText ? '\n' : ''}📎 ${attachedFile.name}`
+    : userText;
+
   inputBox.value = '';
   inputBox.style.height = 'auto';
 
-  addUserMsg(userText);
+  const fileCtx = attachedFile
+    ? `Attached brief: "${attachedFile.name}"${attachedFileContent ? '\n\n' + attachedFileContent.slice(0, 3000) : ''}`
+    : '';
+  const modeAtSend = currentMode;
+  removeFile();
+
+  addUserMsg(displayText);
   addTyping();
 
-  await new Promise(r => setTimeout(r, 1500));
-  removeTyping();
+  try {
+    const messages = [
+      ...conversationHistory,
+      { role: 'user', content: (userText || 'Build a pitch brief based on the attached file') + (fileCtx ? '\n\n[ATTACHED BRIEF]\n' + fileCtx : '') }
+    ];
 
-  const q = userText.toLowerCase();
-  let aiText = '';
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-opus-4-6',
+        max_tokens: 2000,
+        system: getSystemPrompt(modeAtSend, fileCtx),
+        messages
+      })
+    });
 
-  if (q.includes('beats') || q.includes('headphone') || q.includes('audio')) {
-    aiText = "## AUDIENCE SNAPSHOT\nFootball-obsessed 16–24 year olds for whom headphones are identity, not just utility. They wear them in the tunnel, on the walk to the pitch, in the gym. Music and football are the same culture for this audience — and they can tell immediately when a brand doesn't belong.\n\n## KEY DATA\n- **84%** listen to music via headphones every day or most days [RB IG Insights — #023 Headphones, N~34K]\n- **67%** say \"I can't leave the house without my headphones\" [RB IG Insights — #023 Headphones, N~34K]\n- **82%** want headphones that are good quality AND look stylish [RB IG Insights — #023 Headphones, N~34K]\n- **31%** say seeing which headphones their favourite players wear influences which brand they buy [RB IG Insights — #023 Headphones, N~34K]\n- **69%** discovered a new artist through the EA FC/FIFA soundtrack [Next Wave Vol.1 — Gen Z Football Manual, N=867]\n- **39%** say player x music campaigns are the most exciting brand activation for World Cup 2026 [World Cup Heartbeats, N=5,237]\n\n## THE PITCH\nThe RB audience has headphones on 84% of all days — and 67% won't leave the house without them. But the real commercial lever is this: 31% say the headphones their favourite players wear directly influences which brand they buy. That's a direct line from player partnership to purchase intent, backed by first-party data from 34,000 respondents. A brand like Beats showing up authentically in player content — tunnel walks, pre-match rituals, post-training clips — isn't a sponsorship. It's a cultural fit.\n\n## ACTIVATION ANGLES\n**1. Pre-Match Ritual Series** — players and grassroots ballers share their actual pre-match playlist and headphone setup. Native to Instagram where 73% of our audience consumes football content [RB IG Insights — Social Media Consumption].\n\n**2. EA FC Soundtrack Partnership** — 69% of our audience discovered music through gaming [Next Wave Vol.1]. A headphones brand that owns the EA FC soundtrack drop moment plugs directly into how this audience finds new music.\n\n**3. World Cup 2026 Tunnel Content** — 39% most excited by player x music campaigns for WC 2026 [World Cup Heartbeats, N=5,237]. Authentic tunnel walk content across the tournament window.\n\n## DATA CONFIDENCE\n**STRONG** — Headphones is one of our richest categories. Large sample (N~34K), corroborated by Gen Z Football Manual (N=867) and World Cup Heartbeats (N=5,237).";
-  } else if (q.includes('nike') || q.includes('women') || q.includes('sab') || q.includes('female')) {
-    aiText = "## AUDIENCE SNAPSHOT\nThe SAB audience is female-skewed, football-obsessed, and chronically underserved by brands. 58% are \"ultimate fans\" who watch both men's and women's football. They attend more, spend more proportionally, and have an extremely high radar for brands that don't take them seriously.\n\n## KEY DATA\n- **58%** are \"ultimate fans\" — follow both men's and women's football [Women's Fandom Report / SAB Survey, N=1,153]\n- **87%** say brands should do more events for women's football fans [SAB IG Insights]\n- **94%** say it's \"very important\" to see female leaders working in football [SAB IG Insights]\n- **76%** want current female players used as brand ambassadors [Women's Fandom Report, N=1,153]\n- **8%** of women's football fans never attend games — vs 69% of men's fans [Women's Fandom Report, N=1,153]\n- **80%** want brand-sponsored tournaments over pop-up shops [SAB IG Insights]\n\n## THE PITCH\nNike already leads in perceived support for women's football — 53% of our Gen Z audience says so [Next Wave Vol.1]. But the SAB audience wants more than awareness campaigns. They want to be treated as the serious football consumers they are. 8% of women's football fans never attend games compared to 69% of men's fans — they are showing up, and they are watching to see whether brands show up too. A campaign that meets them with real players as ambassadors and community-first activations converts belief into loyalty.\n\n## ACTIVATION ANGLES\n**1. Female Ambassador Series** — 76% specifically want current female players as brand ambassadors [Women's Fandom Report]. Players, not celebrities.\n\n**2. Community Tournament** — 80% want brand-sponsored tournaments over pop-ups [SAB IG Insights]. A Nike-backed SAB tournament ties investment directly to grassroots infrastructure.\n\n**3. \"Beyond Playing\" Campaign** — 87% wish they knew more about getting involved in football beyond playing [SAB IG Insights]. A career-in-football content series answers a stated, unmet need.\n\n## DATA CONFIDENCE\n**STRONG** — Women's football fandom is one of our best-researched areas. SAB Survey N=1,153 corroborated by SAB IG Insights across multiple topics.";
-  } else if (q.includes('world cup') || q.includes('2026')) {
-    aiText = "## AUDIENCE SNAPSHOT\nMulti-national, Gen Z, Instagram-first. 81% of our World Cup audience is 16–24. They follow multiple teams, discover content through creators before broadcasters, and have a finely tuned radar for forced brand activations.\n\n## KEY DATA\n- **70%** plan to watch most or all of the 2026 World Cup [World Cup Heartbeats, N=5,237]\n- **85.6%** will follow it via Instagram [World Cup Heartbeats, N=5,237]\n- **61.6%** support more than one national team [World Cup Heartbeats, N=5,237]\n- **7.1/10** average: \"I can tell when a brand collaboration is forced vs natural\" [World Cup Heartbeats, N=5,237]\n- **44.2%** most engaged by on-pitch performance sponsorships [World Cup Heartbeats, N=5,237]\n- **39.3%** most engaged by players featured in music campaigns [World Cup Heartbeats, N=5,237]\n- **65.6%** want to see street and fan culture from the host cities [World Cup Heartbeats, N=5,237]\n\n## THE PITCH\nThe brands that win World Cup 2026 won't be the ones with the biggest spend. They'll be the ones who understood this audience was already watching through creators, group chats, and Instagram Stories — and met them there. A 7.1/10 authenticity score is the brief, not a barrier. It tells you exactly what format the activation needs to take.\n\n## ACTIVATION ANGLES\n**1. Creator-First Coverage** — 16.5% would watch a creator before the official broadcaster during a key WC moment [World Cup Heartbeats]. Commission creator content that runs alongside broadcast, not after it.\n\n**2. Music x Football Moment** — 38.6% say football x music is the most exciting WC 2026 crossover [World Cup Heartbeats]. Player playlist and tunnel content is the brand-friendliest format.\n\n**3. Multi-National Fandom Stories** — 61.6% support more than one team [World Cup Heartbeats]. Content that speaks to hybrid football identity travels across every market simultaneously.\n\n## DATA CONFIDENCE\n**STRONG** — Drawn entirely from World Cup Heartbeats, our largest single study (N=5,237, Aug 2025).";
-  } else if (q.includes('content') || q.includes('series') || q.includes('ideas')) {
-    if (q.includes('sab') || q.includes('women')) {
-      aiText = "## THE DATA CASE\n**94%** of the SAB audience say it's very important to see female leaders in football [SAB IG Insights]. **87%** say brands should do more events for women's football fans [SAB IG Insights]. **58%** are ultimate fans who follow both men's and women's football [Women's Fandom Report, N=1,153].\n\n## CONTENT IDEAS\n1. **\"In The Game\"** — football careers series. 87% wish they knew more about how to get involved in football beyond playing [SAB IG Insights]. Profiles of women working across the industry — scouts, agents, coaches, physios, media. Answers a stated, explicit need.\n\n2. **\"She Rates It\"** — women's football culture show. 94% player content preference among women's-only fans [Women's Fandom Report, N=1,153]. A weekly player-forward show covering WSL moments with personality and cultural context — not match reports.\n\n3. **\"Kit Drop\"** — fashion x women's football. 92% believe footballers should express themselves through fashion [Next Wave Vol.1, N=867]. A series around kit drops, player style, and the crossover between women's football and fashion culture.\n\n4. **\"Safe Space\"** — the topics no one else will touch. 73% say the menstrual cycle is definitely taboo in football [SAB IG Insights]. 77% say female players don't receive adequate cycle support [SAB IG Insights]. Built for trust, not reach.\n\n5. **\"Underdog Atlas\"** — global women's football discovery. Arsenal dominates WSL support across every region [Women's Fandom Report]. Spotlight women's football cultures outside the UK and US.\n\n## THE ANGLE THAT'S MOST DEFENSIBLE\n**\"In The Game\"** — 87% expressing a direct stated need for this content [SAB IG Insights] is as strong a commissioning case as you'll find in the data. It's not inferred demand, it's explicit. Every female-founded business in football is a potential commercial partner.";
+    const data = await response.json();
+    removeTyping();
+
+    if (data.error) {
+      addAIMsg('## ERROR\n' + (data.error.message || 'Something went wrong. Please try again.'), modeAtSend);
     } else {
-      aiText = "## THE DATA CASE\n**55%** of our audience follow their favourite player mainly for personality and personal life content — not matchday clips [Next Wave Vol.1, N=867]. **80%** follow Rising Ballers, second only to their own club [Next Wave Vol.1, N=867]. **73%** consume football content primarily on Instagram [RB IG Insights — Consumption].\n\n## CONTENT IDEAS\n1. **\"Grassroots Diaries\"** — player journey series. 57% of our audience play football themselves at some level [Next Wave Vol.1, N=867]. A raw first-person diary following three players — grassroots, academy, semi-pro — across a full season.\n\n2. **\"The Pressure\"** — mental health documentary series. 97.4% agree footballers experience life-impacting pressure [Next Wave Vol.1, N=867]. Go further than any club will officially go. The trust-building content in the slate.\n\n3. **\"Off The Pitch\"** — player personality interview format. 55% follow players for personality and personal life [Next Wave Vol.1]. Not a press junket — players talking music, gaming, fashion, identity in their own voice.\n\n4. **\"Football x Music\"** — cultural crossover series. 69% discovered music through EA FC [Next Wave Vol.1]. 38.6% say football x music is the most exciting WC 2026 crossover [World Cup Heartbeats, N=5,237]. The commercial intersection that brands most want to own.\n\n5. **\"The Weekly Drop\"** — audience opinion show. 43% find polls about teams and players the most engaging interactive content [RB IG Insights — Social Currency]. Our community's opinions as editorial, not just engagement metrics.\n\n## THE ANGLE THAT'S MOST DEFENSIBLE\n**\"Football x Music\"** is corroborated by three separate sources: Next Wave Vol.1, RB IG Insights, and World Cup Heartbeats. Highest commercial potential in the slate — and the most brand-friendly format to build partnership revenue around.";
+      const aiText = data.content[0].text;
+      conversationHistory.push({ role: 'user', content: userText || 'Build a pitch brief' });
+      conversationHistory.push({ role: 'assistant', content: aiText });
+      addAIMsg(aiText, modeAtSend);
     }
-  } else if (q.includes('music') || q.includes('spotify') || q.includes('discover')) {
-    aiText = "## AUDIENCE SNAPSHOT\nMusic and football are inseparable for this audience. 87% are on Spotify. 69% have found a new artist through an EA FC soundtrack. Pre-match ritual is the second major discovery window — and World Cup 2026 is the biggest music x football activation moment in a generation.\n\n## KEY DATA\n- **87%** use Spotify as their primary music platform [RB IG Insights — Consumption, N~35K]\n- **69%** discovered a new artist through the EA FC/FIFA game soundtrack [Next Wave Vol.1 — Gen Z Football Manual, N=867]\n- **64%** include music in their pre-match preparation ritual [Next Wave Vol.1, N=867]\n- **39.3%** say players featured in music campaigns are the most exciting WC 2026 brand activation [World Cup Heartbeats, N=5,237]\n- **38.6%** say football x music performance is the most exciting cross-industry collab for WC 2026 [World Cup Heartbeats, N=5,237]\n\n## THE PITCH\nMusic discovery for this audience runs through football — not playlists, not algorithmic recommendations. 69% have found a new artist through the EA FC soundtrack alone [Next Wave Vol.1]. Platform consolidation is near-total at 87% Spotify [RB IG Insights]. Any brand in audio or streaming has an extremely warm, large-sample audience here — and the EA FC / pre-match ritual route is a concrete, underused activation channel that bypasses traditional ad formats entirely.\n\n## ACTIVATION ANGLES\n**1. EA FC Soundtrack Moment** — 69% discover music via gaming [Next Wave Vol.1]. A brand that owns this discovery window reaches the audience at peak music attention.\n\n**2. Pre-Match Playlist Series** — 64% include music in pre-match ritual [Next Wave Vol.1]. Player and grassroots playlist content owns a habitual, recurring moment.\n\n**3. World Cup 2026 Music Campaign** — 39.3% most excited by player x music campaigns for WC 2026 [World Cup Heartbeats]. The single highest-scoring non-performance sponsorship category.\n\n## DATA CONFIDENCE\n**HIGH** — Music data corroborated across RB IG Insights (N~35K), Next Wave Vol.1 (N=867), and World Cup Heartbeats (N=5,237).";
-  } else if (q.includes('mental health') || q.includes('wellbeing') || q.includes('pressure')) {
-    aiText = "## AUDIENCE SNAPSHOT\nThis audience doesn't view mental health in football as a niche issue — it's mainstream, high-conviction, and commercially open. 97.4% agree footballers experience life-impacting pressure. They're not observers. 57% play themselves.\n\n## KEY DATA\n- **97.4%** agree footballers experience a level of pressure that impacts their life in and outside football [Next Wave Vol.1 — Gen Z Football Manual, N=867]\n- **93%** believe footballers struggle to speak up about how they feel [Next Wave Vol.1, N=867]\n- **73.4%** don't believe clubs do enough to support player mental health [Next Wave Vol.1, N=867]\n- **7.6/10** average: \"Brands should support player wellbeing campaigns as part of WC 2026 strategy\" [World Cup Heartbeats, N=5,237]\n- **82.6%** agree football has become more of a business than a sport [Next Wave Vol.1, N=867]\n\n## THE PITCH\n97.4% agreement is one of the highest scores in our entire data corpus — and it comes from 867 verified respondents [Next Wave Vol.1]. The audience doesn't just care about player mental health in the abstract — they relate to it. They've played. They know the pressure. And the World Cup 2026 data shows they're actively inviting brands into this conversation: 7.6/10 average for brands supporting player wellbeing campaigns. That's audience permission, in numbers.\n\n## ACTIVATION ANGLES\n**1. \"The Pressure\" Documentary Series** — go further than any club will officially go. 93% believe footballers can't speak up [Next Wave Vol.1]. Give them the platform.\n\n**2. World Cup 2026 Wellbeing Campaign** — 7.6/10 audience appetite for brands in this space [World Cup Heartbeats]. The window is open and explicitly data-backed.\n\n**3. Grassroots Mental Health Content** — 57% of RB audience play football themselves [Next Wave Vol.1]. Content that speaks to grassroots pressure, not just elite, lands with the full audience.\n\n## DATA CONFIDENCE\n**STRONG** — Highest agreement scores in the entire corpus. Multiple corroborating sources across different study cohorts.";
-  } else {
-    aiText = "## AUDIENCE SNAPSHOT\nRising Ballers reaches 16–24 year olds who are football-first but culture-wide. 80% follow RB on social media — second only to their own club [Next Wave Vol.1, N=867]. They play grassroots, stream daily, game on PlayStation, and wear kit off the pitch. They live inside football culture, they don't observe it.\n\n## KEY DATA\n- **80%** of Gen Z football audience follow Rising Ballers — 2nd only to their own club [Next Wave Vol.1, N=867]\n- **73%** use Instagram as their primary football content platform [RB IG Insights — Consumption]\n- **81.1%** of our World Cup audience is 16–24 [World Cup Heartbeats, N=5,237]\n- **7.1/10**: \"I can tell when a brand collaboration is forced vs natural\" [World Cup Heartbeats, N=5,237]\n- **87%** use Spotify as their music platform [RB IG Insights — Consumption, N~35K]\n- **80%** play video games — 38% daily [RB IG Insights — Gaming, N~46K]\n- **92%** believe footballers should express themselves through fashion [Next Wave Vol.1, N=867]\n\n## THE PITCH\nThis audience has an extremely high authenticity filter — 7.1/10 for detecting forced brand collabs [World Cup Heartbeats]. That's not a barrier, that's a brief. A brand that earns genuine placement in Rising Ballers content isn't buying reach. They're buying trust from an audience that is actively resistant to being sold to, and responds powerfully when something feels real.\n\n## ACTIVATION ANGLES\n**1. Player-First Integration** — 55% follow players mainly for personality and personal life [Next Wave Vol.1]. Brand moments that live inside authentic player content outperform all traditional ad formats.\n\n**2. World Cup 2026 Window** — 70% plan to watch most or all games [World Cup Heartbeats]. A tournament-anchored campaign gives the brand a cultural moment, not just a media buy.\n\n**3. Grassroots Presence** — 57% of our audience play football themselves [Next Wave Vol.1]. Brands that show up at pitch level register as culturally credible in a way stadium LED boards never will.\n\n## DATA CONFIDENCE\n**STRONG** — Core audience data is robust across multiple large-sample sources.";
+  } catch (err) {
+    removeTyping();
+    addAIMsg('## CONNECTION ERROR\nCould not reach the server. Please check your connection and try again.', modeAtSend);
   }
 
-  conversationHistory.push({ role: 'user', content: userText });
-  conversationHistory.push({ role: 'assistant', content: aiText });
-
-  addAIMsg(aiText);
-
   isLoading = false;
-  document.getElementById('sendBtn').disabled = false;
+  sendBtn.disabled = false;
 }
+
+// Initialise pills on load
+setMode('pitch', document.querySelector('.mode-tab.active'));
 </script>
 </body>
 </html>
