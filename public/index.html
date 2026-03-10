@@ -162,20 +162,6 @@
     text-transform: uppercase;
   }
 
-  .pill-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .pill-group-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 8px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
-
   .mode-tabs {
     display: flex;
     flex-wrap: wrap;
@@ -199,6 +185,20 @@
   }
   .mode-tab:hover { border-color: rgba(255,255,255,0.18); color: var(--white); }
   .mode-tab.active { border-color: rgba(0,255,170,0.4); color: var(--accent); background: rgba(0,255,170,0.05); }
+
+  .pill-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pill-group-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
 
   /* active mode indicator in chat */
   .chat-mode-badge {
@@ -379,7 +379,7 @@
     color: var(--white);
     font-family: 'DM Sans', sans-serif;
     font-size: 15px;
-    padding: 18px 60px 18px 24px;
+    padding: 18px 60px 18px 52px;
     resize: none;
     outline: none;
     min-height: 58px;
@@ -403,60 +403,39 @@
   .upload-btn.has-file { color: var(--accent); }
   .upload-btn svg { width: 16px; height: 16px; }
 
-  .input-box {
-    padding-left: 52px !important;
-  }
-
   .file-chip {
     display: none;
     align-items: center;
     gap: 8px;
-    background: rgba(0,255,170,0.06);
+    background: rgba(0,255,170,0.08);
     border: 1px solid rgba(0,255,170,0.2);
-    padding: 5px 10px 5px 12px;
     border-radius: 100px;
+    padding: 5px 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
     margin-bottom: 8px;
     width: fit-content;
   }
   .file-chip.visible { display: flex; }
-  .file-chip-name {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    color: var(--accent);
-    letter-spacing: 0.5px;
-    max-width: 300px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
   .file-chip-remove {
     background: none; border: none; cursor: pointer;
-    color: var(--muted); display: flex; align-items: center;
-    padding: 0; transition: color 0.15s;
+    color: var(--accent); opacity: 0.6;
+    display: flex; align-items: center; padding: 0;
   }
-  .file-chip-remove:hover { color: var(--white); }
-  .file-chip-remove svg { width: 12px; height: 12px; }
+  .file-chip-remove:hover { opacity: 1; }
+  .file-chip-remove svg { width: 10px; height: 10px; }
 
   .send-btn {
-    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-    width: 38px; height: 38px;
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px;
     background: var(--gold); border: none; border-radius: 50%;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s;
+    transition: opacity 0.15s;
   }
-  .send-btn:hover { background: #d4b060; }
-  .send-btn:disabled { background: var(--muted2); cursor: not-allowed; }
-  .send-btn svg { width: 14px; height: 14px; fill: var(--bg); margin-left: 1px; }
-
-  .input-hint {
-    text-align: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    color: var(--muted2);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-top: 10px;
-  }
+  .send-btn:hover { opacity: 0.85; }
+  .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .send-btn svg { width: 14px; height: 14px; fill: #0e0e0c; }
 
   ::-webkit-scrollbar { width: 3px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -541,7 +520,7 @@
         <textarea
           class="input-box"
           id="inputBox"
-          placeholder="Ask about our audience, or upload a brand brief directly..."
+          placeholder="Name a brand or category — e.g. 'Pitch to Beats by Dre'"
           rows="1"
           onkeydown="handleKey(event)"
           oninput="autoResize(this)"
@@ -581,29 +560,18 @@ const MODES = {
       'SAB ultimate fan persona',
       'Gen Z grassroots player persona',
       'World Cup 2026 multi-national fan',
-      'Women\'s football superfan persona'
+      "Women's football superfan persona"
     ]
   },
   compare: {
     label: 'Audience Comparison',
-    placeholder: "What to compare — e.g. 'RB vs SAB audience on music'",
+    placeholder: "What to compare — e.g. 'RB vs SAB demographics across platforms'",
     pills: [
-      'RB vs SAB on music consumption',
-      'RB vs SAB on brand attitudes',
-      'RB vs SAB on social media habits',
-      'Men\'s vs women\'s football fans on gaming',
-      'RB vs SAB on fashion and spending'
-    ]
-  },
-  campaign: {
-    label: 'Campaign Naming',
-    placeholder: "Describe the campaign — e.g. 'Nike women\'s football community activation'",
-    pills: [
-      'Nike women\'s grassroots tournament',
-      'Spotify x EA FC music discovery campaign',
-      'Mental health in football awareness push',
-      'World Cup 2026 multi-national fan series',
-      'Headphones brand tunnel walk content'
+      'RB vs SAB gender split across platforms',
+      'RB Instagram vs TikTok demographics',
+      'RB vs SAB age breakdown',
+      'RB vs SAB top countries comparison',
+      'Combined RB + SAB audience overview'
     ]
   },
   calendar: {
@@ -612,7 +580,7 @@ const MODES = {
     pills: [
       'Best windows for a gaming brand',
       'Music brand activation calendar',
-      'Women\'s football brand moments 2026',
+      "Women's football brand moments 2026",
       'World Cup 2026 activation timeline',
       'Fashion brand calendar for RB audience'
     ]
@@ -655,6 +623,11 @@ const SOURCE_LIBRARY = {
     name: "Women's Fandom Report — SAB Survey",
     meta: 'Quant survey · N = 1,153 · Fielded 2024',
     detail: "Survey of women's football fans examining fandom depth, attendance, brand attitudes, ambassador preferences, and streaming behaviour."
+  },
+  'Sprout Social Demographics': {
+    name: 'Sprout Social Audience Demographics — Jan–Mar 2026',
+    meta: 'Live platform data · RB Instagram (N=2,981,789) · SAB Instagram (N=265,129) · RB TikTok (N=6,162,025) · SAB TikTok (N=128,941)',
+    detail: 'First-party audience demographics exported from Sprout Social. Covers gender split, age distribution (Instagram only), top countries and top cities across four channels: Rising Ballers Instagram, She\'s A Baller Instagram, Rising Ballers TikTok, She\'s A Baller TikTok. Data as of January–10 March 2026.'
   }
 };
 
@@ -765,8 +738,202 @@ She's A Baller Instagram newsletter polls. Women's football audience. 1,000–4,
 - 76% want current female players as brand ambassadors
 - Nike seen as doing most for women's football by 53% of Gen Z
 
+=== SOURCE 6: SPROUT SOCIAL AUDIENCE DEMOGRAPHICS (Jan–10 Mar 2026) ===
+Live platform audience data across four channels. Use this for demographic, geographic, and gender questions.
+Always specify which channel(s) data is from. Keep RB and SAB separate unless asked to combine.
+
+--- RISING BALLERS INSTAGRAM (N = 2,981,789 followers) ---
+AGE DISTRIBUTION:
+- 13–17: 8.7% (259,415)
+- 18–24: 39.4% (1,174,824) ← largest cohort
+- 25–34: 35.7% (1,064,498)
+- 35–44: 10.3% (307,124)
+- 45–54: 3.9% (116,289)
+- 55–64: 1.0% (29,817)
+- 65+: 1.0% (29,817)
+- Core 18–34 cohort: 75.1% (2,239,322)
+
+GENDER SPLIT:
+- Men: 66.5% (1,982,889)
+- Women: 5.5% (163,998)
+- Nonbinary/Unspecified: 28.0% (834,900)
+NOTE: The 28% Nonbinary/Unspecified is a platform artefact — Instagram allows users to skip gender. True male skew is likely higher.
+
+TOP COUNTRIES:
+1. United Kingdom: 592,096 (19.9%)
+2. United States: 263,200 (8.8%)
+3. Nigeria: 148,665 (5.0%)
+4. Indonesia: 113,881 (3.8%)
+5. India: 87,097 (2.9%)
+6. South Africa: 73,977 (2.5%)
+7. Brazil: 71,548 (2.4%)
+8. Ghana: 65,101 (2.2%)
+9. Kenya: 61,503 (2.1%)
+10. Germany: 57,724 (1.9%)
+11. Tanzania: 57,019 (1.9%)
+12. Senegal: 52,904 (1.8%)
+13. Morocco: 50,615 (1.7%)
+14. Algeria: 47,977 (1.6%)
+15. Australia: 47,734 (1.6%)
+16. Italy: 43,866 (1.5%)
+17. Netherlands: 43,635 (1.5%)
+18. Ireland: 42,580 (1.4%)
+19. Canada: 42,487 (1.4%)
+20. Egypt: 39,386 (1.3%)
+21. France: 36,975 (1.2%)
+22. Spain: 30,648 (1.0%)
+23. Turkey: 28,911 (1.0%)
+24. Malaysia: 28,103 (0.9%)
+25. Sweden: 27,232 (0.9%)
+26. Poland: 26,264 (0.9%)
+27. Iraq: 25,585 (0.9%)
+28. Mexico: 22,561 (0.8%)
+29. Iran: 21,750 (0.7%)
+30. Portugal: 20,007 (0.7%)
+
+TOP CITIES:
+1. London, England: 62,879 (2.1%)
+2. Lagos, Nigeria: 49,749 (1.7%)
+3. Dar es Salaam, Tanzania: 34,097 (1.1%)
+4. Nairobi, Kenya: 28,084 (0.9%)
+5. Accra, Ghana: 27,296 (0.9%)
+6. Dakar, Senegal: 22,206 (0.7%)
+7. Kumasi, Ghana: 19,757 (0.7%)
+8. Jakarta, Indonesia: 15,820 (0.5%)
+9. Cape Town, South Africa: 14,830 (0.5%)
+10. Abuja, Nigeria: 13,954 (0.5%)
+11. Sydney, Australia: 12,302 (0.4%)
+12. Dublin, Ireland: 11,989 (0.4%)
+13. New York, USA: 11,769 (0.4%)
+14. Birmingham, England: 11,406 (0.4%)
+15. Melbourne, Australia: 11,048 (0.4%)
+16. Cairo, Egypt: 10,835 (0.4%)
+17. Algiers, Algeria: 10,754 (0.4%)
+18. Casablanca, Morocco: 10,709 (0.4%)
+19. Dubai, UAE: 10,172 (0.3%)
+20. Istanbul, Turkey: 9,339 (0.3%)
+21. Manchester, England: 9,236 (0.3%)
+22. Abidjan, Ivory Coast: 9,139 (0.3%)
+23. Kampala, Uganda: 8,317 (0.3%)
+24. Singapore: 8,280 (0.3%)
+25. Liverpool, England: 8,226 (0.3%)
+
+--- SHE'S A BALLER INSTAGRAM (N = 265,129 followers) ---
+AGE DISTRIBUTION:
+- 13–17: 6.9% (18,293)
+- 18–24: 27.8% (73,705)
+- 25–34: 32.5% (86,166) ← largest cohort
+- 35–44: 18.0% (47,723)
+- 45–54: 9.6% (25,452)
+- 55–64: 3.5% (9,279)
+- 65+: 1.7% (4,507)
+- Core 18–34 cohort: 60.3% (159,871)
+- SAB audience is notably older than RB IG: 25–34 is peak vs 18–24 for RB
+
+GENDER SPLIT:
+- Men: 33.5% (88,818)
+- Women: 39.6% (104,991)
+- Nonbinary/Unspecified: 26.9% (71,319)
+- SAB is the only RB/SAB channel with majority female-identifying audience
+
+TOP COUNTRIES:
+1. United Kingdom: 97,450 (36.8%)
+2. United States: 33,984 (12.8%)
+3. Australia: 10,208 (3.9%)
+4. Nigeria: 7,446 (2.8%)
+5. Germany: 7,001 (2.6%)
+6. India: 5,485 (2.1%)
+7. Ireland: 5,101 (1.9%)
+8. Canada: 4,789 (1.8%)
+9. Netherlands: 4,121 (1.6%)
+10. Brazil: 3,669 (1.4%)
+11. Sweden: 3,657 (1.4%)
+12. Indonesia: 3,538 (1.3%)
+13. South Africa: 3,281 (1.2%)
+14. Spain: 3,067 (1.2%)
+15. Kenya: 3,008 (1.1%)
+16. France: 2,943 (1.1%)
+17. Italy: 2,812 (1.1%)
+18. Ghana: 2,800 (1.1%)
+19. Mexico: 2,104 (0.8%)
+20. Tanzania: 2,066 (0.8%)
+
+TOP CITIES:
+1. London, England: 11,235 (4.2%)
+2. Sydney, Australia: 2,666 (1.0%)
+3. Lagos, Nigeria: 2,570 (1.0%)
+4. Melbourne, Australia: 2,028 (0.8%)
+5. Dublin, Ireland: 1,406 (0.5%)
+6. Birmingham, England: 1,379 (0.5%)
+7. Manchester, England: 1,374 (0.5%)
+8. New York, USA: 1,279 (0.5%)
+9. Nairobi, Kenya: 1,234 (0.5%)
+10. Dar es Salaam, Tanzania: 1,206 (0.5%)
+11. Accra, Ghana: 1,180 (0.4%)
+12. Sheffield, England: 1,057 (0.4%)
+13. Kumasi, Ghana: 951 (0.4%)
+14. Leeds, England: 928 (0.4%)
+15. Brighton, England: 909 (0.3%)
+
+--- RISING BALLERS TIKTOK (N = 6,162,025 followers) ---
+NOTE: TikTok does not provide age breakdown via Sprout Social export.
+
+GENDER SPLIT:
+- Men: 78.0% (4,806,379)
+- Women: 21.0% (1,294,025)
+- Nonbinary/Unspecified: 1.0% (61,620)
+- Strongest male skew of all four channels
+
+TOP COUNTRIES:
+1. United Kingdom: 4,202,501 (68.2%) ← dominant — TikTok is a heavily UK-focused channel for RB
+2. United States: 579,230 (9.4%)
+3. South Africa: 382,046 (6.2%)
+4. Germany: 160,213 (2.6%)
+5. Ghana: 135,565 (2.2%)
+6. Nigeria: 129,403 (2.1%)
+7. Senegal: 123,241 (2.0%)
+8. Indonesia: 117,078 (1.9%)
+9. Brazil: 104,754 (1.7%)
+10. Kenya: 98,592 (1.6%)
+
+--- SHE'S A BALLER TIKTOK (N = 128,941 followers) ---
+NOTE: TikTok does not provide age breakdown via Sprout Social export.
+
+GENDER SPLIT:
+- Men: 51.0% (65,759)
+- Women: 48.0% (61,891)
+- Nonbinary/Unspecified: 1.0% (1,289)
+- Most gender-balanced channel across the whole RB/SAB network
+
+TOP COUNTRIES:
+1. United Kingdom: 29,270 (22.7%)
+2. United States: 13,410 (10.4%)
+3. Australia: 2,837 (2.2%)
+4. Ghana: 2,837 (2.2%)
+5. Germany: 2,708 (2.1%)
+6. Ireland: 2,063 (1.6%)
+7. Kenya: 1,934 (1.5%)
+8. South Africa: 1,934 (1.5%)
+9. France: 1,805 (1.4%)
+10. Nigeria: 1,805 (1.4%)
+
+--- COMBINED TOTALS (all four channels) ---
+Total combined reach: 9,537,884 followers
+- RB combined (IG + TT): 9,143,814
+- SAB combined (IG + TT): 394,070
+- Instagram combined (RB + SAB): 3,246,918
+- TikTok combined (RB + SAB): 6,290,966
+
+COMBINED GENDER (weighted across all 4 channels):
+- Men: ~74% (platform-weighted estimate)
+- Women: ~18%
+- Nonbinary/Unspecified: ~8%
+
+UK IS #1 MARKET ACROSS ALL CHANNELS. Second market varies: USA on IG, South Africa on RB TikTok.
+African markets (Nigeria, Ghana, Kenya, South Africa, Senegal, Tanzania) are consistently top 10 across RB channels.
+
 === DATA CONFIDENCE ===
-STRONG: Headphones, Gaming, Music/Spotify, Social Media, Fashion, Women's Football, Mental Health, World Cup 2026
+STRONG: Headphones, Gaming, Music/Spotify, Social Media, Fashion, Women's Football, Mental Health, World Cup 2026, Audience Demographics (Sprout Social live data)
 MODERATE: Finance, Travel, Nutrition, Streaming preferences
 DATA GAPS: Telecoms, Automotive, Alcohol/FMCG, Betting
 `;
@@ -809,39 +976,30 @@ Cultural values, attitudes to football, mental health, authenticity. Most resona
 ## THE COMMERCIAL INSIGHT
 One paragraph: what this persona means for a brand wanting to reach them.`,
 
-  compare: `Compare the two audiences side-by-side. Structure:
+  compare: `Compare the two audiences or channels side-by-side. This mode handles both:
+(a) RB vs SAB attitudinal/behavioural comparisons (using poll data)
+(b) Platform/demographic comparisons across RB IG, SAB IG, RB TikTok, SAB TikTok (using Sprout Social data)
+(c) Combined views when the user asks for a full picture across all channels
+
+Structure:
 
 ## WHAT WE'RE COMPARING
-One sentence on the two audiences and the topic.
+One sentence on the audiences/channels and the topic.
 
 ## SIDE BY SIDE
 Use this format for each data point — present at least 6 comparisons:
 **[Topic]**
-RB: [stat + source]
-SAB: [stat + source]
+RB [channel]: [stat + source]
+SAB [channel]: [stat + source]
 Difference: [one-line interpretation]
 
+For demographic comparisons, always specify the channel (IG vs TikTok). Note any platform-specific caveats (e.g. age data Instagram-only; RB TikTok's extreme UK concentration at 68.2%).
+
 ## WHAT THE GAP MEANS
-2–3 sentences on what the differences tell a brand about which audience to prioritise for this category, and why.
+2–3 sentences on what the differences tell a brand about audience selection, channel strategy, or campaign targeting.
 
 ## THE CALL
-One clear recommendation: which audience is stronger for this specific brand or campaign.`,
-
-  campaign: `Generate campaign name options grounded in the audience data. Structure:
-
-## THE DATA BRIEF
-2–3 stats that define what this campaign should feel like to this audience. Cite sources.
-
-## CAMPAIGN NAMES
-Generate 8–10 name options. For each:
-**[NAME]**
-One line on what it means and which data point it's rooted in.
-
-## TOP 3 RECOMMENDATIONS
-Which 3 names are strongest and why — based on audience resonance, brand fit, and cultural authenticity.
-
-## WHAT TO AVOID
-One short paragraph on naming directions that would feel forced or inauthentic to this audience, based on the data.`,
+One clear recommendation: which audience/channel is stronger for this specific brief, and why.`,
 
   calendar: `Build a seasonal activation calendar grounded in the football calendar and audience data. Structure:
 
@@ -888,17 +1046,24 @@ UNIVERSAL RULES:
 - Cite every stat immediately after using it: [Source Name, N=xxx]
 - Bold stat numbers and key phrases using **markdown**
 - Write confidently — this is a culture company, not a research agency
-- Sharp and specific beats long and vague`;
+- Sharp and specific beats long and vague
+
+DEMOGRAPHICS RULES (apply whenever the question touches audience size, gender, age, geography, or platform):
+- Always specify WHICH channel the data is from (RB IG / SAB IG / RB TikTok / SAB TikTok)
+- Keep RB and SAB data separate unless the user explicitly asks to combine them
+- When combining is requested, use the combined totals section and label clearly
+- For gender: note the Nonbinary/Unspecified caveat on Instagram (platform artefact, not a real signal)
+- For geographic questions: distinguish between IG and TikTok if the pattern differs (e.g. RB TikTok is 68% UK — much more concentrated than RB IG at 20% UK)
+- Age data is Instagram-only; TikTok does not export age breakdowns via Sprout Social
+- Cite all demographic data as [Sprout Social Demographics, Jan–Mar 2026]`;
 }
 
 function setMode(mode, btn) {
   currentMode = mode;
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
   if (btn) btn.classList.add('active');
-
   const m = MODES[mode];
   document.getElementById('inputBox').placeholder = m.placeholder;
-
   const pillsEl = document.getElementById('promptPills');
   pillsEl.innerHTML = m.pills.map(p =>
     `<button class="pill" onclick="usePill(this)">${p}</button>`
@@ -907,8 +1072,23 @@ function setMode(mode, btn) {
 
 function detectSources(text) {
   const found = [];
-  for (const key of Object.keys(SOURCE_LIBRARY)) {
-    if (text.includes(key)) found.push(key);
+  const sourceMap = {
+    'RB IG Insights': 'RB IG Insights',
+    'SAB IG Insights': 'SAB IG Insights',
+    'Next Wave Vol.1': 'Next Wave Vol.1',
+    'Next Wave': 'Next Wave Vol.1',
+    'World Cup Heartbeats': 'World Cup Heartbeats',
+    "Women's Fandom Report": "Women's Fandom Report",
+    'Sprout Social Demographics': 'Sprout Social Demographics',
+    'Sprout Social': 'Sprout Social Demographics',
+    'Jan–Mar 2026': 'Sprout Social Demographics',
+  };
+  const added = new Set();
+  for (const [keyword, sourceKey] of Object.entries(sourceMap)) {
+    if (text.includes(keyword) && !added.has(sourceKey)) {
+      found.push(sourceKey);
+      added.add(sourceKey);
+    }
   }
   return found;
 }
