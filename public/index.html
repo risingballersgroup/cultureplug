@@ -44,9 +44,10 @@
   }
 
   .logo {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    font-style: italic;
     color: var(--white);
     display: flex;
     align-items: center;
@@ -83,6 +84,7 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    align-items: center;
   }
 
   /* ── LANDING ── */
@@ -90,16 +92,18 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    padding: 0 40px 120px;
-    max-width: 860px;
-    gap: 28px;
+    padding: 0 40px 100px;
+    max-width: 760px;
+    margin: 0 auto;
+    gap: 20px;
+    text-align: center;
   }
 
   .landing-eyebrow {
     font-family: 'DM Mono', monospace;
-    font-size: 10px;
+    font-size: 9px;
     letter-spacing: 2.5px;
     color: var(--muted);
     text-transform: uppercase;
@@ -107,15 +111,15 @@
 
   .landing-headline {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(42px, 5vw, 66px);
+    font-size: clamp(32px, 3.8vw, 50px);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.15;
     color: var(--white);
   }
   .landing-headline em { color: var(--gold); font-style: italic; }
 
   .landing-sub {
-    font-size: 14px;
+    font-size: 13px;
     color: var(--muted);
     letter-spacing: 0.2px;
     line-height: 1.5;
@@ -124,8 +128,8 @@
   .prompt-pills {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 4px;
+    gap: 7px;
+    justify-content: center;
   }
 
   .pill {
@@ -133,8 +137,8 @@
     border: 1px solid var(--border);
     color: var(--muted);
     font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    padding: 8px 18px;
+    font-size: 12px;
+    padding: 7px 16px;
     border-radius: 100px;
     cursor: pointer;
     transition: all 0.18s ease;
@@ -146,22 +150,16 @@
   .mode-selector {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 4px;
+    gap: 0;
   }
 
-  .mode-selector-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-  }
+  .mode-selector-label { display: none; }
 
   .mode-tabs {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 5px;
+    justify-content: center;
   }
 
   .mode-tab {
@@ -169,10 +167,10 @@
     border: 1px solid var(--border);
     color: var(--muted);
     font-family: 'DM Mono', monospace;
-    font-size: 9px;
+    font-size: 8px;
     letter-spacing: 1.2px;
     text-transform: uppercase;
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 100px;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -351,9 +349,11 @@
     bottom: 0; left: 0; right: 0;
     padding: 0 40px 32px;
     background: linear-gradient(to top, var(--bg) 65%, transparent);
+    display: flex;
+    justify-content: center;
   }
 
-  .input-inner { max-width: 760px; position: relative; }
+  .input-inner { max-width: 760px; width: 100%; position: relative; }
 
   .input-box {
     width: 100%;
