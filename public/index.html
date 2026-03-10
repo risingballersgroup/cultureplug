@@ -16,7 +16,16 @@
     --white: #f0ede6;
     --muted: #8a8880;
     --muted2: #2e2d29;
+    --pink: #ffb3c6;
   }
+
+  /* ── DEMOGRAPHICS / PINK THEME ── */
+  .theme-pink .resp-section-title { color: var(--pink); border-bottom-color: rgba(255,179,198,0.2); }
+  .theme-pink .stat-card { background: rgba(255,179,198,0.03); border-color: rgba(255,179,198,0.12); border-left-color: var(--pink); }
+  .theme-pink .stat-number { color: var(--pink); }
+  .theme-pink .sources-btn.active { border-color: rgba(255,179,198,0.35); color: var(--pink); }
+  .theme-pink .source-card-name { color: var(--pink); }
+  .theme-pink .chat-mode-badge { color: var(--pink); border-color: rgba(255,179,198,0.3); }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1213,6 +1222,14 @@ function addAIMsg(text, mode) {
   el.className = 'msg ai';
   const bubble = document.createElement('div');
   bubble.className = 'msg-bubble';
+
+  // Apply pink theme for demographic/Sprout Social responses
+  const isDemographic = text.includes('Sprout Social') || text.includes('Jan–Mar 2026') ||
+    text.includes('RB Instagram') || text.includes('SAB Instagram') ||
+    text.includes('RB TikTok') || text.includes('SAB TikTok') ||
+    (mode === 'compare' && (text.includes('%') && (text.includes('follower') || text.includes('gender') || text.includes('country') || text.includes('age'))));
+  if (isDemographic) bubble.classList.add('theme-pink');
+
   const panelId = 'sources-' + Date.now();
   const modeLabel = MODES[mode] ? `<div class="chat-mode-badge">${MODES[mode].label}</div>` : '';
   bubble.innerHTML = modeLabel + renderMarkdown(text) + buildSourcesPanel(text, panelId);
