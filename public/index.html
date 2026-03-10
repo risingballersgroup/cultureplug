@@ -27,6 +27,7 @@
   .theme-pink .source-card-name { color: var(--pink); }
   .theme-pink .chat-mode-badge { color: var(--pink); border-color: rgba(255,179,198,0.3); }
   .theme-pink strong { color: var(--pink); }
+  .theme-pink .list-num { color: var(--pink); }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -320,6 +321,7 @@
   .list-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); flex-shrink: 0; padding-top: 2px; min-width: 18px; }
 
   .msg.ai .msg-bubble strong { color: var(--gold); font-weight: 600; }
+  .msg.ai .msg-bubble.theme-pink strong { color: var(--pink); }
   .citation { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 0.2px; }
 
   /* ── SOURCES TOGGLE ── */
@@ -381,6 +383,67 @@
   }
 
   .input-inner { max-width: 760px; width: 100%; position: relative; }
+
+  /* ── MARKDOWN TABLES ── */
+  .resp-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .resp-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    font-weight: 400;
+  }
+  .resp-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--white);
+    line-height: 1.5;
+  }
+  .resp-table tr:last-child td { border-bottom: none; }
+  .resp-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .theme-pink .resp-table th { color: rgba(255,179,198,0.5); }
+  .theme-pink .resp-table td strong { color: var(--pink); }
+
+  /* ── ACTIVE BRIEF CHIP ── */
+  .brief-bar {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .brief-bar.visible { display: flex; }
+  .brief-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 100px;
+    padding: 5px 10px 5px 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .brief-chip-label { opacity: 0.5; margin-right: 4px; }
+  .brief-chip-remove {
+    background: none; border: none; cursor: pointer;
+    color: var(--gold); opacity: 0.5;
+    display: flex; align-items: center; padding: 0;
+    transition: opacity 0.15s;
+  }
+  .brief-chip-remove:hover { opacity: 1; }
+  .brief-chip-remove svg { width: 9px; height: 9px; }
 
   .input-box {
     width: 100%;
@@ -492,6 +555,7 @@
           <button class="mode-tab" onclick="setMode('compare', this)">Audience Comparison</button>
           <button class="mode-tab" onclick="setMode('calendar', this)">Seasonal Calendar</button>
           <button class="mode-tab" onclick="setMode('exec', this)">Exec Summary</button>
+          <button class="mode-tab" onclick="setMode('objection', this)">Objection Handler</button>
         </div>
       </div>
       <div class="pill-group">
@@ -514,6 +578,15 @@
 
   <div class="input-wrapper">
     <div class="input-inner">
+      <div class="brief-bar" id="briefBar">
+        <div class="brief-chip">
+          <span class="brief-chip-label">Brief</span>
+          <span id="briefChipName"></span>
+          <button class="brief-chip-remove" onclick="clearActiveBrief()" title="Clear brief">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
       <div class="file-chip" id="fileChip">
         <span class="file-chip-name" id="fileChipName"></span>
         <button class="file-chip-remove" onclick="removeFile()" title="Remove file">
@@ -549,6 +622,7 @@ let conversationHistory = [];
 let attachedFile = null;
 let attachedFileContent = '';
 let currentMode = 'pitch';
+let activeBrief = null; // { brand, context } — persists across messages
 
 const MODES = {
   pitch: {
@@ -604,6 +678,17 @@ const MODES = {
       'SAB audience value for a music brand',
       'Mental health — the commercial case',
       'RB audience vs mainstream sports media'
+    ]
+  },
+  objection: {
+    label: 'Objection Handler',
+    placeholder: "Paste a client objection — e.g. 'Your audience is too niche for us'",
+    pills: [
+      "Your audience is too young / niche",
+      "We already work with Copa90 / VERSUS",
+      "We don't have budget for content partnerships",
+      "Can you prove your audience actually buys?",
+      "Women's football isn't mainstream enough yet"
     ]
   }
 };
@@ -1039,15 +1124,39 @@ Exactly 3 bullet points. Each one: one stat + one implication. No more.
 - **[Stat]** — [what it means for a brand]
 
 ## THE ASK
-One sentence: what you want the exec to do or decide based on this.`
+One sentence: what you want the exec to do or decide based on this.`,
+
+  objection: `You are handling a live sales objection. The user will paste something a client or prospect has said that pushes back on working with Rising Ballers or She's A Baller. Your job is to return a sharp, data-backed rebuttal they can use in the room.
+
+Structure:
+
+## THE OBJECTION
+Restate the objection in one line, cleanly.
+
+## THE REBUTTAL
+2–3 sentences. Confident, direct. Don't hedge. This is what the commercial team says out loud.
+
+## THE DATA BEHIND IT
+3–5 stats that back up the rebuttal. Format: - **[stat]** [what it proves] [Source, N=xxx]
+Choose the most surprising or irrefutable data points. Prioritise stats the client wouldn't expect.
+
+## THE TURN
+One sentence that flips the objection into an opportunity — ending the rebuttal on the front foot.
+
+## IF THEY PUSH BACK AGAIN
+One pre-emptive response to the most likely follow-up objection.`
 };
 
 function getSystemPrompt(mode, fileCtx) {
+  const briefCtx = activeBrief
+    ? `ACTIVE BRIEF CONTEXT: The user is currently pitching to / focused on "${activeBrief.brand}". Keep this brand in mind throughout the conversation unless they explicitly ask about something else. Reference it naturally.\n`
+    : '';
+
   return `You are Culture Plug — the internal commercial intelligence engine for Rising Ballers, a football media and production company. You have access to Rising Ballers' proprietary first-party data corpus below.
 
 ${DATA_CORPUS}
 
-${fileCtx ? `The user has uploaded a brand brief for context:\n${fileCtx}\n` : ''}
+${briefCtx}${fileCtx ? `The user has uploaded a brand brief for context:\n${fileCtx}\n` : ''}
 
 ${MODE_PROMPTS[mode] || MODE_PROMPTS.pitch}
 
@@ -1066,6 +1175,34 @@ DEMOGRAPHICS RULES (apply whenever the question touches audience size, gender, a
 - For geographic questions: distinguish between IG and TikTok if the pattern differs (e.g. RB TikTok is 68% UK — much more concentrated than RB IG at 20% UK)
 - Age data is Instagram-only; TikTok does not export age breakdowns via Sprout Social
 - Cite all demographic data as [Sprout Social Demographics, Jan–Mar 2026]`;
+}
+
+function setActiveBrief(brand) {
+  activeBrief = { brand };
+  document.getElementById('briefChipName').textContent = brand;
+  document.getElementById('briefBar').classList.add('visible');
+}
+
+function clearActiveBrief() {
+  activeBrief = null;
+  document.getElementById('briefBar').classList.remove('visible');
+  document.getElementById('briefChipName').textContent = '';
+}
+
+function detectBrandFromQuery(text) {
+  // Patterns: "pitch to X", "brief for X", "pitching X", "pitch X"
+  const patterns = [
+    /pitch(?:ing)? (?:to |for )?([A-Z][A-Za-z0-9 &'\.]+?)(?:\s+based|\s+using|\s+with|$)/,
+    /brief for ([A-Z][A-Za-z0-9 &'\.]+?)(?:\s+based|\s+using|\s+with|$)/,
+    /for ([A-Z][A-Za-z0-9 &'\.]+?) (?:pitch|brief|deck|campaign)/i,
+  ];
+  for (const p of patterns) {
+    const m = text.match(p);
+    if (m && m[1] && m[1].trim().length > 1 && m[1].trim().length < 40) {
+      return m[1].trim();
+    }
+  }
+  return null;
 }
 
 function setMode(mode, btn) {
@@ -1158,6 +1295,7 @@ function goHome() {
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').style.height = 'auto';
   removeFile();
+  clearActiveBrief();
 }
 
 function showChat() {
@@ -1242,9 +1380,44 @@ function addAIMsg(text, mode) {
 
 function renderMarkdown(text) {
   const lines = text.split('\n');
-  let html = '', inList = false, inOrderedList = false;
+  let html = '', inList = false, inOrderedList = false, inTable = false, tableHeaders = [];
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+
+    // ── TABLE DETECTION ──
+    // Header row: | col | col |
+    if (line.trim().startsWith('|') && line.trim().endsWith('|')) {
+      const nextLine = lines[i + 1] || '';
+      const isHeader = nextLine.trim().match(/^\|[\s\-|]+\|$/);
+
+      if (isHeader && !inTable) {
+        // Close any open lists
+        if (inList) { html += '</ul>'; inList = false; }
+        if (inOrderedList) { html += '</ol>'; inOrderedList = false; }
+        // Parse headers
+        tableHeaders = line.split('|').map(c => c.trim()).filter(Boolean);
+        html += '<table class="resp-table"><thead><tr>';
+        tableHeaders.forEach(h => { html += `<th>${formatInline(h)}</th>`; });
+        html += '</tr></thead><tbody>';
+        inTable = true;
+        i++; // skip separator line
+        continue;
+      }
+
+      if (inTable) {
+        // Skip separator lines
+        if (line.trim().match(/^\|[\s\-|]+\|$/)) continue;
+        const cells = line.split('|').map(c => c.trim()).filter(Boolean);
+        html += '<tr>';
+        cells.forEach(c => { html += `<td>${formatInline(c)}</td>`; });
+        html += '</tr>';
+        continue;
+      }
+    } else if (inTable) {
+      html += '</tbody></table>';
+      inTable = false;
+    }
     if (line.startsWith('## ')) {
       if (inList) { html += '</ul>'; inList = false; }
       if (inOrderedList) { html += '</ol>'; inOrderedList = false; }
@@ -1289,6 +1462,7 @@ function renderMarkdown(text) {
   }
   if (inList) html += '</ul>';
   if (inOrderedList) html += '</ol>';
+  if (inTable) html += '</tbody></table>';
   return html;
 }
 
@@ -1322,6 +1496,12 @@ async function sendMessage() {
 
   addUserMsg(displayText);
   addTyping();
+
+  // Detect brand from query and set active brief if not already set
+  if (!activeBrief && userText) {
+    const detected = detectBrandFromQuery(userText);
+    if (detected) setActiveBrief(detected);
+  }
 
   try {
     const messages = [
