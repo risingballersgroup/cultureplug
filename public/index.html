@@ -520,38 +520,40 @@
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     position: relative; overflow: hidden;
+    padding-bottom: 60px;
   }
   .login-eyebrow {
     font-family: 'DM Mono', monospace; font-size: 11px;
     letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 32px;
+    color: var(--accent); margin-bottom: 28px;
   }
   .login-headline {
     font-family: 'Playfair Display', serif;
-    font-size: clamp(42px, 7vw, 84px);
-    font-weight: 700; line-height: 1.05;
+    font-size: 56px;
+    font-weight: 700; line-height: 1.08;
     color: var(--white); text-align: center;
-    max-width: 780px; margin-bottom: 20px;
+    max-width: 720px; margin-bottom: 18px;
   }
   .login-headline em {
     font-style: italic; color: var(--gold);
   }
   .login-sub {
-    font-family: 'DM Sans', sans-serif; font-size: 15px;
-    color: var(--muted); text-align: center; margin-bottom: 52px;
-    max-width: 400px; line-height: 1.6;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--muted); text-align: center; margin-bottom: 48px;
+    max-width: 380px; line-height: 1.6;
   }
   .login-btn {
     display: flex; align-items: center; gap: 10px;
-    background: var(--white); color: #1a1a1a;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-    padding: 14px 28px; border-radius: 8px; text-decoration: none;
-    transition: opacity 0.15s; margin-bottom: 20px;
+    background: var(--surface); color: var(--white);
+    border: 1px solid var(--border);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    padding: 13px 28px; border-radius: 40px; text-decoration: none;
+    transition: border-color 0.15s; margin-bottom: 16px;
   }
-  .login-btn:hover { opacity: 0.88; }
+  .login-btn:hover { border-color: var(--muted); }
   .login-domain {
     font-family: 'DM Mono', monospace; font-size: 11px;
-    letter-spacing: 0.06em; color: var(--muted); opacity: 0.6;
+    letter-spacing: 0.06em; color: var(--muted); opacity: 0.5;
   }
   .login-error {
     margin-top: 16px; font-family: 'DM Sans', sans-serif;
@@ -559,22 +561,16 @@
   }
   .login-stats {
     position: absolute; bottom: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: center;
+    gap: 48px; padding: 16px 0;
     border-top: 1px solid var(--border);
-    display: flex; align-items: stretch;
   }
   .login-stat {
-    flex: 1; padding: 20px 0; text-align: center;
-    border-right: 1px solid var(--border);
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted);
   }
-  .login-stat:last-child { border-right: none; }
-  .login-stat-n {
-    font-family: 'Playfair Display', serif; font-size: 22px;
-    color: var(--white); margin-bottom: 4px;
-  }
-  .login-stat-l {
-    font-family: 'DM Mono', monospace; font-size: 10px;
-    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
-  }
+  .login-stat span { color: var(--white); margin-right: 6px; }
 
   /* ── USER CHIP ── */
   .user-chip {
@@ -610,10 +606,10 @@
     <p class="login-domain">@risingballers.co.uk accounts only</p>
     <p id="loginError" class="login-error" style="display:none"></p>
     <div class="login-stats">
-      <div class="login-stat"><div class="login-stat-n">50K+</div><div class="login-stat-l">Respondents</div></div>
-      <div class="login-stat"><div class="login-stat-n">6</div><div class="login-stat-l">Data Sources</div></div>
-      <div class="login-stat"><div class="login-stat-n">Jan 2023</div><div class="login-stat-l">Coverage Start</div></div>
-      <div class="login-stat"><div class="login-stat-n">Live</div><div class="login-stat-l">Updated</div></div>
+      <div class="login-stat"><span>50K+</span>Respondents</div>
+      <div class="login-stat"><span>6</span>Data Sources</div>
+      <div class="login-stat"><span>Jan 2023</span>Coverage Start</div>
+      <div class="login-stat"><span>Live</span>Updated</div>
     </div>
   </div>
 </div>
