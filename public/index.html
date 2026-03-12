@@ -556,6 +556,7 @@
           <button class="mode-tab" onclick="setMode('calendar', this)">Seasonal Calendar</button>
           <button class="mode-tab" onclick="setMode('exec', this)">Exec Summary</button>
           <button class="mode-tab" onclick="setMode('objection', this)">Objection Handler</button>
+          <button class="mode-tab" onclick="setMode('email', this)">Initial Email</button>
         </div>
       </div>
       <div class="pill-group">
@@ -689,6 +690,17 @@ const MODES = {
       "We don't have budget for content partnerships",
       "Can you prove your audience actually buys?",
       "Women's football isn't mainstream enough yet"
+    ]
+  },
+  email: {
+    label: 'Initial Email',
+    placeholder: "Name a brand — e.g. 'Apple Music' or 'Adidas US team'",
+    pills: [
+      'Apple Music',
+      'Beats by Dre',
+      'Nike US',
+      'PlayStation',
+      'Spotify'
     ]
   }
 };
@@ -1144,7 +1156,23 @@ Choose the most surprising or irrefutable data points. Prioritise stats the clie
 One sentence that flips the objection into an opportunity — ending the rebuttal on the front foot.
 
 ## IF THEY PUSH BACK AGAIN
-One pre-emptive response to the most likely follow-up objection.`
+One pre-emptive response to the most likely follow-up objection.`,
+
+  email: `Write a short, personalised cold outreach email from Rising Ballers to the brand the user names. This email should feel like it was written by a real person, not generated — conversational, direct, with a warm but confident tone.
+
+RULES:
+- Do NOT use subject lines, headers, bullet points, or bold text — write it as plain flowing prose like a real email
+- Maximum 120 words in the body. Shorter is better. Every sentence must earn its place.
+- Sound like a person who knows their worth, not a pitch deck
+- Namedrop one or two things the brand is doing well right now — show you've done your homework
+- Include exactly ONE audience insight from the data that is genuinely relevant to what this brand cares about
+- Mention our reach naturally — frame it as "100 million+ across our network" or similar, don't make it the headline
+- One line on who our audience is (age, culture, platform — keep it tight)
+- End with a single low-friction closing line — not "I look forward to hearing from you", something more human
+- Sign off: Best, / [Name] / Rising Ballers
+- Leave [Name] as a placeholder
+
+Do not explain what you're doing. Just write the email.`
 };
 
 function getSystemPrompt(mode, fileCtx) {
