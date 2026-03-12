@@ -598,7 +598,7 @@
   <div class="login-wrap">
     <p class="login-eyebrow">Rising Ballers &times; She's A Baller &mdash; Internal</p>
     <h1 class="login-headline">What do you need to know<br><em>before you pitch?</em></h1>
-    <p class="login-sub">Audience intelligence, data-backed pitch tools, and commercial insights &mdash; for Rising Ballers team only.</p>
+    <p class="login-sub">Audience intelligence, data-backed pitch tools, and commercial insights — for Certified employees only.</p>
     <a href="/auth/login" class="login-btn">
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.5" height="9.5" fill="#F25022"/><rect x="10.5" width="9.5" height="9.5" fill="#7FBA00"/><rect y="10.5" width="9.5" height="9.5" fill="#00A4EF"/><rect x="10.5" y="10.5" width="9.5" height="9.5" fill="#FFB900"/></svg>
       Sign in
@@ -653,13 +653,13 @@
       <div class="mode-selector">
         <div class="mode-selector-label">Mode</div>
         <div class="mode-tabs">
-          <button class="mode-tab active" onclick="setMode('pitch', this)">Pitch Brief</button>
+          <button class="mode-tab active" onclick="setMode('email', this)">Initial Email</button>
+          <button class="mode-tab" onclick="setMode('pitch', this)">Pitch Brief</button>
           <button class="mode-tab" onclick="setMode('persona', this)">Audience Persona</button>
           <button class="mode-tab" onclick="setMode('compare', this)">Audience Comparison</button>
           <button class="mode-tab" onclick="setMode('calendar', this)">Seasonal Calendar</button>
           <button class="mode-tab" onclick="setMode('exec', this)">Exec Summary</button>
           <button class="mode-tab" onclick="setMode('objection', this)">Objection Handler</button>
-          <button class="mode-tab" onclick="setMode('email', this)">Initial Email</button>
         </div>
       </div>
       <div class="pill-group">
@@ -1806,7 +1806,7 @@ async function sendMessage() {
 }
 
 // Initialise pills on load
-setMode('pitch', document.querySelector('.mode-tab.active'));
+setMode('email', document.querySelector('.mode-tab.active'));
 
 // ── AUTH INIT ──
 (async () => {
