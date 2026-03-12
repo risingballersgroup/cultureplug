@@ -1163,11 +1163,12 @@ One pre-emptive response to the most likely follow-up objection.`,
 RULES:
 - Do NOT use subject lines, headers, bullet points, or bold text — plain prose only
 - Maximum 100 words in the body. Ruthlessly short.
-- Open with one casual line saying you love what they're doing lately — NO specific campaign names, just a genuine nod e.g. "love what you've been doing lately" or "been following the direction you're taking the brand"
+- Always open with "Hey team," on its own line
+- Follow with one casual line saying you love what they're doing lately — NO specific campaign names, just a genuine nod e.g. "love what you've been doing lately" or "been following the direction you're taking the brand"
 - Do NOT introduce Rising Ballers by name or say "We're Rising Ballers" — it's inferred from the sign-off. Jump straight into the value.
 - Get to the point fast: we reach 100M+ football fans, here's one sharp data insight that's directly relevant to this brand's world
 - One tight line on the audience: age, culture, where they live online
-- SOCIAL PROOF: If existing client context is provided below, weave in ONE relevant brand name naturally — e.g. "we've done similar work with [Brand]" — keep it to one name, don't list them, don't make it a boast
+- SOCIAL PROOF: If existing client context is provided below, use it to name 2–3 clients from different categories — the mix should feel intentional e.g. "We've done similar culture-led work with the likes of Nike, EA Sports & Whoop." Never name a direct competitor of the brand being pitched. Variety beats category match — a sports brand, a tech brand, a lifestyle brand is more impressive than three sportswear names.
 - End with something low-key — "open to a chat?" or "worth a quick call?" — not corporate
 - Sign off: Best, / [Name] / Rising Ballers
 - Leave [Name] as a placeholder
@@ -1248,99 +1249,54 @@ const EXISTING_CLIENTS = [
 
 function getSocialProof(brandName) {
   if (!brandName) return '';
-
-  // Direct match — don't suggest the brand itself
   const name = brandName.toLowerCase();
 
-  // Category mapping for the prospect — rough inference from brand name keywords
-  const categoryKeywords = {
-    'Gaming':             ['game','gaming','esport','console','playstation','xbox','activision','ea ','fifa','steam','epic','valorant'],
-    'Audio & Tech':       ['beats','bose','sony','jbl','audio','headphone','sennheiser','jabra','marshall'],
-    'Sportswear':         ['nike','adidas','puma','under armour','new balance','umbro','hummel','kappa','fila','reebok'],
-    'Fashion & Apparel':  ['fashion','apparel','clothing','streetwear','supreme','palace','stone island','ralph','tommy','levis'],
-    'Food & Drink':       ['food','drink','restaurant','burger','pizza','chicken','snack','chocolate','cereal','sauce','coffee','energy drink'],
-    'Alcohol':            ['beer','lager','whisky','whiskey','gin','vodka','rum','wine','brewery','distillery','heineken','carlsberg','corona'],
-    'Tech & Platforms':   ['google','youtube','tiktok','meta','instagram','twitter','snapchat','discord','twitch','microsoft','samsung'],
-    'Music & Entertainment': ['music','record','label','spotify','apple music','amazon music','deezer','universal','sony music','warner','tidal','soundcloud'],
-    'Media & Broadcasting': ['media','tv','broadcast','streaming','channel','netflix','prime','disney','hbo','espn','dazn'],
-    'Finance':            ['bank','finance','fintech','payment','card','crypto','insurance','invest','money','loan','revolut','monzo'],
-    'Telecoms':           ['telecom','mobile','network','sim','broadband','o2','vodafone','three','bt','t-mobile','verizon','sprint'],
-    'Retail':             ['retail','store','shop','marketplace','ecommerce','amazon','asos','zalando','sports direct','jd'],
-    'Sports & Football':  ['football','soccer','league','club','fc','united','city','sport','athletic','bundesliga','serie a','ligue'],
-    'Sports Tech':        ['stats','performance','tracker','wearable','analytics','kit','training','coaching'],
-    'FMCG':               ['fmcg','consumer goods','health','nutrition','supplement','protein','hygiene','beauty','skincare'],
-  };
+  // Exclude the brand itself
+  const eligible = EXISTING_CLIENTS.filter(c => c.name.toLowerCase() !== name);
 
-  // Find matching category for the prospect
-  let matchedCategory = null;
-  for (const [cat, keywords] of Object.entries(categoryKeywords)) {
-    if (keywords.some(k => name.includes(k))) {
-      matchedCategory = cat;
-      break;
+  // Never suggest a direct competitor
+  const COMPETITOR_PAIRS = [
+    ['Nike','adidas'],['Nike','Puma'],['Nike','Under Armour'],['Nike','New Balance'],
+    ['adidas','Puma'],['adidas','Under Armour'],['adidas','New Balance'],
+    ['Puma','Under Armour'],['Puma','New Balance'],
+    ['PlayStation','Xbox'],
+    ['Guinness','Asahi'],['Guinness','Jameson'],['Asahi','Jameson'],
+    ['Google','YouTube'],['Google','TikTok'],
+    ["McDonald's",'Subway'],["McDonald's","Nando's"],["McDonald's",'Wingstop'],
+    ['Sky Sports','TNT Sports'],['Sky Sports','BBC'],
+    ['EA Sports','Activision'],['EA Sports','Football Manager'],
+  ];
+  const isCompetitor = (a, b) => COMPETITOR_PAIRS.some(p =>
+    (p[0].toLowerCase()===a && p[1].toLowerCase()===b) ||
+    (p[1].toLowerCase()===a && p[0].toLowerCase()===b)
+  );
+
+  const safe = eligible.filter(c => !isCompetitor(name, c.name.toLowerCase()));
+  if (safe.length === 0) return '';
+
+  // Pick 3 from different categories — prioritise recognisable household names
+  const TIER1 = ['Nike','adidas','EA Sports','PlayStation','Google','TikTok','Netflix','Mastercard','Guinness',"McDonald's",'Universal','Premier League','YouTube','Unilever','The FA'];
+  const TIER2 = ['Under Armour','New Balance','Puma','Sky Sports','JBL','Whoop','Just Eat',"Nando's",'Red Bull Leipzig','MLS','NFL','Hollister','Ugg','JD Sports','Chelsea FC'];
+
+  const picked = [];
+  const usedCategories = new Set();
+
+  for (const n of [...TIER1, ...TIER2]) {
+    if (picked.length >= 3) break;
+    const client = safe.find(c => c.name === n);
+    if (client && !usedCategories.has(client.category)) {
+      picked.push(client);
+      usedCategories.add(client.category);
     }
   }
 
-  // Find clients in same category, excluding the prospect itself
-  const sameCategory = EXISTING_CLIENTS.filter(c =>
-    c.category === matchedCategory &&
-    c.name.toLowerCase() !== name
-  );
+  if (picked.length === 0) return '';
 
-  // Also find adjacent categories for softer proof
-  const adjacentMap = {
-    'Gaming':             ['Audio & Tech', 'Tech & Platforms'],
-    'Audio & Tech':       ['Gaming', 'Music & Entertainment'],
-    'Sportswear':         ['Fashion & Apparel', 'Retail', 'Sports & Football'],
-    'Fashion & Apparel':  ['Sportswear', 'Retail'],
-    'Food & Drink':       ['Alcohol', 'FMCG'],
-    'Alcohol':            ['Food & Drink'],
-    'Tech & Platforms':   ['Gaming', 'Media & Broadcasting', 'Music & Entertainment'],
-    'Music & Entertainment': ['Tech & Platforms', 'Audio & Tech'],
-    'Media & Broadcasting': ['Tech & Platforms', 'Sports & Football'],
-    'Finance':            ['Telecoms', 'Tech & Platforms'],
-    'Telecoms':           ['Finance', 'Tech & Platforms'],
-    'Retail':             ['Sportswear', 'Fashion & Apparel'],
-    'Sports & Football':  ['Sportswear', 'Sports Tech', 'Media & Broadcasting'],
-    'Sports Tech':        ['Sports & Football', 'Sportswear'],
-    'FMCG':               ['Food & Drink', 'Alcohol'],
-  };
+  const names = picked.map(c => c.name);
+  const listStr = names.length === 1 ? names[0]
+    : names.slice(0,-1).join(', ') + ' & ' + names[names.length-1];
 
-  const adjacentCats = (adjacentMap[matchedCategory] || []);
-  const adjacentClients = EXISTING_CLIENTS.filter(c =>
-    adjacentCats.includes(c.category) &&
-    c.name.toLowerCase() !== name
-  );
-
-  // Never suggest a direct competitor as social proof
-  const COMPETITOR_PAIRS = [
-    ['Nike', 'adidas'], ['Nike', 'Puma'], ['adidas', 'Puma'],
-    ['PlayStation', 'Xbox'], ['Guinness', 'Asahi'], ['Guinness', 'Jameson'],
-    ['Google', 'YouTube'], // YouTube is Google
-  ];
-  const isCompetitor = (a, b) => COMPETITOR_PAIRS.some(pair =>
-    (pair[0].toLowerCase() === a && pair[1].toLowerCase() === b) ||
-    (pair[1].toLowerCase() === a && pair[0].toLowerCase() === b)
-  );
-
-  if (sameCategory.length > 0) {
-    const priority = ['Nike','adidas','PlayStation','EA Sports','Google','TikTok','YouTube','Netflix','Mastercard','Guinness',"McDonald's",'Premier League','Universal','JBL','Unilever'];
-    const best = sameCategory
-      .filter(c => !isCompetitor(name, c.name.toLowerCase()))
-      .find(c => priority.includes(c.name)) ||
-      sameCategory.find(c => !isCompetitor(name, c.name.toLowerCase()));
-    if (!best) return '';
-    return `SOCIAL PROOF CONTEXT: "${best.name}" is an existing Rising Ballers client in the same category (${matchedCategory}). You can naturally reference working with them — one mention only, woven into the email, not a boast.`;
-  } else if (adjacentClients.length > 0) {
-    const priority = ['Nike','adidas','PlayStation','EA Sports','Google','TikTok','YouTube','Netflix','Mastercard','Guinness',"McDonald's",'Premier League','Universal','JBL','Unilever'];
-    const best = adjacentClients
-      .filter(c => !isCompetitor(name, c.name.toLowerCase()))
-      .find(c => priority.includes(c.name)) ||
-      adjacentClients.find(c => !isCompetitor(name, c.name.toLowerCase()));
-    if (!best) return '';
-    return `SOCIAL PROOF CONTEXT: "${best.name}" is an existing Rising Ballers client in an adjacent category (${best.category}). You may reference this lightly if it adds credibility — one mention only.`;
-  }
-
-  return '';
+  return `SOCIAL PROOF CONTEXT: Rising Ballers has existing partnerships with ${listStr}. Include a line like "We've done similar culture-led work with the likes of ${listStr}." Use all names listed. Never name a direct competitor of the brand being pitched.`;
 }
 
 function getSystemPrompt(mode, fileCtx) {
