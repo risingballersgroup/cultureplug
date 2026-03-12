@@ -517,28 +517,63 @@
   /* ── LOGIN GATE ── */
   .login-wrap {
     min-height: 100vh; background: var(--bg);
-    display: flex; align-items: center; justify-content: center;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
   }
-  .login-box {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 48px 40px; width: 380px;
-    display: flex; flex-direction: column; align-items: center; text-align: center;
+  .login-eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 32px;
   }
-  .login-desc {
-    font-family: 'DM Sans', sans-serif; font-size: 14px;
-    color: var(--muted); line-height: 1.6; margin-bottom: 28px;
+  .login-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 7vw, 84px);
+    font-weight: 700; line-height: 1.05;
+    color: var(--white); text-align: center;
+    max-width: 780px; margin-bottom: 20px;
+  }
+  .login-headline em {
+    font-style: italic; color: var(--gold);
+  }
+  .login-sub {
+    font-family: 'DM Sans', sans-serif; font-size: 15px;
+    color: var(--muted); text-align: center; margin-bottom: 52px;
+    max-width: 400px; line-height: 1.6;
   }
   .login-btn {
     display: flex; align-items: center; gap: 10px;
     background: var(--white); color: #1a1a1a;
     font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-    padding: 12px 24px; border-radius: 8px; text-decoration: none;
-    transition: opacity 0.15s;
+    padding: 14px 28px; border-radius: 8px; text-decoration: none;
+    transition: opacity 0.15s; margin-bottom: 20px;
   }
   .login-btn:hover { opacity: 0.88; }
+  .login-domain {
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    letter-spacing: 0.06em; color: var(--muted); opacity: 0.6;
+  }
   .login-error {
     margin-top: 16px; font-family: 'DM Sans', sans-serif;
     font-size: 13px; color: #ff6b6b;
+  }
+  .login-stats {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: stretch;
+  }
+  .login-stat {
+    flex: 1; padding: 20px 0; text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .login-stat:last-child { border-right: none; }
+  .login-stat-n {
+    font-family: 'Playfair Display', serif; font-size: 22px;
+    color: var(--white); margin-bottom: 4px;
+  }
+  .login-stat-l {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
   }
 
   /* ── USER CHIP ── */
@@ -565,18 +600,20 @@
 <!-- ── LOGIN GATE ── -->
 <div id="loginGate" style="display:none">
   <div class="login-wrap">
-    <div class="login-box">
-      <a class="logo" style="justify-content:center;margin-bottom:32px">
-        <span>Certified</span>
-        <div class="logo-rule"></div>
-        <span class="logo-sub">Culture Plug</span>
-      </a>
-      <p class="login-desc">Rising Ballers internal use only.<br>Sign in with your @risingballers.co.uk account.</p>
-      <a href="/auth/login" class="login-btn">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.5" height="9.5" fill="#F25022"/><rect x="10.5" width="9.5" height="9.5" fill="#7FBA00"/><rect y="10.5" width="9.5" height="9.5" fill="#00A4EF"/><rect x="10.5" y="10.5" width="9.5" height="9.5" fill="#FFB900"/></svg>
-        Sign in with Microsoft
-      </a>
-      <p id="loginError" class="login-error" style="display:none"></p>
+    <p class="login-eyebrow">Rising Ballers &times; She's A Baller &mdash; Internal</p>
+    <h1 class="login-headline">What do you need to know<br><em>before you pitch?</em></h1>
+    <p class="login-sub">Audience intelligence, data-backed pitch tools, and commercial insights &mdash; for Rising Ballers team only.</p>
+    <a href="/auth/login" class="login-btn">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.5" height="9.5" fill="#F25022"/><rect x="10.5" width="9.5" height="9.5" fill="#7FBA00"/><rect y="10.5" width="9.5" height="9.5" fill="#00A4EF"/><rect x="10.5" y="10.5" width="9.5" height="9.5" fill="#FFB900"/></svg>
+      Sign in
+    </a>
+    <p class="login-domain">@risingballers.co.uk accounts only</p>
+    <p id="loginError" class="login-error" style="display:none"></p>
+    <div class="login-stats">
+      <div class="login-stat"><div class="login-stat-n">50K+</div><div class="login-stat-l">Respondents</div></div>
+      <div class="login-stat"><div class="login-stat-n">6</div><div class="login-stat-l">Data Sources</div></div>
+      <div class="login-stat"><div class="login-stat-n">Jan 2023</div><div class="login-stat-l">Coverage Start</div></div>
+      <div class="login-stat"><div class="login-stat-n">Live</div><div class="login-stat-l">Updated</div></div>
     </div>
   </div>
 </div>
