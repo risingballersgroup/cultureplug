@@ -513,10 +513,75 @@
   ::-webkit-scrollbar { width: 3px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── LOGIN GATE ── */
+  .login-wrap {
+    min-height: 100vh; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .login-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 48px 40px; width: 380px;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .login-desc {
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--muted); line-height: 1.6; margin-bottom: 28px;
+  }
+  .login-btn {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--white); color: #1a1a1a;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    padding: 12px 24px; border-radius: 8px; text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .login-btn:hover { opacity: 0.88; }
+  .login-error {
+    margin-top: 16px; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; color: #ff6b6b;
+  }
+
+  /* ── USER CHIP ── */
+  .user-chip {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'DM Mono', monospace; font-size: 11px;
+    color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .user-avatar {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--accent); color: var(--bg);
+    font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logout-link {
+    color: var(--muted); text-decoration: none; font-size: 13px;
+    opacity: 0.6; transition: opacity 0.15s;
+  }
+  .logout-link:hover { opacity: 1; }
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- ── LOGIN GATE ── -->
+<div id="loginGate" style="display:none">
+  <div class="login-wrap">
+    <div class="login-box">
+      <a class="logo" style="justify-content:center;margin-bottom:32px">
+        <span>Certified</span>
+        <div class="logo-rule"></div>
+        <span class="logo-sub">Culture Plug</span>
+      </a>
+      <p class="login-desc">Rising Ballers internal use only.<br>Sign in with your @risingballers.co.uk account.</p>
+      <a href="/auth/login" class="login-btn">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="9.5" height="9.5" fill="#F25022"/><rect x="10.5" width="9.5" height="9.5" fill="#7FBA00"/><rect y="10.5" width="9.5" height="9.5" fill="#00A4EF"/><rect x="10.5" y="10.5" width="9.5" height="9.5" fill="#FFB900"/></svg>
+        Sign in with Microsoft
+      </a>
+      <p id="loginError" class="login-error" style="display:none"></p>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="appShell" style="display:none">
 
   <header>
     <a class="logo" href="#" onclick="goHome(); return false;">
@@ -538,6 +603,11 @@
         <div class="header-stat-l">Coverage</div>
       </div>
       <div class="live-dot"></div>
+      <div class="user-chip" id="userChip" style="display:none">
+        <div class="user-avatar" id="userAvatar"></div>
+        <span id="userName"></span>
+        <a href="/auth/logout" class="logout-link" title="Sign out">↩</a>
+      </div>
     </div>
   </header>
 
@@ -616,7 +686,7 @@
     </div>
   </div>
 
-</div>
+</div><!-- /#appShell -->
 <script>
 let isLoading = false;
 let conversationHistory = [];
@@ -624,6 +694,7 @@ let attachedFile = null;
 let attachedFileContent = '';
 let currentMode = 'pitch';
 let activeBrief = null; // { brand, context } — persists across messages
+let currentUser = null; // { name, fullName, email } — set after O365 sign-in
 
 const MODES = {
   pitch: {
@@ -1170,8 +1241,8 @@ RULES:
 - One tight line on the audience: age, culture, where they live online
 - SOCIAL PROOF: If existing client context is provided below, use it to name 2–3 clients from different categories — the mix should feel intentional e.g. "We've done similar culture-led work with the likes of Nike, EA Sports & Whoop." Never name a direct competitor of the brand being pitched. Variety beats category match — a sports brand, a tech brand, a lifestyle brand is more impressive than three sportswear names.
 - End with something low-key — "open to a chat?" or "worth a quick call?" — not corporate
-- Sign off: Best, / [Name] / Rising Ballers
-- Leave [Name] as a placeholder
+- Sign off: Best, / [SENDER_NAME] / Rising Ballers
+- Replace [SENDER_NAME] with the name provided in the SENDER context below — do not leave it as a placeholder
 - NEVER use em dashes (—) anywhere. Use commas or full stops instead. Em dashes are a giveaway of AI-generated writing.
 
 TONE REFERENCE: Imagine a senior person at a culture company firing off a quick email between meetings. Warm but not gushing. Confident but not arrogant. Human above all.
@@ -1309,11 +1380,15 @@ function getSystemPrompt(mode, fileCtx) {
     ? getSocialProof(activeBrief.brand) + '\n'
     : '';
 
+  const senderCtx = (mode === 'email' && currentUser)
+    ? `SENDER: The person writing this email is ${currentUser.name}. Use their first name in the sign-off instead of [SENDER_NAME].\n`
+    : '';
+
   return `You are Culture Plug — the internal commercial intelligence engine for Rising Ballers, a football media and production company. You have access to Rising Ballers' proprietary first-party data corpus below.
 
 ${DATA_CORPUS}
 
-${briefCtx}${socialProofCtx}${fileCtx ? `The user has uploaded a brand brief for context:\n${fileCtx}\n` : ''}
+${briefCtx}${socialProofCtx}${senderCtx}${fileCtx ? `The user has uploaded a brand brief for context:\n${fileCtx}\n` : ''}
 
 ${MODE_PROMPTS[mode] || MODE_PROMPTS.pitch}
 
@@ -1699,6 +1774,36 @@ async function sendMessage() {
 
 // Initialise pills on load
 setMode('pitch', document.querySelector('.mode-tab.active'));
+
+// ── AUTH INIT ──
+(async () => {
+  const params = new URLSearchParams(window.location.search);
+  const errorParam = params.get('error');
+
+  try {
+    const res = await fetch('/api/me');
+    const user = await res.json();
+
+    if (user.authenticated) {
+      currentUser = user;
+      document.getElementById('appShell').style.display = 'flex';
+      document.getElementById('userChip').style.display = 'flex';
+      document.getElementById('userName').textContent = user.name;
+      document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+    } else {
+      document.getElementById('loginGate').style.display = 'block';
+      if (errorParam) {
+        const el = document.getElementById('loginError');
+        el.style.display = 'block';
+        el.textContent = errorParam === 'unauthorised_domain'
+          ? 'Access restricted to @risingballers.co.uk accounts.'
+          : 'Sign-in failed. Please try again.';
+      }
+    }
+  } catch (e) {
+    document.getElementById('loginGate').style.display = 'block';
+  }
+})();
 </script>
 </body>
 </html>
