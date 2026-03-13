@@ -644,7 +644,20 @@
       <div class="user-chip" id="userChip" style="display:none">
         <div class="user-avatar" id="userAvatar"></div>
         <span id="userName"></span>
+        <button onclick="toggleBookingPanel()" title="Set your booking link" id="bookingBtn" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:13px;opacity:0.6;transition:opacity 0.15s;padding:0 2px;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">⚙</button>
         <a href="/auth/logout" class="logout-link" title="Sign out">↩</a>
+      </div>
+      <!-- Booking link panel -->
+      <div id="bookingPanel" style="display:none;position:absolute;top:56px;right:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;width:340px;z-index:100;box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">Your Booking Link</div>
+        <p style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);margin:0 0 10px;line-height:1.5;">Paste your Outlook booking URL. It'll be added to every Initial Email you generate.</p>
+        <input id="bookingUrlInput" type="url" placeholder="https://outlook.office.com/bookwithme/..." style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 12px;border-radius:8px;outline:none;box-sizing:border-box;margin-bottom:10px;">
+        <div style="display:flex;gap:8px;">
+          <button onclick="saveBookingUrl()" style="flex:1;background:var(--accent);color:var(--bg);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;border:none;padding:9px;border-radius:6px;cursor:pointer;font-weight:700;">Save</button>
+          <button onclick="clearBookingUrl()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:9px 12px;border-radius:6px;cursor:pointer;">Clear</button>
+          <button onclick="toggleBookingPanel()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:9px 12px;border-radius:6px;cursor:pointer;">Cancel</button>
+        </div>
+        <div id="bookingUrlStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-top:8px;display:none;"></div>
       </div>
     </div>
   </header>
@@ -1629,8 +1642,9 @@ function getSystemPrompt(mode, fileCtx) {
     ? getSocialProof(activeBrief.brand) + '\n'
     : '';
 
+  const bookingUrl = sessionStorage.getItem('cp_booking_url') || '';
   const senderCtx = (mode === 'email' && currentUser)
-    ? `SENDER: The person writing this email is ${currentUser.name}. Use their first name in the sign-off instead of [SENDER_NAME].\n`
+    ? `SENDER: The person writing this email is ${currentUser.name}. Use their first name in the sign-off instead of [SENDER_NAME].${bookingUrl ? `\nBOOKING LINK: After the approved closing line, add exactly this on its own line: "Feel free to book in time here to save the back and forth: ${bookingUrl}" — do not alter the URL.` : ''}\n`
     : '';
 
   return `You are Culture Plug — the internal commercial intelligence engine for Rising Ballers, a football media and production company. You have access to Rising Ballers' proprietary first-party data corpus below.
@@ -2039,6 +2053,7 @@ setMode('email', document.querySelector('.mode-tab.active'));
       document.getElementById('userChip').style.display = 'flex';
       document.getElementById('userName').textContent = user.name;
       document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
+      restoreBookingBtnState();
     } else {
       document.getElementById('loginGate').style.display = 'block';
       if (errorParam) {
@@ -2054,7 +2069,68 @@ setMode('email', document.querySelector('.mode-tab.active'));
   }
 })();
 
-// ── REACH CALCULATOR ──
+// ── BOOKING LINK ──
+let bookingPanelOpen = false;
+
+function toggleBookingPanel() {
+  bookingPanelOpen = !bookingPanelOpen;
+  const panel = document.getElementById('bookingPanel');
+  panel.style.display = bookingPanelOpen ? 'block' : 'none';
+  if (bookingPanelOpen) {
+    const saved = sessionStorage.getItem('cp_booking_url') || '';
+    document.getElementById('bookingUrlInput').value = saved;
+    document.getElementById('bookingUrlStatus').style.display = 'none';
+  }
+}
+
+function saveBookingUrl() {
+  const url = document.getElementById('bookingUrlInput').value.trim();
+  if (url && !url.startsWith('http')) {
+    document.getElementById('bookingUrlStatus').style.display = 'block';
+    document.getElementById('bookingUrlStatus').style.color = '#ff6b6b';
+    document.getElementById('bookingUrlStatus').textContent = 'Please enter a valid URL starting with https://';
+    return;
+  }
+  sessionStorage.setItem('cp_booking_url', url);
+  const btn = document.getElementById('bookingBtn');
+  btn.style.color = url ? 'var(--accent)' : 'var(--muted)';
+  btn.style.opacity = '1';
+  const status = document.getElementById('bookingUrlStatus');
+  status.style.display = 'block';
+  status.style.color = 'var(--accent)';
+  status.textContent = url ? '✓ Saved — will appear in all Initial Emails' : '✓ Cleared';
+  setTimeout(() => toggleBookingPanel(), 1200);
+}
+
+function clearBookingUrl() {
+  document.getElementById('bookingUrlInput').value = '';
+  sessionStorage.removeItem('cp_booking_url');
+  document.getElementById('bookingBtn').style.color = 'var(--muted)';
+  document.getElementById('bookingBtn').style.opacity = '0.6';
+  const status = document.getElementById('bookingUrlStatus');
+  status.style.display = 'block';
+  status.style.color = 'var(--muted)';
+  status.textContent = '✓ Cleared';
+  setTimeout(() => toggleBookingPanel(), 900);
+}
+
+// Close panel on outside click
+document.addEventListener('click', (e) => {
+  if (bookingPanelOpen && !document.getElementById('bookingPanel').contains(e.target) && e.target.id !== 'bookingBtn') {
+    bookingPanelOpen = false;
+    document.getElementById('bookingPanel').style.display = 'none';
+  }
+});
+
+// On load — restore booking btn colour if URL already saved
+function restoreBookingBtnState() {
+  const saved = sessionStorage.getItem('cp_booking_url');
+  if (saved) {
+    const btn = document.getElementById('bookingBtn');
+    if (btn) { btn.style.color = 'var(--accent)'; btn.style.opacity = '1'; }
+  }
+}
+
 
 const CALC_DATA = {
   rb_ig: {
