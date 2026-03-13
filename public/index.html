@@ -1644,7 +1644,7 @@ function getSystemPrompt(mode, fileCtx) {
 
   const bookingUrl = sessionStorage.getItem('cp_booking_url') || '';
   const senderCtx = (mode === 'email' && currentUser)
-    ? `SENDER: The person writing this email is ${currentUser.name}. Use their first name in the sign-off instead of [SENDER_NAME].${bookingUrl ? `\nBOOKING LINK: After the approved closing line, add exactly this on its own line: "Feel free to book in time here to save the back and forth: ${bookingUrl}" — do not alter the URL.` : ''}\n`
+    ? `SENDER: The person writing this email is ${currentUser.name}. Use their first name in the sign-off instead of [SENDER_NAME]. Do NOT include any booking link or URL in your output — this is handled separately.\n`
     : '';
 
   return `You are Culture Plug — the internal commercial intelligence engine for Rising Ballers, a football media and production company. You have access to Rising Ballers' proprietary first-party data corpus below.
@@ -1962,9 +1962,23 @@ function renderMarkdown(text) {
 }
 
 function formatInline(text) {
-  return text
+  // Preserve safe anchor tags output by the model (booking links)
+  const anchorPlaceholders = [];
+  const safeText = text.replace(/<a\s+href="([^"]+)">([^<]+)<\/a>/g, (match, href, label) => {
+    anchorPlaceholders.push(`<a href="${href}" target="_blank" rel="noopener noreferrer" style="color:var(--accent)">${label}</a>`);
+    return `%%ANCHOR_${anchorPlaceholders.length - 1}%%`;
+  });
+
+  let result = safeText
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
     .replace(/\[([^\]]+)\]/g, '<span class="citation">[$1]</span>');
+
+  // Restore anchors
+  anchorPlaceholders.forEach((anchor, i) => {
+    result = result.replace(`%%ANCHOR_${i}%%`, anchor);
+  });
+
+  return result;
 }
 
 async function sendMessage() {
@@ -2021,7 +2035,28 @@ async function sendMessage() {
     if (data.error) {
       addAIMsg('## ERROR\n' + (data.error.message || 'Something went wrong. Please try again.'), modeAtSend);
     } else {
-      const aiText = data.content[0].text;
+      let aiText = data.content[0].text;
+
+      // ── EMAIL MODE: ensure booking link is a hyperlink in the right place ──
+      if (modeAtSend === 'email') {
+        const bookingUrl = sessionStorage.getItem('cp_booking_url');
+        if (bookingUrl) {
+          const anchor = `<a href="${bookingUrl}">Feel free to book in some time here</a>`;
+          // Remove any version the model may have output (raw URL, mangled anchor, plain text line)
+          aiText = aiText
+            .replace(/<a\s+href="[^"]*">Feel free to book in some time here<\/a>/gi, '')
+            .replace(/Feel free to book in (?:some )?time here(?:[^\n]*)?/gi, '')
+            .replace(new RegExp(bookingUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '');
+
+          // Now insert it in the right place: after the closing line, before "Best,"
+          if (aiText.includes('Best,')) {
+            aiText = aiText.replace(/(\n)(Best,)/, `\n${anchor}\n\n$2`);
+          } else {
+            aiText = aiText.trimEnd() + `\n\n${anchor}`;
+          }
+        }
+      }
+
       conversationHistory.push({ role: 'user', content: userText || 'Build a pitch brief' });
       conversationHistory.push({ role: 'assistant', content: aiText });
       addAIMsg(aiText, modeAtSend);
