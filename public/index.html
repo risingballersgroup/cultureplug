@@ -678,6 +678,7 @@
           <button class="mode-tab" onclick="setMode('calendar', this)">Seasonal Calendar</button>
           <button class="mode-tab" onclick="setMode('exec', this)">Exec Summary</button>
           <button class="mode-tab" onclick="setMode('objection', this)">Objection Handler</button>
+          <button class="mode-tab" onclick="showBulkMode(this)">Bulk Email</button>
           <button class="mode-tab" onclick="showReachCalculator(this)">Reach Calculator</button>
         </div>
       </div>
@@ -799,6 +800,89 @@
           <div style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);line-height:1.5;" id="calcMethodNote"></div>
         </div>
         <button onclick="copyCalcResult()" style="margin-top:16px;background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:8px 16px;border-radius:6px;cursor:pointer;" id="calcCopyBtn">Copy for pitch</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── BULK EMAIL MODAL ── -->
+<div id="bulkModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:200;overflow-y:auto;padding:40px 20px;">
+  <div style="max-width:780px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;position:relative;">
+    <button onclick="closeBulkModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;line-height:1;">✕</button>
+
+    <!-- Header -->
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Bulk Email Generator</div>
+    <h2 style="font-family:'Playfair Display',serif;font-size:26px;color:var(--white);margin:0 0 6px;">500 emails. One run.</h2>
+    <p style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);margin:0 0 28px;line-height:1.6;">Upload your Apollo CSV export. Culture Plug generates a tailored email for each brand and outputs a CSV ready to import into Apollo, Instantly, or Lemlist.</p>
+
+    <!-- Step 1: Upload -->
+    <div id="bulkStep1">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Step 1 — Upload Apollo CSV</div>
+
+      <div id="bulkDropZone" onclick="document.getElementById('bulkFileInput').click()" style="border:2px dashed var(--border);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:border-color 0.2s;margin-bottom:16px;"
+        ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+        ondragleave="this.style.borderColor='var(--border)'"
+        ondrop="handleBulkDrop(event)">
+        <div style="font-size:28px;margin-bottom:8px;">📋</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:14px;color:var(--white);margin-bottom:4px;">Drop your Apollo CSV here</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">or click to browse</div>
+      </div>
+      <input type="file" id="bulkFileInput" accept=".csv" style="display:none" onchange="handleBulkFile(event)">
+
+      <div id="bulkFileInfo" style="display:none;background:rgba(0,255,170,0.06);border:1px solid rgba(0,255,170,0.2);border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">File loaded</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--white);" id="bulkFileStats"></div>
+      </div>
+
+      <!-- Column mapping -->
+      <div id="bulkColMap" style="display:none;margin-bottom:20px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Map your columns</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <label style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Company Name *</label>
+            <select id="colCompany" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border-radius:6px;outline:none;"></select>
+          </div>
+          <div>
+            <label style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Contact Email *</label>
+            <select id="colEmail" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border-radius:6px;outline:none;"></select>
+          </div>
+          <div>
+            <label style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">First Name</label>
+            <select id="colFirst" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border-radius:6px;outline:none;"></select>
+          </div>
+          <div>
+            <label style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px;">Job Title</label>
+            <select id="colTitle" style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;border-radius:6px;outline:none;"></select>
+          </div>
+        </div>
+      </div>
+
+      <button id="bulkStartBtn" onclick="startBulkGeneration()" style="display:none;width:100%;background:var(--accent);color:var(--bg);font-family:'DM Mono',monospace;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;border:none;padding:14px;border-radius:8px;cursor:pointer;font-weight:700;">Generate All Emails</button>
+    </div>
+
+    <!-- Step 2: Progress -->
+    <div id="bulkStep2" style="display:none;">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:16px;">Generating emails</div>
+      <div style="background:var(--bg);border-radius:100px;height:6px;margin-bottom:12px;overflow:hidden;">
+        <div id="bulkProgressBar" style="height:100%;background:var(--accent);width:0%;transition:width 0.3s;border-radius:100px;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:24px;">
+        <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);" id="bulkProgressLabel">Starting...</div>
+        <div style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);" id="bulkProgressCount">0 / 0</div>
+      </div>
+      <div id="bulkCurrentBrand" style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);margin-bottom:16px;min-height:18px;"></div>
+      <div id="bulkPreviewList" style="max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;"></div>
+      <button id="bulkPauseBtn" onclick="toggleBulkPause()" style="margin-top:16px;background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:10px 20px;border-radius:6px;cursor:pointer;">Pause</button>
+    </div>
+
+    <!-- Step 3: Done -->
+    <div id="bulkStep3" style="display:none;text-align:center;padding:20px 0;">
+      <div style="font-size:40px;margin-bottom:12px;">✓</div>
+      <div style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);margin-bottom:8px;" id="bulkDoneTitle">All done.</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);margin-bottom:28px;" id="bulkDoneSub"></div>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button onclick="downloadBulkCSV()" style="background:var(--accent);color:var(--bg);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;border:none;padding:12px 24px;border-radius:8px;cursor:pointer;font-weight:700;">Download CSV</button>
+        <button onclick="resetBulkModal()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;padding:12px 24px;border-radius:8px;cursor:pointer;">Run Another Batch</button>
       </div>
     </div>
   </div>
@@ -2103,6 +2187,179 @@ setMode('email', document.querySelector('.mode-tab.active'));
     document.getElementById('loginGate').style.display = 'block';
   }
 })();
+
+// ── BULK EMAIL GENERATOR ──
+let bulkData = [];
+let bulkHeaders = [];
+let bulkResults = [];
+let bulkPaused = false;
+let bulkStopped = false;
+let bulkIndex = 0;
+
+function showBulkMode(btn) {
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  resetBulkModal();
+  document.getElementById('bulkModal').style.display = 'block';
+}
+
+function closeBulkModal() {
+  document.getElementById('bulkModal').style.display = 'none';
+  bulkStopped = true;
+}
+
+function resetBulkModal() {
+  bulkData = []; bulkHeaders = []; bulkResults = [];
+  bulkPaused = false; bulkStopped = false; bulkIndex = 0;
+  document.getElementById('bulkStep1').style.display = 'block';
+  document.getElementById('bulkStep2').style.display = 'none';
+  document.getElementById('bulkStep3').style.display = 'none';
+  document.getElementById('bulkFileInfo').style.display = 'none';
+  document.getElementById('bulkColMap').style.display = 'none';
+  document.getElementById('bulkStartBtn').style.display = 'none';
+  document.getElementById('bulkPreviewList').innerHTML = '';
+  document.getElementById('bulkFileInput').value = '';
+}
+
+function handleBulkDrop(e) {
+  e.preventDefault();
+  document.getElementById('bulkDropZone').style.borderColor = 'var(--border)';
+  const file = e.dataTransfer.files[0];
+  if (file && file.name.endsWith('.csv')) parseBulkCSV(file);
+}
+
+function handleBulkFile(e) {
+  const file = e.target.files[0];
+  if (file) parseBulkCSV(file);
+}
+
+function parseBulkCSV(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const text = e.target.result;
+    const lines = text.trim().split('\n');
+    if (lines.length < 2) return;
+    function parseCSVLine(line) {
+      const result = []; let current = ''; let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        if (line[i] === '"') { inQuotes = !inQuotes; continue; }
+        if (line[i] === ',' && !inQuotes) { result.push(current.trim()); current = ''; continue; }
+        current += line[i];
+      }
+      result.push(current.trim()); return result;
+    }
+    bulkHeaders = parseCSVLine(lines[0]);
+    bulkData = lines.slice(1).filter(l => l.trim()).map(l => {
+      const vals = parseCSVLine(l); const row = {};
+      bulkHeaders.forEach((h, i) => { row[h] = vals[i] || ''; }); return row;
+    });
+    document.getElementById('bulkFileStats').textContent = file.name + ' — ' + bulkData.length + ' contacts loaded';
+    document.getElementById('bulkFileInfo').style.display = 'block';
+    const noneOpt = '<option value="">— not in file —</option>';
+    const opts = bulkHeaders.map(h => '<option value="' + h + '">' + h + '</option>').join('');
+    ['colCompany','colEmail','colFirst','colTitle'].forEach(id => {
+      document.getElementById(id).innerHTML = noneOpt + opts;
+    });
+    const autoMap = {
+      colCompany: ['company name','company','organization','account name'],
+      colEmail:   ['email','email address','work email'],
+      colFirst:   ['first name','firstname','first'],
+      colTitle:   ['title','job title','position','role'],
+    };
+    Object.entries(autoMap).forEach(([id, candidates]) => {
+      const match = bulkHeaders.find(h => candidates.includes(h.toLowerCase().trim()));
+      if (match) document.getElementById(id).value = match;
+    });
+    document.getElementById('bulkColMap').style.display = 'block';
+    document.getElementById('bulkStartBtn').style.display = 'block';
+  };
+  reader.readAsText(file);
+}
+
+async function startBulkGeneration() {
+  const colCompany = document.getElementById('colCompany').value;
+  const colEmail   = document.getElementById('colEmail').value;
+  const colFirst   = document.getElementById('colFirst').value;
+  const colTitle   = document.getElementById('colTitle').value;
+  if (!colCompany || !colEmail) { alert('Please map Company Name and Contact Email columns.'); return; }
+  bulkResults = []; bulkIndex = 0; bulkPaused = false; bulkStopped = false;
+  document.getElementById('bulkStep1').style.display = 'none';
+  document.getElementById('bulkStep2').style.display = 'block';
+  document.getElementById('bulkPreviewList').innerHTML = '';
+  const total = bulkData.length;
+  const bookingUrl = sessionStorage.getItem('cp_booking_url') || '';
+  const senderName = currentUser ? currentUser.name.split(' ')[0] : '';
+  async function processNext() {
+    if (bulkStopped) return;
+    if (bulkIndex >= total) { showBulkDone(); return; }
+    if (bulkPaused) { setTimeout(processNext, 500); return; }
+    const row = bulkData[bulkIndex];
+    const company  = (row[colCompany] || '').trim();
+    const email    = (row[colEmail]   || '').trim();
+    const firstName = colFirst ? (row[colFirst] || '').trim() : '';
+    const title    = colTitle  ? (row[colTitle]  || '').trim() : '';
+    const pct = Math.round(((bulkIndex + 1) / total) * 100);
+    document.getElementById('bulkProgressBar').style.width = pct + '%';
+    document.getElementById('bulkProgressCount').textContent = (bulkIndex + 1) + ' / ' + total;
+    document.getElementById('bulkCurrentBrand').textContent = 'Writing email for: ' + company;
+    try {
+      const spCtx = getSocialProof(company);
+      const sys = 'You are Culture Plug, the internal commercial intelligence engine for Rising Ballers, a global football media and production company.\n\n' + DATA_CORPUS + '\n\n' + (spCtx ? spCtx + '\n' : '') + 'SENDER: The person writing this email is ' + senderName + '. Use their first name only in the sign-off. Do NOT add Rising Ballers after the name. Do NOT include any booking link or URL.\n\n' + MODE_PROMPTS.email + '\n\nUNIVERSAL RULES:\n- Only use data from the corpus. Never invent stats.\n- Sharp and specific beats long and vague.';
+      const resp = await fetch('/api/chat', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 600, system: sys,
+          messages: [{ role: 'user', content: 'Write a cold outreach email to ' + company + '.' + (title ? ' The contact title is ' + title + '.' : '') }]
+        })
+      });
+      const apiData = await resp.json();
+      let body = (apiData.content && apiData.content[0] && apiData.content[0].text) ? apiData.content[0].text : '';
+      if (bookingUrl && body.includes('Best,')) {
+        body = body.replace('\nBest,', '\n\nFeel free to book in some time here: ' + bookingUrl + '\n\nBest,');
+      }
+      bulkResults.push({ company, email, firstName, title, body });
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;flex-shrink:0;';
+      card.innerHTML = '<div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-family:DM Mono,monospace;font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;">' + company + '</span><span style="font-family:DM Mono,monospace;font-size:10px;color:var(--muted);">✓</span></div><div style="font-family:DM Sans,sans-serif;font-size:12px;color:var(--muted);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">' + body.slice(0,140).replace(/</g,'&lt;') + '…</div>';
+      const list = document.getElementById('bulkPreviewList');
+      list.appendChild(card); list.scrollTop = list.scrollHeight;
+    } catch(err) {
+      bulkResults.push({ company, email, firstName, title, body: 'ERROR: Generation failed.' });
+    }
+    bulkIndex++;
+    setTimeout(processNext, 400);
+  }
+  processNext();
+}
+
+function toggleBulkPause() {
+  bulkPaused = !bulkPaused;
+  const btn = document.getElementById('bulkPauseBtn');
+  btn.textContent = bulkPaused ? 'Resume' : 'Pause';
+  btn.style.color = bulkPaused ? 'var(--accent)' : 'var(--muted)';
+}
+
+function showBulkDone() {
+  document.getElementById('bulkStep2').style.display = 'none';
+  document.getElementById('bulkStep3').style.display = 'block';
+  const errors = bulkResults.filter(r => r.body.startsWith('ERROR')).length;
+  document.getElementById('bulkDoneTitle').textContent = bulkResults.length + ' emails generated.';
+  document.getElementById('bulkDoneSub').textContent = errors
+    ? (bulkResults.length - errors) + ' successful, ' + errors + ' failed. Download to review.'
+    : 'All done. Download your CSV to import into Apollo, Instantly, or Lemlist.';
+}
+
+function downloadBulkCSV() {
+  const rows = [['Company Name','Contact Email','First Name','Job Title','Email Body']].concat(
+    bulkResults.map(r => [r.company, r.email, r.firstName, r.title, r.body].map(v => '"' + (v||'').replace(/"/g,'""') + '"'))
+  );
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = 'culture-plug-bulk-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+
 
 // ── BOOKING LINK ──
 let bookingPanelOpen = false;
