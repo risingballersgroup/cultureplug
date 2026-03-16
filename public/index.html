@@ -2316,16 +2316,20 @@ async function startBulkGeneration() {
       });
       const apiData = await resp.json();
       let body = (apiData.content && apiData.content[0] && apiData.content[0].text) ? apiData.content[0].text : '';
-      // Inject booking link before Best, — same logic as single email mode
+      // Inject booking link before Best, — plain text URL for CSV/Outlook compatibility
       if (bookingUrl) {
         body = body
           .replace(/<a[^>]*>Feel free to book in some time here<\/a>/gi, '')
           .replace(/Feel free to book in (?:some )?time here(?:[^\n]*)?/gi, '')
           .replace(new RegExp(bookingUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '');
         if (body.includes('Best,')) {
-          body = body.replace(/(\n)(Best,)/, '\n<a href="' + bookingUrl + '">Feel free to book in some time here</a>\n\n$2');
+          body = body.replace(/(\n)(Best,)/, '\nFeel free to book in some time here: ' + bookingUrl + '\n\n$2');
         }
       }
+      // Sanitise body — strip em dashes and smart quotes before storing
+      body = body
+        .replace(/\u2014/g, '-').replace(/\u2013/g, '-')
+        .replace(/\u2018|\u2019/g, "'").replace(/\u201C|\u201D/g, '"');
       bulkResults.push({ company, email, firstName, title, body });
       const card = document.createElement('div');
       card.style.cssText = 'background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;flex-shrink:0;';
@@ -2358,13 +2362,27 @@ function showBulkDone() {
     : 'All done. Download your CSV to import into Apollo, Instantly, or Lemlist.';
 }
 
+function cleanBodyText(text) {
+  return (text || '')
+    .replace(/\u2014/g, '-')   // em dash → hyphen
+    .replace(/\u2013/g, '-')   // en dash → hyphen
+    .replace(/\u2018|\u2019/g, "'")  // smart single quotes → straight
+    .replace(/\u201C|\u201D/g, '"')  // smart double quotes → straight
+    .replace(/\u2026/g, '...')       // ellipsis → three dots
+    .replace(/[\u0080-\u009F]/g, '') // strip control characters
+    .trim();
+}
+
 function downloadBulkCSV() {
   const rows = [['Company Name','Contact Email','First Name','Job Title','Email Body']].concat(
-    bulkResults.map(r => [r.company, r.email, r.firstName, r.title, r.body].map(v => '"' + (v||'').replace(/"/g,'""') + '"'))
+    bulkResults.map(r => [r.company, r.email, r.firstName, r.title, cleanBodyText(r.body)]
+      .map(v => '"' + (v||'').replace(/"/g,'""') + '"'))
   );
   const csv = rows.map(r => r.join(',')).join('\n');
+  // Prepend UTF-8 BOM so Excel opens it with correct encoding
+  const bom = '\uFEFF';
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.href = URL.createObjectURL(new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' }));
   a.download = 'culture-plug-bulk-' + new Date().toISOString().slice(0,10) + '.csv';
   a.click(); URL.revokeObjectURL(a.href);
 }
@@ -2438,10 +2456,9 @@ const CALC_DATA = {
   rb_ig: {
     label: 'Rising Ballers Instagram',
     totalFollowers: 2981789,
-    source: 'Meta Business Suite (direct export)',
-    // age brackets: % of total audience (men + women combined from Meta)
+    source: 'Sprout Social (Jan–Mar 2026) · Age/gender: Meta Business Suite',
+    // Age/gender: direct from Meta cross-tab (% of total)
     age: { '18-24': 41.5, '25-34': 40.0, '35-44': 12.0, '45-54': 4.3, '55-64': 1.1, '65+': 1.1 },
-    // gender by age: { age: { men: %, women: % } } — direct from Meta cross-tab
     genderByAge: {
       '18-24': { men: 38.9, women: 2.6 },
       '25-34': { men: 37.7, women: 2.3 },
@@ -2450,17 +2467,27 @@ const CALC_DATA = {
       '55-64': { men: 0.9,  women: 0.2 },
       '65+':   { men: 1.0,  women: 0.1 },
     },
-    // country: % of total followers
+    // Countries: full Sprout Social list (% of 2,981,789 followers)
     countries: {
-      'United Kingdom': 19.8, 'United States': 8.8, 'Nigeria': 5.0,
-      'Indonesia': 3.8, 'India': 2.9, 'South Africa': 2.5,
-      'Brazil': 2.4, 'Ghana': 2.2, 'Kenya': 2.1, 'Germany': 1.9,
+      'United Kingdom': 19.86, 'United States': 8.83, 'Nigeria': 4.99,
+      'Indonesia': 3.82, 'India': 2.92, 'South Africa': 2.48,
+      'Brazil': 2.40, 'Ghana': 2.18, 'Kenya': 2.06, 'Germany': 1.94,
+      'Tanzania': 1.91, 'Senegal': 1.77, 'Morocco': 1.70, 'Algeria': 1.61,
+      'Australia': 1.60, 'Italy': 1.47, 'Netherlands': 1.46, 'Ireland': 1.43,
+      'Canada': 1.42, 'Egypt': 1.32, 'France': 1.24, 'Spain': 1.03,
+      'Turkey': 0.97, 'Malaysia': 0.94, 'Sweden': 0.91, 'Poland': 0.88,
+      'Iraq': 0.86, 'Mexico': 0.76, 'Iran': 0.73, 'Portugal': 0.67,
+      'Thailand': 0.67, 'Belgium': 0.67, 'United Arab Emirates': 0.65,
+      'Norway': 0.61, 'Argentina': 0.60, 'Saudi Arabia': 0.59,
+      'Denmark': 0.58, 'Uganda': 0.56, 'Pakistan': 0.48, 'Colombia': 0.45,
+      'Zambia': 0.38, "Ivory Coast (Côte d'Ivoire)": 0.38, 'Tunisia': 0.35,
+      'Switzerland': 0.35, 'Zimbabwe': 0.35,
     }
   },
   rb_fb: {
     label: 'Rising Ballers Facebook',
-    totalFollowers: null, // Facebook page likes — not exported; use % basis only
-    source: 'Meta Business Suite (direct export)',
+    totalFollowers: null,
+    source: 'Meta Business Suite (direct export) · % basis only — total not exported',
     age: { '18-24': 37.6, '25-34': 40.9, '35-44': 13.8, '45-54': 3.8, '55-64': 1.3, '65+': 2.6 },
     genderByAge: {
       '18-24': { men: 35.1, women: 2.5 },
@@ -2470,6 +2497,7 @@ const CALC_DATA = {
       '55-64': { men: 1.1,  women: 0.2 },
       '65+':   { men: 2.3,  women: 0.3 },
     },
+    // Facebook countries from Meta Business Suite export
     countries: {
       'Nigeria': 21.3, 'South Africa': 12.1, 'Kenya': 10.2,
       'Ghana': 6.7, 'United Kingdom': 5.1, 'Liberia': 2.4,
@@ -2479,7 +2507,7 @@ const CALC_DATA = {
   sab_ig: {
     label: "She's A Baller Instagram",
     totalFollowers: 265129,
-    source: 'Meta Business Suite (direct export)',
+    source: 'Sprout Social (Jan–Mar 2026) · Age/gender: Meta Business Suite',
     age: { '18-24': 27.4, '25-34': 35.2, '35-44': 20.7, '45-54': 10.8, '55-64': 4.0, '65+': 1.9 },
     genderByAge: {
       '18-24': { men: 13.2, women: 14.2 },
@@ -2489,16 +2517,26 @@ const CALC_DATA = {
       '55-64': { men: 1.9,  women: 2.1  },
       '65+':   { men: 1.1,  women: 0.8  },
     },
+    // Countries: full Sprout Social list (% of 265,129 followers)
     countries: {
-      'United Kingdom': 36.8, 'United States': 12.9, 'Australia': 3.9,
-      'Nigeria': 2.8, 'Germany': 2.6, 'India': 2.1,
-      'Ireland': 1.9, 'Canada': 1.8, 'Netherlands': 1.6, 'Brazil': 1.4,
+      'United Kingdom': 36.75, 'United States': 12.82, 'Australia': 3.85,
+      'Nigeria': 2.81, 'Germany': 2.64, 'India': 2.07,
+      'Ireland': 1.92, 'Canada': 1.81, 'Netherlands': 1.55, 'Brazil': 1.38,
+      'Sweden': 1.38, 'Indonesia': 1.33, 'South Africa': 1.24, 'Spain': 1.16,
+      'Kenya': 1.13, 'France': 1.11, 'Italy': 1.06, 'Ghana': 1.06,
+      'Mexico': 0.79, 'Tanzania': 0.78, 'Egypt': 0.74, 'Switzerland': 0.67,
+      'Iran': 0.66, 'Norway': 0.62, 'Belgium': 0.59, 'Morocco': 0.58,
+      'Portugal': 0.56, 'Malaysia': 0.54, 'Senegal': 0.49, 'Denmark': 0.48,
+      'Pakistan': 0.43, 'United Arab Emirates': 0.41, 'New Zealand': 0.41,
+      'Austria': 0.38, 'Argentina': 0.37, 'Turkey': 0.37, 'Finland': 0.37,
+      'Algeria': 0.36, 'Saudi Arabia': 0.33, 'Uganda': 0.31,
+      'Colombia': 0.29, 'Thailand': 0.28, 'Singapore': 0.26, 'Iraq': 0.26,
     }
   },
   sab_fb: {
     label: "She's A Baller Facebook",
     totalFollowers: null,
-    source: 'Meta Business Suite (direct export)',
+    source: 'Meta Business Suite (direct export) · % basis only — total not exported',
     age: { '18-24': 18.0, '25-34': 29.9, '35-44': 20.3, '45-54': 13.2, '55-64': 9.6, '65+': 9.0 },
     genderByAge: {
       '18-24': { men: 14.0, women: 4.0 },
@@ -2508,6 +2546,7 @@ const CALC_DATA = {
       '55-64': { men: 6.4,  women: 3.2 },
       '65+':   { men: 6.8,  women: 2.2 },
     },
+    // Facebook countries from Meta Business Suite export
     countries: {
       'United Kingdom': 20.9, 'Nigeria': 14.1, 'United States': 11.5,
       'Kenya': 6.2, 'South Africa': 2.9, 'Ghana': 2.8,
@@ -2591,23 +2630,40 @@ function runCalc() {
     genderLabel = gender.charAt(0).toUpperCase() + gender.slice(1);
   }
 
+  // Meta-exact countries for RB IG and SAB IG (top 10 from Meta export)
+  const META_EXACT_RB_IG  = new Set(['United Kingdom','United States','Nigeria','Indonesia','India','South Africa','Brazil','Ghana','Kenya','Germany']);
+  const META_EXACT_SAB_IG = new Set(['United Kingdom','United States','Australia','Nigeria','Germany','India','Ireland','Canada','Netherlands','Brazil']);
+  const META_EXACT_RB_FB  = new Set(['Nigeria','South Africa','Kenya','Ghana','United Kingdom','Liberia','Sierra Leone','Ethiopia','Zambia','United States']);
+  const META_EXACT_SAB_FB = new Set(['United Kingdom','Nigeria','United States','Kenya','South Africa','Ghana','Australia','Ethiopia','Zambia','India']);
+  const metaExactSets = { rb_ig: META_EXACT_RB_IG, sab_ig: META_EXACT_SAB_IG, rb_fb: META_EXACT_RB_FB, sab_fb: META_EXACT_SAB_FB };
+  const isMetaExact = country === 'all' || (metaExactSets[chKey] && metaExactSets[chKey].has(country));
+
   // Final estimate
   let estimate, estimateLabel, sub, methodNote;
 
   if (noTotal) {
-    // Facebook — no follower count, show % only
     const combinedPct = (countryPct/100) * (agePct/100) * (genderPct/100) * 100;
     estimateLabel = `${combinedPct.toFixed(2)}%`;
     estimate = null;
     sub = `of ${data.label} audience`;
-    methodNote = `Facebook page size not exported by Meta Business Suite — percentage estimate only. To get an absolute number, export your Facebook page likes from Meta Business Suite and multiply by this percentage. Age × country × gender distributions are applied as independent variables (not a native cross-tab).`;
+    methodNote = `Facebook page size not exported by Meta Business Suite — percentage estimate only. To get an absolute number, export your Facebook page likes and multiply by this percentage. Age/gender distributions are from Meta's actual cross-tab. Country data from Meta export. Age × country × gender applied as independent variables.`;
   } else {
     const raw = total * (countryPct/100) * (agePct/100) * (genderPct/100);
     estimateLabel = fmt(Math.round(raw));
     estimate = Math.round(raw);
     sub = `estimated followers on ${data.label}`;
-    methodNote = `Based on ${total.toLocaleString()} total ${data.label} followers (${data.source}). Age × country distributions are applied as independent variables — this assumes age profile is uniform across all countries, which is directionally accurate but not a native cross-tab. Gender split uses Meta's actual age-gender matrix where an age band is selected. Suitable for pitch estimates; flag the methodology if the client will scrutinise it closely.`;
+    const countrySource = isMetaExact
+      ? `Country breakdown from Meta Business Suite direct export.`
+      : `Country breakdown from Sprout Social (${total.toLocaleString()} total followers). Age/gender distributions from Meta Business Suite are inferred and applied uniformly — actual distribution may vary by market.`;
+    methodNote = `${countrySource} Age × country applied as independent variables — assumes age profile is broadly consistent across markets. Gender split uses Meta's actual age-gender matrix where an age band is selected. Suitable for pitch estimates; flag methodology if a client will scrutinise closely.`;
   }
+
+  const confidenceLevel = noTotal ? 'Moderate'
+    : (country === 'all' && ageBand === 'all' && gender === 'all') ? 'High'
+    : (country !== 'all' && !isMetaExact && (ageBand !== 'all' || gender !== 'all')) ? 'Directional'
+    : (country !== 'all' && !isMetaExact) ? 'Moderate'
+    : (ageBand !== 'all' && country !== 'all') ? 'Moderate'
+    : 'Moderate';
 
   // Breakdown chips
   const chips = [
@@ -2615,8 +2671,8 @@ function runCalc() {
     { label: 'Country filter', val: country === 'all' ? '100%' : `${countryPct}%` },
     { label: 'Age filter', val: ageBand === 'all' ? '100%' : `${agePct.toFixed(1)}%` },
     { label: 'Gender filter', val: gender === 'all' ? '100%' : `${genderPct.toFixed(1)}%` },
-    { label: 'Data source', val: 'Meta Business Suite' },
-    { label: 'Confidence', val: (country === 'all' && ageBand === 'all') ? 'High' : ageBand !== 'all' && country !== 'all' ? 'Directional' : 'Moderate' },
+    { label: 'Country data', val: isMetaExact ? 'Meta (direct)' : 'Sprout Social' },
+    { label: 'Confidence', val: confidenceLevel },
   ];
 
   document.getElementById('calcResultLabel').textContent =
