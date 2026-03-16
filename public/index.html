@@ -1693,7 +1693,7 @@ function getSocialProof(brandName) {
   if (safe.length === 0) return '';
 
   // Pick 3 from different categories — prioritise recognisable household names
-  const TIER1 = ['Nike','adidas','EA Sports','PlayStation','Google','TikTok','Netflix','Mastercard','Guinness',"McDonald's",'Universal','Premier League','YouTube','Unilever','The FA'];
+  const TIER1 = ['Nike','adidas','EA Sports','PlayStation','Mastercard','Guinness',"McDonald's",'Universal','Premier League','Unilever','The FA','JD Sports','Hollister','Ugg'];
   const TIER2 = ['Under Armour','New Balance','Puma','Sky Sports','JBL','Whoop','Just Eat',"Nando's",'Red Bull Leipzig','MLS','NFL','Hollister','Ugg','JD Sports','Chelsea FC'];
 
   const picked = [];
@@ -1714,7 +1714,7 @@ function getSocialProof(brandName) {
   const listStr = names.length === 1 ? names[0]
     : names.slice(0,-1).join(', ') + ' & ' + names[names.length-1];
 
-  return `SOCIAL PROOF CONTEXT: Rising Ballers has existing partnerships with ${listStr}. Include a line like "We've done award-winning work with the likes of ${listStr}." Use all names listed. Never name a direct competitor of the brand being pitched.`;
+  return `SOCIAL PROOF CONTEXT: Rising Ballers has existing partnerships with ${listStr}. Include exactly this line: "We've done award-winning work with the likes of ${listStr}. Lots of case studies on our site too." CRITICAL: Only ever name ${listStr} — do not add, substitute or invent any other client names under any circumstances. These are the only verified clients.`;
 }
 
 function getSystemPrompt(mode, fileCtx) {
