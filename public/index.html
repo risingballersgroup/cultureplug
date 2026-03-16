@@ -1557,7 +1557,7 @@ One pre-emptive response to the most likely follow-up objection.`,
 RULES:
 - Do NOT use subject lines, headers, bullet points, or bold text — plain prose only
 - Maximum 100 words in the body. Ruthlessly short.
-- Always open with "Hey team," on its own line
+- Always open with "Hey team," on its own line when no contact name is known. If a specific contact name is available, open with "Hey [First Name]," instead. If neither is available, fall back to "Hey,"
 - Follow with one short casual line that references the brand by name. Examples: "Love what Beats has been up to recently." / "Been following what Monzo has been doing lately." STOP THERE. One sentence. No comma extensions, no second clause, no editorial observation added after. The line ends after the brand nod.
 - Do NOT introduce Rising Ballers by name or say "We're Rising Ballers" — it's inferred from the sign-off. Jump straight into the value.
 - For the reach line, pick ONE at random from this exact list — do not use any other variation:
@@ -2305,16 +2305,26 @@ async function startBulkGeneration() {
     try {
       const spCtx = getSocialProof(company);
       const sys = 'You are Culture Plug, the internal commercial intelligence engine for Rising Ballers, a global football media and production company.\n\n' + DATA_CORPUS + '\n\n' + (spCtx ? spCtx + '\n' : '') + 'SENDER: The person writing this email is ' + senderName + '. Use their first name only in the sign-off. Do NOT add Rising Ballers after the name. Do NOT include any booking link or URL.\n\n' + MODE_PROMPTS.email + '\n\nUNIVERSAL RULES:\n- Only use data from the corpus. Never invent stats.\n- Sharp and specific beats long and vague.';
+      const greetingInstruction = firstName
+        ? 'Open with "Hey ' + firstName + '," on its own line — NOT "Hey team,".'
+        : 'Open with "Hey," on its own line.';
       const resp = await fetch('/api/chat', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 600, system: sys,
-          messages: [{ role: 'user', content: 'Write a cold outreach email to ' + company + '.' + (title ? ' The contact title is ' + title + '.' : '') }]
+          messages: [{ role: 'user', content: 'Write a cold outreach email to ' + company + '. ' + greetingInstruction + (title ? ' The contact job title is ' + title + '.' : '') }]
         })
       });
       const apiData = await resp.json();
       let body = (apiData.content && apiData.content[0] && apiData.content[0].text) ? apiData.content[0].text : '';
-      if (bookingUrl && body.includes('Best,')) {
-        body = body.replace('\nBest,', '\n\nFeel free to book in some time here: ' + bookingUrl + '\n\nBest,');
+      // Inject booking link before Best, — same logic as single email mode
+      if (bookingUrl) {
+        body = body
+          .replace(/<a[^>]*>Feel free to book in some time here<\/a>/gi, '')
+          .replace(/Feel free to book in (?:some )?time here(?:[^\n]*)?/gi, '')
+          .replace(new RegExp(bookingUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), '');
+        if (body.includes('Best,')) {
+          body = body.replace(/(\n)(Best,)/, '\n<a href="' + bookingUrl + '">Feel free to book in some time here</a>\n\n$2');
+        }
       }
       bulkResults.push({ company, email, firstName, title, body });
       const card = document.createElement('div');
