@@ -1025,6 +1025,35 @@
         </div>
       </div>
 
+      <!-- PAID MEDIA RATECARD -->
+      <div style="margin-bottom:28px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">Paid Media — Amplification Cheatsheet</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);margin-bottom:12px;">Up to 3% of overall budget can be assigned to paid. These rates are per £1,000 spend.</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+          <!-- RB Paid -->
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Rising Ballers (£0.03 CPV avg)</div>
+            <div style="overflow-x:auto;">
+              <table class="mp-table" id="rcPaidTableRB">
+                <thead><tr><th>Type</th><th>Budget</th><th>Reach</th><th>Imps</th><th>Views</th><th>Engs</th></tr></thead>
+                <tbody id="rcPaidBodyRB"></tbody>
+              </table>
+            </div>
+          </div>
+          <!-- SAB Paid -->
+          <div>
+            <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:8px;">She's A Baller (£0.015 CPV avg)</div>
+            <div style="overflow-x:auto;">
+              <table class="mp-table" id="rcPaidTableSAB">
+                <thead><tr><th>Type</th><th>Budget</th><th>Reach</th><th>Imps</th><th>Views</th><th>Engs</th></tr></thead>
+                <tbody id="rcPaidBodySAB"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <button onclick="mpGoStep(2)" style="background:var(--accent);color:var(--bg);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;border:none;padding:12px 28px;border-radius:8px;cursor:pointer;font-weight:700;">Confirm Rates → Build Plan</button>
     </div>
 
@@ -2716,6 +2745,7 @@ function showMediaPlan(btn) {
   btn.classList.add('active');
   mpRates = { RB: MP_RATECARD.RB.map(r => ({...r})), SAB: MP_RATECARD.SAB.map(r => ({...r})) };
   mpRenderRatecard();
+  mpRenderPaidRatecard();
   mpRenderPlanInputs();
   mpGoStep(1);
   document.getElementById('mediaPlanModal').style.display = 'block';
@@ -2735,11 +2765,53 @@ function mpGoStep(n) {
 }
 
 function fmt(n) { return isNaN(n) ? '0' : Math.round(n).toLocaleString('en-GB'); }
+function fmtN(n) { return isNaN(n) ? '0' : Number(n).toLocaleString('en-GB'); }
 function fmtGBP(n) { return '£' + fmt(n); }
 
 function toggleRatecardLock() {
   const unlocked = document.getElementById('rcUnlock').checked;
   document.querySelectorAll('.rc-editable').forEach(el => { el.disabled = !unlocked; });
+}
+
+
+const MP_PAID_RATECARD = {
+  RB: [
+    { type: 'Instagram Feed Boost', budget: 1000, reach: 34500,  imps: 38333,  views: 33333, engs: 575  },
+    { type: 'Instagram Feed Dark',  budget: 5000, reach: 172500, imps: 191667, views: 166667, engs: 2875 },
+    { type: 'Instagram Story Dark', budget: 1000, reach: 34500,  imps: 38333,  views: 33333, engs: 38   },
+    { type: 'TikTok Feed',          budget: 5000, reach: 207000, imps: 230000, views: 200000, engs: 230  },
+    { type: 'TikTok Story',         budget: 1000, reach: 41400,  imps: 46000,  views: 40000, engs: 690  },
+    { type: 'YouTube Hero',         budget: 1000, reach: 34500,  imps: 38333,  views: 33333, engs: 383  },
+    { type: 'YT Shorts',            budget: 1000, reach: 34500,  imps: 38333,  views: 33333, engs: 192  },
+  ],
+  SAB: [
+    { type: 'Instagram Feed Boost', budget: 1000, reach: 103500, imps: 115000,  views: 100000, engs: 1725 },
+    { type: 'Instagram Feed Dark',  budget: 5000, reach: 345000, imps: 383333,  views: 333333, engs: 5750 },
+    { type: 'Instagram Story Dark', budget: 1000, reach: 69000,  imps: 76667,   views: 66667,  engs: 77   },
+    { type: 'TikTok Feed',          budget: 5000, reach: 517500, imps: 575000,  views: 500000, engs: 575  },
+    { type: 'TikTok Story',         budget: 1000, reach: 103500, imps: 115000,  views: 100000, engs: 1725 },
+    { type: 'YouTube Hero',         budget: 1000, reach: 86250,  imps: 95833,   views: 83333,  engs: 958  },
+    { type: 'YT Shorts',            budget: 1000, reach: 69000,  imps: 76667,   views: 66667,  engs: 383  },
+  ]
+};
+
+function mpRenderPaidRatecard() {
+  ['RB','SAB'].forEach(brand => {
+    const tbody = document.getElementById('rcPaidBody' + brand);
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    MP_PAID_RATECARD[brand].forEach(row => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${row.type}</td>
+        <td style="font-family:'DM Mono',monospace;">£${fmtN(row.budget)}</td>
+        <td style="font-family:'DM Mono',monospace;color:var(--muted);">${fmtN(row.reach)}</td>
+        <td style="font-family:'DM Mono',monospace;color:var(--muted);">${fmtN(row.imps)}</td>
+        <td style="font-family:'DM Mono',monospace;color:var(--muted);">${fmtN(row.views)}</td>
+        <td style="font-family:'DM Mono',monospace;color:var(--muted);">${fmtN(row.engs)}</td>`;
+      tbody.appendChild(tr);
+    });
+  });
 }
 
 function mpRenderRatecard() {
@@ -2751,11 +2823,11 @@ function mpRenderRatecard() {
       tr.innerHTML = `
         <td>${row.format}</td>
         <td><span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform}</span></td>
-        <td><input class="mp-qty-input rc-editable" disabled type="number" value="${row.cost}" onchange="mpRates['${brand}'][${i}].cost=+this.value;mpRecalc()" style="width:80px;"></td>
-        <td><input class="mp-qty-input rc-editable" disabled type="number" value="${row.reach}" onchange="mpRates['${brand}'][${i}].reach=+this.value;mpRecalc()" style="width:90px;"></td>
-        <td><input class="mp-qty-input rc-editable" disabled type="number" value="${row.imps}" onchange="mpRates['${brand}'][${i}].imps=+this.value;mpRecalc()" style="width:90px;"></td>
-        <td><input class="mp-qty-input rc-editable" disabled type="number" value="${row.views}" onchange="mpRates['${brand}'][${i}].views=+this.value;mpRecalc()" style="width:90px;"></td>
-        <td><input class="mp-qty-input rc-editable" disabled type="number" value="${row.engs}" onchange="mpRates['${brand}'][${i}].engs=+this.value;mpRecalc()" style="width:80px;"></td>`;
+        <td><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.cost)}" data-raw="${row.cost}" onchange="mpRates['${brand}'][${i}].cost=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;"></td>
+        <td><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="mpRates['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:100px;"></td>
+        <td><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="mpRates['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:100px;"></td>
+        <td><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.views)}" data-raw="${row.views}" onchange="mpRates['${brand}'][${i}].views=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:100px;"></td>
+        <td><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" data-raw="${row.engs}" onchange="mpRates['${brand}'][${i}].engs=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;"></td>`;
       tbody.appendChild(tr);
     });
   });
