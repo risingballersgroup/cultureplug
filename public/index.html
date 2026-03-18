@@ -997,7 +997,7 @@
 
 <!-- ── MEDIA PLAN BUILDER MODAL ── -->
 <div id="mediaPlanModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;overflow-y:auto;padding:40px 16px;">
-  <div style="max-width:960px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;position:relative;">
+  <div style="max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative;">
     <button onclick="closeMediaPlan()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;">✕</button>
 
     <!-- STEP INDICATOR -->
@@ -1026,45 +1026,53 @@
         <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Rising Ballers — Organic</div>
         <div style="overflow-x:auto;">
           <table class="mp-table" id="rcTableRB">
-            <thead><tr><th>Format</th><th>Platform</th><th>Cost (£)</th><th>Reach</th><th>Impressions</th><th>Views</th><th>Engagements</th></tr></thead>
+            <thead><tr><th>Format</th><th>Platform</th><th style="text-align:center;">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Impressions</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engagements</th></tr></thead>
             <tbody id="rcBodyRB"></tbody>
           </table>
         </div>
       </div>
 
       <!-- SAB RATECARD TABLE -->
-      <div style="margin-bottom:28px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:10px;">She's A Baller — Organic</div>
+      <div style="margin-bottom:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:8px;">She's A Baller — Organic</div>
         <div style="overflow-x:auto;">
           <table class="mp-table" id="rcTableSAB">
-            <thead><tr><th>Format</th><th>Platform</th><th>Cost (£)</th><th>Reach</th><th>Impressions</th><th>Views</th><th>Engagements</th></tr></thead>
+            <thead><tr><th>Format</th><th>Platform</th><th style="text-align:center;">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Impressions</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engagements</th></tr></thead>
             <tbody id="rcBodySAB"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- PAID MEDIA RATECARD -->
-      <div style="margin-bottom:28px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">Paid Media — Amplification Cheatsheet</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);margin-bottom:12px;">Up to 3% of overall budget can be assigned to paid. These rates are per £1,000 spend.</div>
+      <!-- RB USA RATECARD TABLE -->
+      <div style="margin-bottom:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Rising Ballers USA — Organic</div>
+        <div style="overflow-x:auto;">
+          <table class="mp-table" id="rcTableRBUSA">
+            <thead><tr><th>Format</th><th>Platform</th><th style="text-align:center;">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Impressions</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engagements</th></tr></thead>
+            <tbody id="rcBodyRBUSA"></tbody>
+          </table>
+        </div>
+      </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-          <!-- RB Paid -->
+      <!-- PAID MEDIA RATECARD -->
+      <div style="margin-bottom:16px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">Paid Media — Amplification Cheatsheet</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);margin-bottom:8px;">Up to 3% of overall budget can be assigned to paid. Rates shown are per £1,000 spend.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
           <div>
-            <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Rising Ballers (£0.03 CPV avg)</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Rising Ballers (£0.03 CPV avg)</div>
             <div style="overflow-x:auto;">
               <table class="mp-table" id="rcPaidTableRB">
-                <thead><tr><th>Type</th><th>Budget</th><th>Reach</th><th>Imps</th><th>Views</th><th>Engs</th></tr></thead>
+                <thead><tr><th>Type</th><th style="text-align:center;">Budget</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
                 <tbody id="rcPaidBodyRB"></tbody>
               </table>
             </div>
           </div>
-          <!-- SAB Paid -->
           <div>
-            <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:8px;">She's A Baller (£0.015 CPV avg)</div>
+            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:6px;">She's A Baller (£0.015 CPV avg)</div>
             <div style="overflow-x:auto;">
               <table class="mp-table" id="rcPaidTableSAB">
-                <thead><tr><th>Type</th><th>Budget</th><th>Reach</th><th>Imps</th><th>Views</th><th>Engs</th></tr></thead>
+                <thead><tr><th>Type</th><th style="text-align:center;">Budget</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
                 <tbody id="rcPaidBodySAB"></tbody>
               </table>
             </div>
@@ -1081,8 +1089,8 @@
       <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);margin:0 0 6px;">Set budget & post quantities</h2>
       <p style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);margin:0 0 24px;">Fill in the client name, total budget, and number of posts per format. The plan calculates automatically.</p>
 
-      <!-- Client + Budget -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+      <!-- Client + Budget + Logo -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;">
         <div>
           <label class="mp-label">Client / Brand Name</label>
           <input id="mpClientName" type="text" placeholder="e.g. Nike" class="mp-input">
@@ -1092,7 +1100,7 @@
           <input id="mpBudget" type="number" placeholder="e.g. 100000" class="mp-input" oninput="mpRecalc()">
         </div>
         <div>
-          <label class="mp-label">Client Logo <span style="color:var(--muted);font-size:10px;">(optional — appears in Client View)</span></label>
+          <label class="mp-label">Client Logo <span style="color:var(--muted);font-size:10px;">(optional)</span></label>
           <div style="display:flex;align-items:center;gap:10px;">
             <label style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 14px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
               Upload Logo
@@ -1102,7 +1110,7 @@
               <img id="mpClientLogoImg" style="height:32px;object-fit:contain;border-radius:4px;">
               <button onclick="mpClearClientLogo()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;" title="Remove">✕</button>
             </div>
-            <span id="mpClientLogoNone" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">No logo uploaded</span>
+            <span id="mpClientLogoNone" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">No logo</span>
           </div>
         </div>
       </div>
@@ -1127,28 +1135,41 @@
             <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-top:4px;" id="mpProdBudgetDisplay">£0</div>
           </div>
         </div>
+        <div id="mpPctWarning" style="display:none;margin-top:10px;background:rgba(255,80,80,0.1);border:1px solid rgba(255,80,80,0.3);border-radius:6px;padding:7px 12px;font-family:'DM Mono',monospace;font-size:10px;color:#ff6b6b;letter-spacing:0.5px;"></div>
       </div>
 
-      <!-- RB POST QUANTITIES -->
+<!-- RB POST QUANTITIES -->
       <div style="margin-bottom:20px;">
         <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Rising Ballers — Post Quantities</div>
         <div style="overflow-x:auto;">
           <table class="mp-table">
-            <thead><tr><th>Format</th><th>Platform</th><th>Rate (£)</th><th>No. of Posts</th><th>Total Cost</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th></tr></thead>
+            <thead><tr><th>Format</th><th>Platform</th><th>Rate (£)</th><th>Qty</th><th>Tiles</th><th>Total Cost</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th></tr></thead>
             <tbody id="mpBodyRB"></tbody>
-            <tfoot><tr style="background:rgba(201,168,76,0.08);"><td colspan="2" style="font-weight:700;color:var(--gold);">RB TOTALS</td><td></td><td id="mpRBTotalPosts" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalCost" style="font-weight:700;color:var(--gold);">£0</td><td id="mpRBTotalReach" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalImps" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalEngs" style="font-weight:700;color:var(--gold);">0</td></tr></tfoot>
+            <tfoot><tr style="background:rgba(201,168,76,0.08);"><td colspan="3" style="font-weight:700;color:var(--gold);">RB TOTALS</td><td id="mpRBTotalPosts" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalTiles" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalCost" style="font-weight:700;color:var(--gold);">£0</td><td id="mpRBTotalReach" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalImps" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalEngs" style="font-weight:700;color:var(--gold);">0</td></tr></tfoot>
           </table>
         </div>
       </div>
 
       <!-- SAB POST QUANTITIES -->
-      <div style="margin-bottom:24px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:10px;">She's A Baller — Post Quantities</div>
+      <div style="margin-bottom:14px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:8px;">She's A Baller — Post Quantities</div>
         <div style="overflow-x:auto;">
           <table class="mp-table">
-            <thead><tr><th>Format</th><th>Platform</th><th>Rate (£)</th><th>No. of Posts</th><th>Total Cost</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th></tr></thead>
+            <thead><tr><th>Format</th><th>Platform</th><th>Rate (£)</th><th>Qty</th><th>Tiles</th><th>Total Cost</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th></tr></thead>
             <tbody id="mpBodySAB"></tbody>
-            <tfoot><tr style="background:rgba(255,179,198,0.06);"><td colspan="2" style="font-weight:700;color:var(--pink);">SAB TOTALS</td><td></td><td id="mpSABTotalPosts" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalCost" style="font-weight:700;color:var(--pink);">£0</td><td id="mpSABTotalReach" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalImps" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalEngs" style="font-weight:700;color:var(--pink);">0</td></tr></tfoot>
+            <tfoot><tr style="background:rgba(255,179,198,0.06);"><td colspan="3" style="font-weight:700;color:var(--pink);">SAB TOTALS</td><td id="mpSABTotalPosts" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalTiles" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalCost" style="font-weight:700;color:var(--pink);">£0</td><td id="mpSABTotalReach" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalImps" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalEngs" style="font-weight:700;color:var(--pink);">0</td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- RB USA POST QUANTITIES -->
+      <div style="margin-bottom:14px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Rising Ballers USA — Post Quantities</div>
+        <div style="overflow-x:auto;">
+          <table class="mp-table">
+            <thead><tr><th>Format</th><th>Platform</th><th>Rate (£)</th><th>Qty</th><th>Tiles</th><th>Total Cost</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th></tr></thead>
+            <tbody id="mpBodyRBUSA"></tbody>
+            <tfoot><tr style="background:rgba(201,168,76,0.08);"><td colspan="3" style="font-weight:700;color:var(--gold);">RB USA TOTALS</td><td id="mpRBUSATotalPosts" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalTiles" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalCost" style="font-weight:700;color:var(--gold);">£0</td><td id="mpRBUSATotalReach" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalImps" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalEngs" style="font-weight:700;color:var(--gold);">0</td></tr></tfoot>
           </table>
         </div>
       </div>
@@ -2756,12 +2777,21 @@ const MP_RATECARD = {
     { format: 'Feed Post - Imagery', platform: 'Instagram', cost: 10000, reach: 200000, imps: 250000, views: 250000, engs: 10000 },
     { format: 'Feed Post - Reels',   platform: 'Instagram', cost: 10000, reach: 125000, imps: 200000, views: 175000, engs: 5000  },
     { format: 'Story',               platform: 'Instagram', cost: 2000,  reach: 50000,  imps: 60000,  views: 60000,  engs: 0     },
-    { format: 'Story Takeover (8)',  platform: 'Instagram', cost: 15000, reach: 400000, imps: 600000, views: 600000, engs: 0     },
+    { format: 'Story Takeover (8)',  platform: 'Instagram', cost: 15000, reach: 400000, imps: 600000, views: 600000, engs: 0,  tiles: 8 },
     { format: 'Feed Post',           platform: 'TikTok',    cost: 8000,  reach: 50000,  imps: 60000,  views: 60000,  engs: 5000  },
     { format: 'Story',               platform: 'TikTok',    cost: 1500,  reach: 30000,  imps: 40000,  views: 40000,  engs: 0     },
-    { format: 'Story Takeover',      platform: 'TikTok',    cost: 10000, reach: 300000, imps: 400000, views: 400000, engs: 0     },
+    { format: 'Story Takeover',      platform: 'TikTok',    cost: 10000, reach: 300000, imps: 400000, views: 400000, engs: 0,  tiles: 8 },
     { format: 'Hero Film',           platform: 'YouTube',   cost: 25000, reach: 50000,  imps: 200000, views: 50000,  engs: 1000  },
     { format: 'YT Shorts',           platform: 'YouTube',   cost: 1000,  reach: 5000,   imps: 5000,   views: 5000,   engs: 250   },
+  ],
+  RBUSA: [
+    { format: 'Feed Post - Imagery', platform: 'Instagram', cost: 2000, reach: 40000,  imps: 50000,  views: 40000,  engs: 2000 },
+    { format: 'Feed Post - Reels',   platform: 'Instagram', cost: 2000, reach: 30000,  imps: 50000,  views: 35000,  engs: 2000 },
+    { format: 'Story',               platform: 'Instagram', cost: 1000, reach: 4000,   imps: 5000,   views: 4000,   engs: 0    },
+    { format: 'Story Takeover (10)', platform: 'Instagram', cost: 5000, reach: 40000,  imps: 50000,  views: 40000,  engs: 0,   tiles: 10 },
+    { format: 'Feed Post',           platform: 'TikTok',    cost: 1000, reach: 15000,  imps: 20000,  views: 15000,  engs: 1500 },
+    { format: 'Story',               platform: 'TikTok',    cost: 750,  reach: 1000,   imps: 2000,   views: 1000,   engs: 0    },
+    { format: 'Story Takeover',      platform: 'TikTok',    cost: 2500, reach: 10000,  imps: 20000,  views: 10000,  engs: 0,   tiles: 8 },
   ],
   SAB: [
     { format: 'Feed Post - Imagery', platform: 'Instagram', cost: 3000,  reach: 40000,  imps: 50000,  views: 50000,  engs: 5000  },
@@ -2777,13 +2807,13 @@ const MP_RATECARD = {
 };
 
 // Working copy — can be overridden
-let mpRates = { RB: MP_RATECARD.RB.map(r => ({...r})), SAB: MP_RATECARD.SAB.map(r => ({...r})) };
+let mpRates = { RB: MP_RATECARD.RB.map(r => ({...r})), RBUSA: MP_RATECARD.RBUSA.map(r => ({...r})), SAB: MP_RATECARD.SAB.map(r => ({...r})) };
 let mpCurrentStep = 1;
 
 function showMediaPlan(btn) {
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  mpRates = { RB: MP_RATECARD.RB.map(r => ({...r})), SAB: MP_RATECARD.SAB.map(r => ({...r})) };
+  mpRates = { RB: MP_RATECARD.RB.map(r => ({...r})), RBUSA: MP_RATECARD.RBUSA.map(r => ({...r})), SAB: MP_RATECARD.SAB.map(r => ({...r})) };
   mpRenderRatecard();
   mpRenderPaidRatecard();
   mpRenderPlanInputs();
@@ -2843,51 +2873,55 @@ function mpRenderPaidRatecard() {
     MP_PAID_RATECARD[brand].forEach(row => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${row.type}</td>
-        <td style="font-family:'DM Mono',monospace;">£${fmtN(row.budget)}</td>
-        <td style="font-family:'DM Mono',monospace;color:var(--muted);">${fmtN(row.reach)}</td>
-        <td style="font-family:'DM Mono',monospace;color:var(--muted);">${fmtN(row.imps)}</td>
-        <td style="font-family:'DM Mono',monospace;color:var(--muted);">${fmtN(row.views)}</td>
-        <td style="font-family:'DM Mono',monospace;color:var(--muted);">${fmtN(row.engs)}</td>`;
+        <td style="font-size:11px;">${row.type}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;text-align:center;">£${fmtN(row.budget)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;text-align:center;color:var(--muted);">${fmtN(row.reach)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;text-align:center;color:var(--muted);">${fmtN(row.imps)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;text-align:center;color:var(--muted);">${fmtN(row.views)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;text-align:center;color:var(--muted);">${fmtN(row.engs)}</td>`;
       tbody.appendChild(tr);
     });
   });
 }
 
 function mpRenderRatecard() {
-  ['RB','SAB'].forEach(brand => {
+  ['RB','RBUSA','SAB'].forEach(brand => {
     const tbody = document.getElementById('rcBody' + brand);
+    if (!tbody) return;
     tbody.innerHTML = '';
     mpRates[brand].forEach((row, i) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${row.format}</td>
+        <td>${row.format}${row.tiles ? '<span style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);margin-left:6px;">(${row.tiles} tiles)</span>' : ''}</td>
         <td><span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform}</span></td>
-        <td><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.cost)}" data-raw="${row.cost}" onchange="mpRates['${brand}'][${i}].cost=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;"></td>
-        <td><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="mpRates['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:100px;"></td>
-        <td><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="mpRates['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:100px;"></td>
-        <td><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.views)}" data-raw="${row.views}" onchange="mpRates['${brand}'][${i}].views=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:100px;"></td>
-        <td><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" data-raw="${row.engs}" onchange="mpRates['${brand}'][${i}].engs=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;"></td>`;
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.cost)}" data-raw="${row.cost}" onchange="mpRates['${brand}'][${i}].cost=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="mpRates['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="mpRates['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.views)}" data-raw="${row.views}" onchange="mpRates['${brand}'][${i}].views=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" data-raw="${row.engs}" onchange="mpRates['${brand}'][${i}].engs=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>`;
       tbody.appendChild(tr);
     });
   });
 }
 
 function mpRenderPlanInputs() {
-  ['RB','SAB'].forEach(brand => {
+  ['RB','RBUSA','SAB'].forEach(brand => {
     const tbody = document.getElementById('mpBody' + brand);
+    if (!tbody) return;
     tbody.innerHTML = '';
     mpRates[brand].forEach((row, i) => {
+      const tilesPerPost = row.tiles || 1;
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${row.format}</td>
         <td><span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform}</span></td>
-        <td style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);">${fmtGBP(row.cost)}</td>
-        <td><input class="mp-qty-input" type="number" value="0" min="0" id="qty_${brand}_${i}" oninput="mpRecalc()" style="width:70px;"></td>
-        <td id="rowCost_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:12px;">£0</td>
-        <td id="rowReach_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);">0</td>
-        <td id="rowImps_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);">0</td>
-        <td id="rowEngs_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);">0</td>`;
+        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">${fmtGBP(row.cost)}</td>
+        <td><input class="mp-qty-input" type="number" value="0" min="0" id="qty_${brand}_${i}" oninput="mpRecalc()" style="width:56px;"></td>
+        <td id="rowTiles_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
+        <td id="rowCost_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;">£0</td>
+        <td id="rowReach_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
+        <td id="rowImps_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
+        <td id="rowEngs_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>`;
       tbody.appendChild(tr);
     });
   });
@@ -2896,30 +2930,44 @@ function mpRenderPlanInputs() {
 
 function mpRecalc() {
   const budget = parseFloat(document.getElementById('mpBudget').value) || 0;
-  const orgPct  = parseFloat(document.getElementById('mpOrgPct').value) / 100 || 1;
-  const ampPct  = parseFloat(document.getElementById('mpAmpPct').value) / 100 || 0;
-  const prodPct = parseFloat(document.getElementById('mpProdPct').value) / 100 || 0;
+  const orgPct  = parseFloat(document.getElementById('mpOrgPct').value) || 0;
+  const ampPct  = parseFloat(document.getElementById('mpAmpPct').value) || 0;
+  const prodPct = parseFloat(document.getElementById('mpProdPct').value) || 0;
+  const totalPct = orgPct + ampPct + prodPct;
 
-  document.getElementById('mpOrgBudgetDisplay').textContent  = fmtGBP(budget * orgPct);
-  document.getElementById('mpAmpBudgetDisplay').textContent  = fmtGBP(budget * ampPct);
-  document.getElementById('mpProdBudgetDisplay').textContent = fmtGBP(budget * prodPct);
+  // Budget % warning
+  const warn = document.getElementById('mpPctWarning');
+  if (warn) {
+    warn.style.display = totalPct > 100 ? 'block' : 'none';
+    warn.textContent = 'Warning: allocations total ' + totalPct + '% — must not exceed 100%';
+  }
 
-  let totalPosts=0, totalCost=0, totalReach=0, totalImps=0, totalEngs=0;
+  document.getElementById('mpOrgBudgetDisplay').textContent  = fmtGBP(budget * orgPct / 100);
+  document.getElementById('mpAmpBudgetDisplay').textContent  = fmtGBP(budget * ampPct / 100);
+  document.getElementById('mpProdBudgetDisplay').textContent = fmtGBP(budget * prodPct / 100);
 
-  ['RB','SAB'].forEach(brand => {
-    let bPosts=0, bCost=0, bReach=0, bImps=0, bEngs=0;
+  let totalPosts=0, totalTiles=0, totalCost=0, totalReach=0, totalImps=0, totalEngs=0;
+
+  ['RB','RBUSA','SAB'].forEach(brand => {
+    let bPosts=0, bTiles=0, bCost=0, bReach=0, bImps=0, bEngs=0;
     mpRates[brand].forEach((row, i) => {
       const qty = parseInt(document.getElementById('qty_'+brand+'_'+i)?.value) || 0;
+      const tilesPerPost = row.tiles || 1;
+      const tiles = qty * tilesPerPost;
       const rCost  = qty * row.cost;
       const rReach = qty * row.reach;
       const rImps  = qty * row.imps;
       const rEngs  = qty * row.engs;
+      const tileEl = document.getElementById('rowTiles_'+brand+'_'+i);
+      if (tileEl) tileEl.textContent = tiles > 0 ? fmt(tiles) : (tilesPerPost > 1 ? '0' : '-');
       document.getElementById('rowCost_'+brand+'_'+i).textContent  = fmtGBP(rCost);
       document.getElementById('rowReach_'+brand+'_'+i).textContent = fmt(rReach);
       document.getElementById('rowImps_'+brand+'_'+i).textContent  = fmt(rImps);
       document.getElementById('rowEngs_'+brand+'_'+i).textContent  = fmt(rEngs);
-      bPosts += qty; bCost += rCost; bReach += rReach; bImps += rImps; bEngs += rEngs;
+      bPosts += qty; bTiles += tiles; bCost += rCost; bReach += rReach; bImps += rImps; bEngs += rEngs;
     });
+    const tilesEl = document.getElementById('mp'+brand+'TotalTiles');
+    if (tilesEl) tilesEl.textContent = fmt(bTiles);
     document.getElementById('mp'+brand+'TotalPosts').textContent = fmt(bPosts);
     document.getElementById('mp'+brand+'TotalCost').textContent  = fmtGBP(bCost);
     document.getElementById('mp'+brand+'TotalReach').textContent = fmt(bReach);
@@ -3140,70 +3188,207 @@ function mpGenerateClientView() {
 }
 
 function mpExportPDF() {
-  const clientName = document.getElementById('mpClientName').value || 'Client';
-  const content = document.getElementById('mpClientViewContent');
-  const w = window.open('', '_blank');
-  w.document.write(`<!DOCTYPE html><html><head><title>Media Plan - ${clientName}</title>
-  <style>
-    body { font-family: Arial, sans-serif; font-size: 12px; color: #222; padding: 32px; background: #fff; }
-    h1 { font-size: 22px; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    th { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; text-align: left; padding: 7px 8px; border-bottom: 2px solid #222; background: #f5f5f5; }
-    td { padding: 7px 8px; border-bottom: 1px solid #eee; font-size: 11px; }
-    .accent { color: #007a4d; font-weight: 700; }
-    .section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #666; margin: 20px 0 8px; }
-    .logo { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-    @media print { body { padding: 0; } }
-  </style></head><body>
-  <div class="logo">Rising Ballers × She's A Baller</div>
-  <h1>Media Plan: ${clientName}</h1>
-  ${content.innerHTML.replace(/style="[^"]*color:\s*var\([^)]+\)[^"]*"/g, '').replace(/var\(--[^)]+\)/g, '#222')}
-  <script>window.onload=()=>window.print()<\/script></body></html>`);
+  var clientName = document.getElementById('mpClientName').value || 'Client';
+  var budget     = parseFloat(document.getElementById('mpBudget').value) || 0;
+  var prodPct    = parseFloat(document.getElementById('mpProdPct').value) || 0;
+  var prodBudget = budget * prodPct / 100;
+  var fN = function(n){ return Number(n).toLocaleString('en-GB'); };
+  var gN = function(n){ return '£' + fN(n); };
+  var brandLabels = { RB: 'Rising Ballers', RBUSA: 'Rising Ballers USA', SAB: "She's A Baller" };
+  var brandColors = { RB: '#c9a84c', RBUSA: '#c9a84c', SAB: '#e91e8c' };
+  var brandData = {};
+  ['RB','RBUSA','SAB'].forEach(function(brand) {
+    var rows=[],bP=0,bT=0,bC=0,bR=0,bI=0,bE=0;
+    mpRates[brand].forEach(function(row,i) {
+      var el = document.getElementById('qty_'+brand+'_'+i);
+      var qty = el ? (parseInt(el.value)||0) : 0;
+      if (!qty) return;
+      var tiles = qty*(row.tiles||1);
+      rows.push({format:row.format,platform:row.platform,qty:qty,tiles:tiles,cost:qty*row.cost,reach:qty*row.reach,imps:qty*row.imps,engs:qty*row.engs});
+      bP+=qty;bT+=tiles;bC+=qty*row.cost;bR+=qty*row.reach;bI+=qty*row.imps;bE+=qty*row.engs;
+    });
+    brandData[brand]={rows:rows,posts:bP,tiles:bT,cost:bC,reach:bR,imps:bI,engs:bE};
+  });
+  var totalCost=brandData.RB.cost+brandData.RBUSA.cost+brandData.SAB.cost;
+  var totalReach=brandData.RB.reach+brandData.RBUSA.reach+brandData.SAB.reach;
+  var totalImps=brandData.RB.imps+brandData.RBUSA.imps+brandData.SAB.imps;
+  var totalEngs=brandData.RB.engs+brandData.RBUSA.engs+brandData.SAB.engs;
+  var addedValue=totalCost-budget;
+  var addedPct=budget>0?Math.round((addedValue/budget)*100):0;
+  var dateStr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  var getCt=function(plt,type){
+    var n=0;
+    ['RB','RBUSA','SAB'].forEach(function(b){
+      mpRates[b].forEach(function(r,i){
+        var el=document.getElementById('qty_'+b+'_'+i);
+        var q=el?(parseInt(el.value)||0):0;
+        if(r.platform!==plt)return;
+        if(type==='Feed'&&r.format.toLowerCase().indexOf('feed')>=0)n+=q;
+        if(type==='Story'&&r.format.toLowerCase().indexOf('story')>=0)n+=q;
+        if(type==='TOTAL')n+=q;
+      });
+    });
+    return n;
+  };
+  var postRows='';
+  ['Feed','Story','TOTAL'].forEach(function(t){
+    var ig=getCt('Instagram',t),tt=getCt('TikTok',t),yt=getCt('YouTube',t);
+    postRows+='<tr'+(t==='TOTAL'?' class="tr-total"':'')+'><td>'+t+'</td><td>'+(ig||0)+'</td><td>'+(tt||0)+'</td><td>'+(yt||0)+'</td><td>'+(ig+tt+yt)+'</td></tr>';
+  });
+  var brandHTML='';
+  ['RB','RBUSA','SAB'].forEach(function(brand){
+    var d=brandData[brand];
+    if(!d.rows.length)return;
+    var col=brandColors[brand];
+    var rr='';
+    d.rows.forEach(function(r){rr+='<tr><td>'+r.format+'</td><td style="color:#666">'+r.platform+'</td><td style="text-align:center">'+r.qty+'</td><td style="text-align:center">'+r.tiles+'</td><td style="text-align:right">'+gN(r.cost)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
+    rr+='<tr class="tr-total"><td colspan="2" style="color:'+col+';font-weight:800">TOTALS</td><td style="text-align:center;color:'+col+'">'+d.posts+'</td><td style="text-align:center;color:'+col+'">'+d.tiles+'</td><td style="text-align:right;color:'+col+'">'+gN(d.cost)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.engs)+'</td></tr>';
+    brandHTML+='<div style="margin-bottom:18px"><div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:'+col+';font-weight:800;margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid '+col+'">'+brandLabels[brand]+'</div><table><thead><tr><th>Format</th><th>Platform</th><th style="text-align:center">Posts</th><th style="text-align:center">Tiles</th><th style="text-align:right">Cost</th><th style="text-align:right">Reach</th><th style="text-align:right">Impressions</th><th style="text-align:right">Engagements</th></tr></thead><tbody>'+rr+'</tbody></table></div>';
+  });
+  var logoHTML=mpClientLogoB64?'<img src="'+mpClientLogoB64+'" style="height:38px;object-fit:contain">':'<span style="font-size:15px;font-weight:800;color:#1a1a18">'+clientName+'</span>';
+  var css='body{font-family:Arial,sans-serif;font-size:11px;color:#1a1a18;background:#fff;padding:28px 32px}@media print{body{padding:10px 14px}@page{margin:8mm;size:A4 landscape}}.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:3px solid #1a1a18;margin-bottom:18px}.brand{font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase}.sub{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-top:2px}.pt{font-size:20px;font-weight:900;margin-bottom:2px}.pd{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:16px}.tg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}.card{border:1px solid #e8e8e8;border-radius:6px;padding:14px}.cl{font-size:7px;text-transform:uppercase;letter-spacing:2px;color:#999;font-weight:700;margin-bottom:8px}.ir{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:11px}.il{color:#555}.iv{font-weight:600}.ih{background:#f0fdf8;margin:6px -8px -8px;padding:8px 8px 6px;border-radius:0 0 5px 5px;border-top:2px solid #00aa66;display:flex;justify-content:space-between}.ih .il{color:#007a4d;font-weight:800;font-size:12px}.ih .iv{color:#007a4d;font-weight:900;font-size:13px}.ap{font-size:8px;color:#007a4d;text-align:right;padding-top:3px;font-weight:700}table{width:100%;border-collapse:collapse;margin-bottom:4px}th{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#888;padding:5px 7px;border-bottom:2px solid #1a1a18;text-align:left;background:#f8f8f8}td{padding:5px 7px;border-bottom:1px solid #f0f0f0;font-size:10px}.tr-total td{font-weight:700;background:#f5f5f5;border-top:1.5px solid #ddd}.tr-grand td{font-weight:900;background:#1a1a18;color:#00FFAA;padding:6px 7px}.sec{font-size:7px;text-transform:uppercase;letter-spacing:2px;color:#999;font-weight:700;margin:16px 0 8px;padding-bottom:3px;border-bottom:1px solid #e8e8e8}.ng{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}.nt{background:#f8f8f8;border-radius:5px;padding:8px 10px}.nk{font-size:7px;text-transform:uppercase;letter-spacing:1.5px;color:#00aa66;font-weight:700;margin-bottom:3px}.nv{font-size:9px;color:#444;line-height:1.5}.bp{margin-top:12px;padding:10px 12px;background:#f0fdf8;border-radius:5px;font-size:9px;color:#444;line-height:1.6;border-left:3px solid #00aa66}.bp strong{color:#1a1a18}.ft{margin-top:18px;padding-top:10px;border-top:1px solid #e8e8e8;display:flex;justify-content:space-between;font-size:8px;color:#bbb}';
+  var body='<div class="hdr"><div><div class="brand">Rising Ballers &times; She&rsquo;s A Baller</div><div class="sub">Media Plan Proposal &mdash; Confidential</div></div><div>'+logoHTML+'</div></div>'+
+    '<div class="pt">Media Plan: '+clientName+'</div><div class="pd">Prepared '+dateStr+'</div>'+
+    '<div class="tg"><div class="card"><div class="cl">Summarised Media Plan Investment</div>'+
+      '<div class="ir"><span class="il">Total Partner Budget</span><span class="iv">'+gN(budget)+'</span></div>'+
+      '<div class="ir"><span class="il">Media Value (Organic+Paid)</span><span class="iv">'+gN(totalCost)+'</span></div>'+
+      '<div class="ir"><span class="il">Other (Production)</span><span class="iv">'+gN(prodBudget)+'</span></div>'+
+      '<div class="ih"><span class="il">Min Added Value</span><span class="iv">'+gN(addedValue)+'</span></div>'+
+      '<div class="ap">'+addedPct+'% Added Value</div></div>'+
+    '<div class="card"><div class="cl">Post Summary by Platform</div>'+
+      '<table><thead><tr><th></th><th style="text-align:center">Instagram</th><th style="text-align:center">TikTok</th><th style="text-align:center">YouTube</th><th style="text-align:center">Total</th></tr></thead><tbody>'+postRows+'</tbody></table></div></div>'+
+    '<div class="sec">Media Breakdown</div>'+
+    '<table><thead><tr><th>Media Type</th><th>Channels</th><th>Platforms</th><th>Formats</th><th>Asset Types</th><th style="text-align:right">Reach</th><th style="text-align:right">Imps</th><th style="text-align:right">Engs</th><th>Eng Rate</th><th style="text-align:right">Media Value</th></tr></thead><tbody>'+
+      '<tr><td><strong>ORGANIC</strong></td><td>RB+PARTNER</td><td>IG+TT+YT</td><td>Mixed</td><td>Launch asset &amp; cutdowns</td><td style="text-align:right">'+fN(totalReach)+'</td><td style="text-align:right">'+fN(totalImps)+'</td><td style="text-align:right">'+fN(totalEngs)+'</td><td>1% Min</td><td style="text-align:right">'+gN(budget)+'</td></tr>'+
+      '<tr><td><strong>ADDED VALUE</strong></td><td>RB+PARTNER</td><td>IG+TT+YT</td><td>Mixed</td><td>Same as above</td><td style="text-align:right">'+fN(Math.round(totalReach*1.97))+'</td><td style="text-align:right">'+fN(Math.round(totalImps*1.97))+'</td><td style="text-align:right">'+fN(Math.round(totalEngs*1.97))+'</td><td>1% Min</td><td style="text-align:right">'+gN(addedValue>0?addedValue:0)+'</td></tr>'+
+      '<tr class="tr-grand"><td colspan="5">OVERALL TOTALS</td><td style="text-align:right">'+fN(totalReach)+'</td><td style="text-align:right">'+fN(totalImps)+'</td><td style="text-align:right">'+fN(totalEngs)+'</td><td>1% Min</td><td style="text-align:right">'+gN(totalCost)+'</td></tr>'+
+    '</tbody></table>'+
+    '<div class="sec">Detailed Channel Breakdown</div>'+brandHTML+
+    '<div class="sec">Campaign Notes</div>'+
+    '<div class="ng">'+
+      '<div class="nt"><div class="nk">Plan</div><div class="nv">Minimum posts published during the campaign period.</div></div>'+
+      '<div class="nt"><div class="nk">Creative</div><div class="nv">Assets subject to partner approval prior to roll-out.</div></div>'+
+      '<div class="nt"><div class="nk">Content</div><div class="nv">Hero + cutdowns produced, all subject to partner approval.</div></div>'+
+      '<div class="nt"><div class="nk">Partnership</div><div class="nv">Content shared across platforms, some as collab posts.</div></div>'+
+      '<div class="nt"><div class="nk">Timings</div><div class="nv">Plan based on agreed timings. Changes may affect numbers.</div></div>'+
+      '<div class="nt"><div class="nk">Reporting</div><div class="nv">Full performance report within 5 working days of campaign end.</div></div>'+
+    '</div>'+
+    '<div class="bp"><strong>Audience:</strong> Our audience is highly engaged, sports-first Gen A, Gen Z &amp; Millennial consumers.<br><br><strong>Engagement:</strong> Lower CPM alternatives exist but fail to deliver the same audience relevance or brand affinity.<br><br><strong>Added Value:</strong> We always look to overdeliver on the minimums guaranteed. Given our projected growth, we are confident to hit well above these minimums.</div>'+
+    '<div class="ft"><span>Rising Ballers &times; She&rsquo;s A Baller &mdash; Confidential</span><span>Generated '+dateStr+'</span></div>';
+  var w=window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Media Plan - '+clientName+'</title><style>*{box-sizing:border-box;margin:0;padding:0}'+css+'</style></head><body>'+body+'<scr'+'ipt>window.onload=function(){window.print()};<\/scr'+'ipt></body></html>');
   w.document.close();
 }
 
-function mpExportXLS() {
+
+async function mpExportXLS() {
   const clientName = document.getElementById('mpClientName').value || 'Client';
   const budget = parseFloat(document.getElementById('mpBudget').value) || 0;
+  const prodPct = parseFloat(document.getElementById('mpProdPct').value) || 0;
+  const prodBudget = budget * prodPct / 100;
 
-  let rows = [
-    ['RISING BALLERS x MEDIA PLAN', '', '', '', '', '', ''],
-    ['Client:', clientName, '', 'Budget:', fmtGBP(budget), '', ''],
-    ['', '', '', '', '', '', ''],
-    ['FORMAT', 'PLATFORM', 'BRAND', 'POSTS', 'COST', 'REACH', 'IMPRESSIONS', 'ENGAGEMENTS'],
-  ];
-
-  ['RB','SAB'].forEach(brand => {
-    const label = brand === 'RB' ? 'Rising Ballers' : "She's A Baller";
-    mpRates[brand].forEach((row, i) => {
+  const brandLabels = { RB: 'Rising Ballers', RBUSA: 'Rising Ballers USA', SAB: "She's A Baller" };
+  const brandData = {};
+  ['RB','RBUSA','SAB'].forEach(brand => {
+    const rows = []; let bPosts=0,bTiles=0,bCost=0,bReach=0,bImps=0,bEngs=0;
+    mpRates[brand].forEach((row,i) => {
       const qty = parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;
       if (qty === 0) return;
-      rows.push([row.format, row.platform, label, qty, qty*row.cost, qty*row.reach, qty*row.imps, qty*row.engs]);
+      const tiles = qty * (row.tiles||1);
+      rows.push({ format:row.format, platform:row.platform, qty, tiles, cost:qty*row.cost, reach:qty*row.reach, imps:qty*row.imps, engs:qty*row.engs });
+      bPosts+=qty; bTiles+=tiles; bCost+=qty*row.cost; bReach+=qty*row.reach; bImps+=qty*row.imps; bEngs+=qty*row.engs;
     });
+    brandData[brand] = { rows, posts:bPosts, tiles:bTiles, cost:bCost, reach:bReach, imps:bImps, engs:bEngs };
   });
+  const totalCost  = brandData.RB.cost  + brandData.RBUSA.cost  + brandData.SAB.cost;
+  const totalReach = brandData.RB.reach + brandData.RBUSA.reach + brandData.SAB.reach;
+  const totalImps  = brandData.RB.imps  + brandData.RBUSA.imps  + brandData.SAB.imps;
+  const totalEngs  = brandData.RB.engs  + brandData.RBUSA.engs  + brandData.SAB.engs;
+  const addedValue = totalCost - budget;
+  const addedPct   = budget > 0 ? Math.round((addedValue/budget)*100) : 0;
 
-  // Totals
-  const rbT = { posts:0,cost:0,reach:0,imps:0,engs:0 };
-  const sabT = { posts:0,cost:0,reach:0,imps:0,engs:0 };
-  mpRates.RB.forEach((r,i) => { const q=parseInt(document.getElementById('qty_RB_'+i)?.value)||0; rbT.posts+=q;rbT.cost+=q*r.cost;rbT.reach+=q*r.reach;rbT.imps+=q*r.imps;rbT.engs+=q*r.engs; });
-  mpRates.SAB.forEach((r,i) => { const q=parseInt(document.getElementById('qty_SAB_'+i)?.value)||0; sabT.posts+=q;sabT.cost+=q*r.cost;sabT.reach+=q*r.reach;sabT.imps+=q*r.imps;sabT.engs+=q*r.engs; });
-  rows.push(['', '', '', '', '', '', '', '']);
-  rows.push(['RB TOTALS','','',rbT.posts,rbT.cost,rbT.reach,rbT.imps,rbT.engs]);
-  rows.push(['SAB TOTALS','','',sabT.posts,sabT.cost,sabT.reach,sabT.imps,sabT.engs]);
-  rows.push(['OVERALL TOTAL','','',rbT.posts+sabT.posts,rbT.cost+sabT.cost,rbT.reach+sabT.reach,rbT.imps+sabT.imps,rbT.engs+sabT.engs]);
-  rows.push(['MEDIA VALUE (total)','','','',rbT.cost+sabT.cost,'','','']);
-  rows.push(['MIN ADDED VALUE','','','',rbT.cost+sabT.cost-budget,'','','']);
+  if (!window.XLSX) {
+    await new Promise((res,rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.onload=res; s.onerror=rej; document.head.appendChild(s);
+    });
+  }
+  const WB = XLSX.utils.book_new();
 
-  const csv = '\uFEFF' + rows.map(r => r.map(v => '"'+String(v||'').replace(/"/g,'""')+'"').join(',')).join('\n');
+  // ── CLIENT VIEW sheet ──
+  const cv = [
+    ['','SUMMARISED MEDIA PLAN INVESTMENT','','','CAMPAIGN MEDIA PLAN NOTES','','','','POSTS','INSTAGRAM','TIKTOK','YOUTUBE'],
+    ['','TOTAL PARTNER BUDGET', budget,'','PLAN - Minimum posts published during the campaign period.','','','','Feed'],
+    ['','MEDIA VALUE (Organic+Paid)', totalCost,'','CREATIVE: All assets subject to partner approval prior to roll-out.','','','','Story'],
+    ['','OTHER (Production)', prodBudget,'','CONTENT: Hero + cutdowns produced, subject to approval.','','','','TOTAL'],
+    ['','MIN ADDED VALUE', addedValue,'','PARTNERSHIP: Content shared across platforms, some as collab posts.'],
+    ['','', addedPct+'% Added Value','','TIMINGS: Plan based on timings in deck.'],
+    [],
+    ['','MEDIA BREAKDOWN'],
+    ['','MEDIA TYPE','MEDIA CHANNELS','PLATFORMS','FORMATS','ASSET TYPES','','TOTAL REACH','','TOTAL IMPS','TOTAL ENGS','ENG RATE','MEDIA VALUE'],
+    ['','ORGANIC','RB + PARTNER','IG + TT + YT','Mixed','Launch asset & cutdowns','',totalReach,'',totalImps,totalEngs,'1% Min',budget],
+    ['','PAID','RB + PARTNER','IG + TT + YT','Amplification','Dark posts + paid boosts'],
+    ['','ADDED VALUE','RB + PARTNER','IG + TT + YT','Mixed','Same as above','',Math.round(totalReach*1.97),'',Math.round(totalImps*1.97),Math.round(totalEngs*1.97),'1% Min',addedValue>0?addedValue:0],
+    ['','OVERALL TOTALS','','','','','',totalReach,'',totalImps,totalEngs,'1% Min',totalCost],
+    [],
+    ['','NOTES'],
+    ['','Audience:','Our audience is highly engaged, sports-first Gen A, Gen Z & Millennial consumers.'],
+    ['','Engagement:','Lower CPM alternatives exist but fail to deliver the same audience relevance or brand affinity.'],
+    ['','Added Value:','We always look to overdeliver on the minimums guaranteed.'],
+  ];
+  const cvS = XLSX.utils.aoa_to_sheet(cv);
+  cvS['!cols'] = [{wch:3},{wch:30},{wch:16},{wch:16},{wch:40},{wch:22},{wch:6},{wch:14},{wch:4},{wch:14},{wch:14},{wch:10},{wch:14}];
+  XLSX.utils.book_append_sheet(WB, cvS, 'CLIENT VIEW');
+
+  // ── SUMMARY sheet ──
+  const sm = [
+    ['MEDIA FORECAST — '+clientName.toUpperCase()],
+    ['Total Budget', budget, '', 'Media Value', totalCost, '', 'Min Added Value', addedValue],
+    [],
+    ['AREA','POSTS','TILES','COST (£)','REACH','IMPRESSIONS','ENGAGEMENTS'],
+  ];
+  let gP=0,gT=0,gC=0,gR=0,gI=0,gE=0;
+  ['RB','RBUSA','SAB'].forEach(b => {
+    const d=brandData[b]; if(!d.posts) return;
+    sm.push([brandLabels[b],d.posts,d.tiles,d.cost,d.reach,d.imps,d.engs]);
+    gP+=d.posts;gT+=d.tiles;gC+=d.cost;gR+=d.reach;gI+=d.imps;gE+=d.engs;
+  });
+  sm.push(['OVERALL TOTAL',gP,gT,gC,gR,gI,gE]);
+  sm.push([]);
+  ['RB','RBUSA','SAB'].forEach(b => {
+    const d=brandData[b]; if(!d.rows.length) return;
+    sm.push([brandLabels[b]+' — BREAKDOWN']);
+    sm.push(['Format','Platform','Posts','Tiles','Cost (£)','Reach','Impressions','Engagements']);
+    d.rows.forEach(r => sm.push([r.format,r.platform,r.qty,r.tiles,r.cost,r.reach,r.imps,r.engs]));
+    sm.push(['TOTALS','',d.posts,d.tiles,d.cost,d.reach,d.imps,d.engs]);
+    sm.push([]);
+  });
+  const smS = XLSX.utils.aoa_to_sheet(sm);
+  smS['!cols'] = [{wch:28},{wch:10},{wch:10},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14}];
+  XLSX.utils.book_append_sheet(WB, smS, 'SUMMARY');
+
+  // ── MEDIA RATECARD sheet ──
+  const rc = [['MEDIA RATECARD'],[]];
+  ['RB','RBUSA','SAB'].forEach(b => {
+    rc.push([brandLabels[b]+' — ORGANIC']);
+    rc.push(['FORMAT','PLATFORM','COST (£)','REACH','IMPRESSIONS','VIEWS','ENGAGEMENTS']);
+    mpRates[b].forEach(r => rc.push([r.format+(r.tiles?' ('+r.tiles+' tiles)':''),r.platform,r.cost,r.reach,r.imps,r.views,r.engs]));
+    rc.push([]);
+  });
+  const rcS = XLSX.utils.aoa_to_sheet(rc);
+  rcS['!cols'] = [{wch:30},{wch:12},{wch:12},{wch:12},{wch:14},{wch:12},{wch:14}];
+  XLSX.utils.book_append_sheet(WB, rcS, 'MEDIA RATECARD');
+
+  const out = XLSX.write(WB, { bookType:'xlsx', type:'array' });
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-  a.download = 'media-plan-' + clientName.toLowerCase().replace(/\s+/g,'-') + '-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.href = URL.createObjectURL(new Blob([out],{type:'application/octet-stream'}));
+  a.download = 'media-plan-'+clientName.toLowerCase().replace(/\s+/g,'-')+'-'+new Date().toISOString().slice(0,10)+'.xlsx';
   a.click(); URL.revokeObjectURL(a.href);
 }
 
 
-// ── BOOKING LINK ──
-let bookingPanelOpen = false;
+// ── BOOKING LINK ── = false;
 
 function toggleBookingPanel() {
   bookingPanelOpen = !bookingPanelOpen;
@@ -3389,12 +3574,6 @@ function showReachCalculator(btn) {
 
 function closeReachCalculator() {
   document.getElementById('reachCalc').style.display = 'none';
-}
-
-function fmt(n) {
-  if (n >= 1000000) return (n/1000000).toFixed(2) + 'M';
-  if (n >= 1000) return Math.round(n).toLocaleString();
-  return Math.round(n).toString();
 }
 
 function runCalc() {
