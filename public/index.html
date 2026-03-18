@@ -635,7 +635,8 @@
   width: 100%;
   border-collapse: collapse;
   font-family: 'DM Sans', sans-serif;
-  font-size: 12px;
+  font-size: 11px;
+  table-layout: fixed;
 }
 .mp-table th {
   font-family: 'DM Mono', monospace;
@@ -644,18 +645,22 @@
   text-transform: uppercase;
   color: var(--muted);
   text-align: left;
-  padding: 8px 10px;
+  padding: 5px 6px;
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
+  overflow: hidden;
 }
 .mp-table td {
-  padding: 8px 10px;
+  padding: 4px 6px;
   border-bottom: 1px solid rgba(255,255,255,0.04);
   color: var(--white);
   vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .mp-table tbody tr:hover td { background: rgba(255,255,255,0.02); }
-.mp-table tfoot td { padding: 10px; }
+.mp-table tfoot td { padding: 6px; }
 .mp-input {
   width: 100%;
   background: var(--bg);
@@ -996,12 +1001,12 @@
 
 
 <!-- ── MEDIA PLAN BUILDER MODAL ── -->
-<div id="mediaPlanModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;overflow-y:auto;padding:40px 16px;">
+<div id="mediaPlanModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;overflow-y:auto;padding:20px 16px;">
   <div style="max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative;">
     <button onclick="closeMediaPlan()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;">✕</button>
 
     <!-- STEP INDICATOR -->
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:28px;">
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
       <div class="mp-step-pill active" id="mpPill1" onclick="mpGoStep(1)">1 Ratecard</div>
       <div style="width:24px;height:1px;background:var(--border);"></div>
       <div class="mp-step-pill" id="mpPill2" onclick="mpGoStep(2)">2 Build Plan</div>
@@ -1011,18 +1016,18 @@
 
     <!-- ═══ STEP 1: RATECARD ═══ -->
     <div id="mpStep1">
-      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">Step 1 — Media Ratecard</div>
-      <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);margin:0 0 6px;">Review & confirm rates</h2>
-      <p style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);margin:0 0 24px;">These are your standard rates. They're locked by default — unlock to override for a specific deal.</p>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-        <label style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;cursor:pointer;">
-          <input type="checkbox" id="rcUnlock" onchange="toggleRatecardLock()" style="accent-color:var(--accent);width:14px;height:14px;">
-          Unlock ratecard for this plan
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:3px;">Step 1 — Media Ratecard</div>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;">
+        <h2 style="font-family:'Playfair Display',serif;font-size:20px;color:var(--white);margin:0;white-space:nowrap;">Review & confirm rates</h2>
+        <span style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);">Locked by default — unlock to override for a specific deal.</span>
+        <label style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;margin-left:auto;white-space:nowrap;">
+          <input type="checkbox" id="rcUnlock" onchange="toggleRatecardLock()" style="accent-color:var(--accent);width:13px;height:13px;">
+          Unlock ratecard
         </label>
       </div>
 
       <!-- RB RATECARD TABLE -->
-      <div style="margin-bottom:20px;">
+      <div style="margin-bottom:6px;">
         <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Rising Ballers — Organic</div>
         <div style="overflow-x:auto;">
           <table class="mp-table" id="rcTableRB">
@@ -1033,7 +1038,7 @@
       </div>
 
       <!-- SAB RATECARD TABLE -->
-      <div style="margin-bottom:12px;">
+      <div style="margin-bottom:6px;">
         <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:8px;">She's A Baller — Organic</div>
         <div style="overflow-x:auto;">
           <table class="mp-table" id="rcTableSAB">
@@ -1044,7 +1049,7 @@
       </div>
 
       <!-- RB USA RATECARD TABLE -->
-      <div style="margin-bottom:12px;">
+      <div style="margin-bottom:6px;">
         <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Rising Ballers USA — Organic</div>
         <div style="overflow-x:auto;">
           <table class="mp-table" id="rcTableRBUSA">
@@ -1085,12 +1090,14 @@
 
     <!-- ═══ STEP 2: BUILD PLAN ═══ -->
     <div id="mpStep2" style="display:none;">
-      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">Step 2 — Build Your Plan</div>
-      <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);margin:0 0 6px;">Set budget & post quantities</h2>
-      <p style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);margin:0 0 24px;">Fill in the client name, total budget, and number of posts per format. The plan calculates automatically.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:3px;">Step 2 — Build Your Plan</div>
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;">
+        <h2 style="font-family:'Playfair Display',serif;font-size:20px;color:var(--white);margin:0;white-space:nowrap;">Set budget & post quantities</h2>
+        <span style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);">Fill in the client name, total budget, and number of posts per format.</span>
+      </div>
 
       <!-- Client + Budget + Logo -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:10px;">
         <div>
           <label class="mp-label">Client / Brand Name</label>
           <input id="mpClientName" type="text" placeholder="e.g. Nike" class="mp-input">
@@ -1116,8 +1123,8 @@
       </div>
 
       <!-- Budget allocation -->
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Budget Allocation</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Budget Allocation</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
           <div>
             <label class="mp-label">Organic %</label>
@@ -1139,50 +1146,50 @@
       </div>
 
 <!-- RB POST QUANTITIES -->
-      <div style="margin-bottom:20px;">
+      <div style="margin-bottom:6px;">
         <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Rising Ballers — Post Quantities</div>
         <div style="overflow-x:auto;">
           <table class="mp-table">
-            <thead><tr><th>Format</th><th>Platform</th><th>Rate (£)</th><th>Qty</th><th>Tiles</th><th>Total Cost</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th></tr></thead>
+            <thead><tr><th>Format</th><th>Platform</th><th>Rate (£)</th><th>Qty (incl. tiles)</th><th>Total Cost</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th></tr></thead>
             <tbody id="mpBodyRB"></tbody>
-            <tfoot><tr style="background:rgba(201,168,76,0.08);"><td colspan="3" style="font-weight:700;color:var(--gold);">RB TOTALS</td><td id="mpRBTotalPosts" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalTiles" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalCost" style="font-weight:700;color:var(--gold);">£0</td><td id="mpRBTotalReach" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalImps" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalEngs" style="font-weight:700;color:var(--gold);">0</td></tr></tfoot>
+            <tfoot><tr style="background:rgba(201,168,76,0.08);"><td colspan="3" style="font-weight:700;color:var(--gold);">RB TOTALS</td><td id="mpRBTotalPosts" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalCost" style="font-weight:700;color:var(--gold);">£0</td><td id="mpRBTotalReach" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalImps" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalEngs" style="font-weight:700;color:var(--gold);">0</td></tr></tfoot>
           </table>
         </div>
       </div>
 
       <!-- SAB POST QUANTITIES -->
-      <div style="margin-bottom:14px;">
+      <div style="margin-bottom:6px;">
         <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:8px;">She's A Baller — Post Quantities</div>
         <div style="overflow-x:auto;">
           <table class="mp-table">
-            <thead><tr><th>Format</th><th>Platform</th><th>Rate (£)</th><th>Qty</th><th>Tiles</th><th>Total Cost</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th></tr></thead>
+            <thead><tr><th>Format</th><th>Platform</th><th>Rate (£)</th><th>Qty (incl. tiles)</th><th>Total Cost</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th></tr></thead>
             <tbody id="mpBodySAB"></tbody>
-            <tfoot><tr style="background:rgba(255,179,198,0.06);"><td colspan="3" style="font-weight:700;color:var(--pink);">SAB TOTALS</td><td id="mpSABTotalPosts" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalTiles" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalCost" style="font-weight:700;color:var(--pink);">£0</td><td id="mpSABTotalReach" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalImps" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalEngs" style="font-weight:700;color:var(--pink);">0</td></tr></tfoot>
+            <tfoot><tr style="background:rgba(255,179,198,0.06);"><td colspan="3" style="font-weight:700;color:var(--pink);">SAB TOTALS</td><td id="mpSABTotalPosts" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalCost" style="font-weight:700;color:var(--pink);">£0</td><td id="mpSABTotalReach" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalImps" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalEngs" style="font-weight:700;color:var(--pink);">0</td></tr></tfoot>
           </table>
         </div>
       </div>
 
       <!-- RB USA POST QUANTITIES -->
-      <div style="margin-bottom:14px;">
+      <div style="margin-bottom:6px;">
         <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Rising Ballers USA — Post Quantities</div>
         <div style="overflow-x:auto;">
           <table class="mp-table">
-            <thead><tr><th>Format</th><th>Platform</th><th>Rate (£)</th><th>Qty</th><th>Tiles</th><th>Total Cost</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th></tr></thead>
+            <thead><tr><th>Format</th><th>Platform</th><th>Rate (£)</th><th>Qty (incl. tiles)</th><th>Total Cost</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th></tr></thead>
             <tbody id="mpBodyRBUSA"></tbody>
-            <tfoot><tr style="background:rgba(201,168,76,0.08);"><td colspan="3" style="font-weight:700;color:var(--gold);">RB USA TOTALS</td><td id="mpRBUSATotalPosts" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalTiles" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalCost" style="font-weight:700;color:var(--gold);">£0</td><td id="mpRBUSATotalReach" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalImps" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalEngs" style="font-weight:700;color:var(--gold);">0</td></tr></tfoot>
+            <tfoot><tr style="background:rgba(201,168,76,0.08);"><td colspan="3" style="font-weight:700;color:var(--gold);">RB USA TOTALS</td><td id="mpRBUSATotalPosts" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalCost" style="font-weight:700;color:var(--gold);">£0</td><td id="mpRBUSATotalReach" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalImps" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalEngs" style="font-weight:700;color:var(--gold);">0</td></tr></tfoot>
           </table>
         </div>
       </div>
 
       <!-- LIVE SUMMARY BAR -->
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Live Summary</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:10px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Live Summary</div>
         <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
-          <div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:3px;">TOTAL POSTS</div><div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--white);" id="mpSumPosts">0</div></div>
-          <div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:3px;">MEDIA VALUE</div><div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--accent);" id="mpSumValue">£0</div></div>
-          <div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:3px;">ADDED VALUE</div><div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--accent);" id="mpSumAdded">£0</div></div>
-          <div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:3px;">TOTAL REACH</div><div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--white);" id="mpSumReach">0</div></div>
-          <div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:3px;">ENGAGEMENTS</div><div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--white);" id="mpSumEngs">0</div></div>
+          <div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:3px;">TOTAL POSTS</div><div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--white);" id="mpSumPosts">0</div></div>
+          <div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:3px;">MEDIA VALUE</div><div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--accent);" id="mpSumValue">£0</div></div>
+          <div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:3px;">ADDED VALUE</div><div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--accent);" id="mpSumAdded">£0</div></div>
+          <div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:3px;">TOTAL REACH</div><div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--white);" id="mpSumReach">0</div></div>
+          <div><div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:3px;">ENGAGEMENTS</div><div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--white);" id="mpSumEngs">0</div></div>
         </div>
       </div>
 
@@ -1254,8 +1261,12 @@
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Campaign Notes</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;" id="cv_notes"></div>
           <div style="border-top:1px solid var(--border);padding-top:14px;">
-            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Audience, Engagement & Added Value</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+              <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);">Audience, Engagement & Added Value</div>
+              <button onclick="toggleBpEdit()" id="bpEditBtn" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:4px;cursor:pointer;">Edit</button>
+            </div>
             <div style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);line-height:1.7;" id="cv_boilerplate"></div>
+            <textarea id="cv_boilerplate_edit" style="display:none;width:100%;background:var(--bg);border:1px solid var(--accent);color:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;line-height:1.7;padding:10px;border-radius:6px;resize:vertical;min-height:120px;outline:none;" oninput="syncBpEdit()"></textarea>
           </div>
         </div>
 
@@ -2870,15 +2881,15 @@ function mpRenderPaidRatecard() {
     const tbody = document.getElementById('rcPaidBody' + brand);
     if (!tbody) return;
     tbody.innerHTML = '';
-    MP_PAID_RATECARD[brand].forEach(row => {
+    MP_PAID_RATECARD[brand].forEach((row, i) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="font-size:11px;">${row.type}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;text-align:center;">£${fmtN(row.budget)}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;text-align:center;color:var(--muted);">${fmtN(row.reach)}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;text-align:center;color:var(--muted);">${fmtN(row.imps)}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;text-align:center;color:var(--muted);">${fmtN(row.views)}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;text-align:center;color:var(--muted);">${fmtN(row.engs)}</td>`;
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="£${fmtN(row.budget)}" data-raw="${row.budget}" onchange="MP_PAID_RATECARD['${brand}'][${i}].budget=parseFloat(this.value.replace(/[£,]/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="MP_PAID_RATECARD['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="MP_PAID_RATECARD['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.views)}" data-raw="${row.views}" onchange="MP_PAID_RATECARD['${brand}'][${i}].views=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" data-raw="${row.engs}" onchange="MP_PAID_RATECARD['${brand}'][${i}].engs=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:70px;text-align:center;"></td>`;
       tbody.appendChild(tr);
     });
   });
@@ -2910,14 +2921,14 @@ function mpRenderPlanInputs() {
     if (!tbody) return;
     tbody.innerHTML = '';
     mpRates[brand].forEach((row, i) => {
-      const tilesPerPost = row.tiles || 1;
+      const isTakeover = row.tiles && row.tiles > 1;
+      const tilesLabel = isTakeover ? ' <span style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);">×'+row.tiles+' tiles</span>' : '';
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${row.format}</td>
-        <td><span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform}</span></td>
+        <td style="font-size:11px;">${row.format}${tilesLabel}</td>
+        <td><span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform}</span></td>
         <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">${fmtGBP(row.cost)}</td>
-        <td><input class="mp-qty-input" type="number" value="0" min="0" id="qty_${brand}_${i}" oninput="mpRecalc()" style="width:56px;"></td>
-        <td id="rowTiles_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
+        <td><input class="mp-qty-input" type="number" value="0" min="0" id="qty_${brand}_${i}" oninput="mpRecalc()" style="width:52px;"></td>
         <td id="rowCost_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;">£0</td>
         <td id="rowReach_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
         <td id="rowImps_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
@@ -2958,16 +2969,12 @@ function mpRecalc() {
       const rReach = qty * row.reach;
       const rImps  = qty * row.imps;
       const rEngs  = qty * row.engs;
-      const tileEl = document.getElementById('rowTiles_'+brand+'_'+i);
-      if (tileEl) tileEl.textContent = tiles > 0 ? fmt(tiles) : (tilesPerPost > 1 ? '0' : '-');
       document.getElementById('rowCost_'+brand+'_'+i).textContent  = fmtGBP(rCost);
       document.getElementById('rowReach_'+brand+'_'+i).textContent = fmt(rReach);
       document.getElementById('rowImps_'+brand+'_'+i).textContent  = fmt(rImps);
       document.getElementById('rowEngs_'+brand+'_'+i).textContent  = fmt(rEngs);
-      bPosts += qty; bTiles += tiles; bCost += rCost; bReach += rReach; bImps += rImps; bEngs += rEngs;
+      bPosts += tiles; bTiles += tiles; bCost += rCost; bReach += rReach; bImps += rImps; bEngs += rEngs;
     });
-    const tilesEl = document.getElementById('mp'+brand+'TotalTiles');
-    if (tilesEl) tilesEl.textContent = fmt(bTiles);
     document.getElementById('mp'+brand+'TotalPosts').textContent = fmt(bPosts);
     document.getElementById('mp'+brand+'TotalCost').textContent  = fmtGBP(bCost);
     document.getElementById('mp'+brand+'TotalReach').textContent = fmt(bReach);
@@ -3388,7 +3395,32 @@ async function mpExportXLS() {
 }
 
 
-// ── BOOKING LINK ── = false;
+// ── BOILERPLATE EDIT ──
+function toggleBpEdit() {
+  const display = document.getElementById('cv_boilerplate');
+  const edit    = document.getElementById('cv_boilerplate_edit');
+  const btn     = document.getElementById('bpEditBtn');
+  const isEditing = edit.style.display !== 'none';
+  if (isEditing) {
+    display.innerHTML = edit.value.replace(/\n/g, '<br>');
+    display.style.display = 'block';
+    edit.style.display = 'none';
+    btn.textContent = 'Edit';
+    btn.style.color = 'var(--muted)';
+    btn.style.borderColor = 'var(--border)';
+  } else {
+    edit.value = display.innerHTML.replace(/<br\s*\/?>/gi, '\n').replace(/<strong[^>]*>/gi, '').replace(/<\/strong>/gi, '').replace(/<[^>]+>/g, '');
+    display.style.display = 'none';
+    edit.style.display = 'block';
+    btn.textContent = 'Save';
+    btn.style.color = 'var(--accent)';
+    btn.style.borderColor = 'var(--accent)';
+    edit.focus();
+  }
+}
+
+// ── BOOKING LINK ──
+let bookingPanelOpen = false;
 
 function toggleBookingPanel() {
   bookingPanelOpen = !bookingPanelOpen;
