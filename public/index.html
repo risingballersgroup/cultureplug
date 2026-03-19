@@ -3199,7 +3199,7 @@ function mpGenerateClientView() {
     brandTotals[brand] = { posts, cost, reach, imps, engs, platformMap };
   });
 
-  // Collect paid totals per brand
+  // Collect paid totals per brand — includes ALL entries with spend > 0
   const paidTotals = {};
   ['RB','SAB'].forEach(brand => {
     let pBudget=0, pReach=0, pImps=0, pEngs=0;
@@ -3334,11 +3334,14 @@ function mpGenerateClientView() {
   const brandLabels = { RB:{label:'Rising Ballers',color:'var(--gold)'}, RBUSA:{label:'Rising Ballers USA',color:'var(--gold)'}, SAB:{label:"She's A Baller",color:'var(--pink)'} };
   ['RB','RBUSA','SAB'].forEach(brand => {
     const bt = brandTotals[brand];
-    const pt = paidTotals[brand];
-    if (bt.posts === 0 && (!pt || pt.rows.length === 0)) return;
+    const pt = paidTotals[brand]; // defined for RB + SAB; undefined for RBUSA
+    const hasPaid = pt && pt.rows.length > 0;
+    // Show section if brand has organic posts OR paid spend
+    if (bt.posts === 0 && !hasPaid) return;
     const col = brandLabels[brand].color;
     detailHTML += `<div style="margin-bottom:24px;">
       <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:${col};margin-bottom:10px;">${brandLabels[brand].label} — Breakdown</div>`;
+    // Organic sub-table
     if (bt.posts > 0) {
       detailHTML += `<div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Organic</div>
       <table class="mp-table" style="margin-bottom:12px;"><thead><tr><th>Format</th><th>Platform</th><th>Posts</th><th>Cost</th><th>Reach</th><th>Impressions</th><th>Engagements</th></tr></thead><tbody>`;
@@ -3364,7 +3367,8 @@ function mpGenerateClientView() {
         <td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.engs)}</td>
       </tr></tbody></table>`;
     }
-    if (pt && pt.rows.length > 0) {
+    // Paid sub-table — shown for RB and SAB whenever spend > 0
+    if (hasPaid) {
       detailHTML += `<div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Paid</div>
       <table class="mp-table"><thead><tr><th>Type</th><th>Spend</th><th>Est. Reach</th><th>Est. Impressions</th><th>Est. Engagements</th></tr></thead><tbody>`;
       pt.rows.forEach(r => {
@@ -3427,22 +3431,22 @@ function mpExportPDF() {
   var gN = function(n){ return '£' + fN(n); };
   var brandLabels = { RB: 'Rising Ballers', RBUSA: 'Rising Ballers USA', SAB: "She's A Baller" };
   var brandColors = { RB: '#c9a84c', RBUSA: '#c9a84c', SAB: '#e91e8c' };
-  // ── Collect organic brand data ──
-  var brandData = {};
-  ['RB','RBUSA','SAB'].forEach(function(brand) {
+  // ── Organic brand data ──
+  var brandData={};
+  ['RB','RBUSA','SAB'].forEach(function(brand){
     var rows=[],bP=0,bT=0,bC=0,bR=0,bI=0,bE=0;
-    mpRates[brand].forEach(function(row,i) {
-      var el = document.getElementById('qty_'+brand+'_'+i);
-      var qty = el ? (parseInt(el.value)||0) : 0;
-      if (!qty) return;
-      var tiles = qty*(row.tiles||1);
+    mpRates[brand].forEach(function(row,i){
+      var el=document.getElementById('qty_'+brand+'_'+i);
+      var qty=el?(parseInt(el.value)||0):0;
+      if(!qty)return;
+      var tiles=qty*(row.tiles||1);
       rows.push({format:row.format,platform:row.platform,qty:qty,tiles:tiles,cost:qty*row.cost,reach:qty*row.reach,imps:qty*row.imps,engs:qty*row.engs});
       bP+=qty;bT+=tiles;bC+=qty*row.cost;bR+=qty*row.reach;bI+=qty*row.imps;bE+=qty*row.engs;
     });
     brandData[brand]={rows:rows,posts:bP,tiles:bT,cost:bC,reach:bR,imps:bI,engs:bE};
   });
-  // ── Collect paid data per brand ──
-  var paidDataPDF={};
+  // ── Paid data per brand ──
+  var paidPDF={};
   ['RB','SAB'].forEach(function(brand){
     var pRows=[],pBudget=0,pReach=0,pImps=0,pEngs=0;
     if(MP_PAID_RATECARD[brand]){
@@ -3457,16 +3461,16 @@ function mpExportPDF() {
         }
       });
     }
-    paidDataPDF[brand]={rows:pRows,budget:pBudget,reach:pReach,imps:pImps,engs:pEngs};
+    paidPDF[brand]={rows:pRows,budget:pBudget,reach:pReach,imps:pImps,engs:pEngs};
   });
   var totalCost=brandData.RB.cost+brandData.RBUSA.cost+brandData.SAB.cost;
   var totalReach=brandData.RB.reach+brandData.RBUSA.reach+brandData.SAB.reach;
   var totalImps=brandData.RB.imps+brandData.RBUSA.imps+brandData.SAB.imps;
   var totalEngs=brandData.RB.engs+brandData.RBUSA.engs+brandData.SAB.engs;
-  var totalPaidBudget=(paidDataPDF.RB?paidDataPDF.RB.budget:0)+(paidDataPDF.SAB?paidDataPDF.SAB.budget:0);
-  var paidReachPDF=(paidDataPDF.RB?paidDataPDF.RB.reach:0)+(paidDataPDF.SAB?paidDataPDF.SAB.reach:0);
-  var paidImpsPDF=(paidDataPDF.RB?paidDataPDF.RB.imps:0)+(paidDataPDF.SAB?paidDataPDF.SAB.imps:0);
-  var paidEngsPDF=(paidDataPDF.RB?paidDataPDF.RB.engs:0)+(paidDataPDF.SAB?paidDataPDF.SAB.engs:0);
+  var totalPaidBudget=(paidPDF.RB?paidPDF.RB.budget:0)+(paidPDF.SAB?paidPDF.SAB.budget:0);
+  var paidReachPDF=(paidPDF.RB?paidPDF.RB.reach:0)+(paidPDF.SAB?paidPDF.SAB.reach:0);
+  var paidImpsPDF=(paidPDF.RB?paidPDF.RB.imps:0)+(paidPDF.SAB?paidPDF.SAB.imps:0);
+  var paidEngsPDF=(paidPDF.RB?paidPDF.RB.engs:0)+(paidPDF.SAB?paidPDF.SAB.engs:0);
   var addedValue=totalCost-budget;
   var addedPct=budget>0?Math.round((addedValue/budget)*100):0;
   var dateStr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
@@ -3477,46 +3481,34 @@ function mpExportPDF() {
   if(brandData.SAB.posts>0)pdfActiveBrands.push('SAB');
   var pdfChannels=(pdfActiveBrands.length?pdfActiveBrands.join('+'):'RB')+'+PARTNER';
   var pdfPlatforms=['Instagram','TikTok','YouTube'].filter(function(plt){
-    return ['RB','RBUSA','SAB'].some(function(b){
-      return mpRates[b].some(function(r,i){var el=document.getElementById('qty_'+b+'_'+i);return r.platform===plt&&(el?(parseInt(el.value)||0):0)>0;});
-    });
+    return['RB','RBUSA','SAB'].some(function(b){return mpRates[b].some(function(r,i){var el=document.getElementById('qty_'+b+'_'+i);return r.platform===plt&&(el?(parseInt(el.value)||0):0)>0;});});
   }).map(function(p){return{Instagram:'IG',TikTok:'TT',YouTube:'YT'}[p];}).join('+');
   if(!pdfPlatforms)pdfPlatforms='IG+TT+YT';
   var getCt=function(plt,type){
     var n=0;
-    ['RB','RBUSA','SAB'].forEach(function(b){
-      mpRates[b].forEach(function(r,i){
-        var el=document.getElementById('qty_'+b+'_'+i);
-        var q=el?(parseInt(el.value)||0):0;
-        if(r.platform!==plt)return;
-        if(type==='Feed'&&r.format.toLowerCase().indexOf('feed')>=0)n+=q;
-        if(type==='Story'&&r.format.toLowerCase().indexOf('story')>=0)n+=q;
-        if(type==='TOTAL')n+=q;
-      });
-    });
+    ['RB','RBUSA','SAB'].forEach(function(b){mpRates[b].forEach(function(r,i){var el=document.getElementById('qty_'+b+'_'+i);var q=el?(parseInt(el.value)||0):0;if(r.platform!==plt)return;if(type==='Feed'&&r.format.toLowerCase().indexOf('feed')>=0)n+=q;if(type==='Story'&&r.format.toLowerCase().indexOf('story')>=0)n+=q;if(type==='TOTAL')n+=q;});});
     return n;
   };
   var postRows='';
-  ['Feed','Story','TOTAL'].forEach(function(t){
-    var ig=getCt('Instagram',t),tt=getCt('TikTok',t),yt=getCt('YouTube',t);
-    postRows+='<tr'+(t==='TOTAL'?' class="tr-total"':'')+'><td>'+t+'</td><td>'+(ig||0)+'</td><td>'+(tt||0)+'</td><td>'+(yt||0)+'</td><td>'+(ig+tt+yt)+'</td></tr>';
-  });
-  // ── Appendix: always build channel breakdown HTML ──
+  ['Feed','Story','TOTAL'].forEach(function(t){var ig=getCt('Instagram',t),tt=getCt('TikTok',t),yt=getCt('YouTube',t);postRows+='<tr'+(t==='TOTAL'?' class="tr-total"':'')+'><td>'+t+'</td><td>'+(ig||0)+'</td><td>'+(tt||0)+'</td><td>'+(yt||0)+'</td><td>'+(ig+tt+yt)+'</td></tr>';});
+  // ── Appendix HTML — always built, always page 2 ──
   var appendixHTML='';
   ['RB','RBUSA','SAB'].forEach(function(brand){
     var d=brandData[brand];
-    var pd=paidDataPDF[brand];
+    var pd=paidPDF[brand];
     var col=brandColors[brand];
-    if(!d.rows.length&&(!pd||!pd.rows.length))return;
+    var hasOrg=d.rows.length>0;
+    var hasPd=pd&&pd.rows.length>0;
+    if(!hasOrg&&!hasPd)return;
     var orgTable='';
-    if(d.rows.length){
+    if(hasOrg){
       var rr='';
       d.rows.forEach(function(r){rr+='<tr><td>'+r.format+'</td><td style="color:#666">'+r.platform+'</td><td style="text-align:center">'+r.qty+'</td><td style="text-align:right">'+gN(r.cost)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
       rr+='<tr class="tr-total"><td colspan="2" style="color:'+col+'">ORGANIC TOTALS</td><td style="text-align:center;color:'+col+'">'+d.posts+'</td><td style="text-align:right;color:'+col+'">'+gN(d.cost)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.engs)+'</td></tr>';
       orgTable='<div class="sub-sec">Organic</div><table><thead><tr><th>Format</th><th>Platform</th><th style="text-align:center">Posts</th><th style="text-align:right">Cost</th><th style="text-align:right">Reach</th><th style="text-align:right">Impressions</th><th style="text-align:right">Engagements</th></tr></thead><tbody>'+rr+'</tbody></table>';
     }
     var paidTable='';
-    if(pd&&pd.rows.length){
+    if(hasPd){
       var pr='';
       pd.rows.forEach(function(r){pr+='<tr><td>'+r.type+'</td><td style="text-align:right">'+gN(r.spend)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
       pr+='<tr class="tr-total"><td style="color:'+col+'">PAID TOTALS</td><td style="text-align:right;color:'+col+'">'+gN(pd.budget)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.engs)+'</td></tr>';
@@ -3554,14 +3546,13 @@ function mpExportPDF() {
     '</div>'+
     '<div class="bp"><strong>Audience:</strong> Our audience is highly engaged, sports-first Gen A, Gen Z &amp; Millennial consumers.<br><br><strong>Engagement:</strong> Lower CPM alternatives exist but fail to deliver the same audience relevance or brand affinity.<br><br><strong>Added Value:</strong> We always look to overdeliver on the minimums guaranteed. Given our projected growth, we are confident to hit well above these minimums.</div>'+
     '<div class="ft"><span>Rising Ballers &times; She&rsquo;s A Baller &mdash; Confidential</span><span>Generated '+dateStr+'</span></div>'+
-    // ── APPENDIX: always page 2 ──
-    (appendixHTML ? '<div class="page-break"></div>'+
+    (appendixHTML?'<div class="page-break"></div>'+
       '<div class="hdr"><div><div class="brand">Rising Ballers &times; She&rsquo;s A Baller</div><div class="sub">Media Plan Proposal &mdash; Confidential</div></div><div>'+logoHTML+'</div></div>'+
       '<div class="appendix-title">Appendix &mdash; Channel Breakdown</div>'+
       '<div class="appendix-sub">Media Plan: '+clientName+' &mdash; '+dateStr+'</div>'+
       appendixHTML+
       '<div class="ft"><span>Rising Ballers &times; She&rsquo;s A Baller &mdash; Confidential</span><span>Generated '+dateStr+'</span></div>'
-    : '');
+    :'');
   var w=window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Media Plan - '+clientName+'</title><style>*{box-sizing:border-box;margin:0;padding:0}'+css+'</style></head><body>'+body+'<scr'+'ipt>window.onload=function(){window.print()};<\/scr'+'ipt></body></html>');
   w.document.close();
@@ -3647,7 +3638,7 @@ async function mpExportXLS() {
   smS['!cols'] = [{wch:28},{wch:10},{wch:10},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14}];
   XLSX.utils.book_append_sheet(WB, smS, 'SUMMARY');
 
-  // ── APPENDIX sheet — always included ──
+  // ── APPENDIX sheet — always included, organic + paid per brand ──
   const ap = [['APPENDIX — CHANNEL BREAKDOWN'],['Media Plan: '+clientName],[]];
   ['RB','RBUSA','SAB'].forEach(b => {
     const d=brandData[b];
