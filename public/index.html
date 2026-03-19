@@ -1104,7 +1104,7 @@
       </div>
 
       <!-- Client + Campaign + Budget + Logo + Channel Toggles -->
-      <div style="display:grid;grid-template-columns:160px 160px 120px auto 1fr;gap:8px;margin-bottom:8px;align-items:end;">
+      <div style="display:grid;grid-template-columns:208px 208px 120px auto auto;gap:8px;margin-bottom:8px;align-items:end;">
         <div>
           <label class="mp-label">Client Name</label>
           <input id="mpClientName" type="text" placeholder="e.g. Nike" class="mp-input" style="font-size:12px;padding:7px 10px;">
@@ -1220,7 +1220,7 @@
             <div>
               <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--gold);margin-bottom:4px;">RB (£0.03 CPV)</div>
               <table class="mp-table rc-compact">
-                <colgroup><col style="width:auto"><col style="width:58px"><col style="width:58px"><col style="width:58px"><col style="width:50px"></colgroup>
+                <colgroup><col style="width:90px"><col style="width:62px"><col style="width:58px"><col style="width:58px"><col style="width:50px"></colgroup>
                 <thead><tr><th>Type</th><th style="text-align:center;">Budget</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Engs</th></tr></thead>
                 <tbody id="mpPaidBodyRB"></tbody>
               </table>
@@ -1228,7 +1228,7 @@
             <div>
               <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--pink);margin-bottom:4px;">SAB (£0.015 CPV)</div>
               <table class="mp-table rc-compact">
-                <colgroup><col style="width:auto"><col style="width:58px"><col style="width:58px"><col style="width:58px"><col style="width:50px"></colgroup>
+                <colgroup><col style="width:90px"><col style="width:62px"><col style="width:58px"><col style="width:58px"><col style="width:50px"></colgroup>
                 <thead><tr><th>Type</th><th style="text-align:center;">Budget</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Engs</th></tr></thead>
                 <tbody id="mpPaidBodySAB"></tbody>
               </table>
@@ -2971,8 +2971,8 @@ function mpRenderPaidPlanInputs() {
       const estimatedImps  = Math.round(row.imps);
       const estimatedEngs  = Math.round(row.engs);
       tr.innerHTML = `
-        <td style="font-size:10px;">${row.type}</td>
-        <td style="text-align:center;"><input class="mp-qty-input" type="number" value="0" min="0" id="paid_${brand}_${i}" oninput="mpRecalc()" style="width:54px;text-align:center;" placeholder="£"></td>
+        <td style="font-size:10px;">${row.type.replace('Instagram Feed Boost','IG Feed Boost').replace('Instagram Feed Dark','IG Feed Dark').replace('Instagram Story Dark','IG Story Dark').replace('TikTok Feed','TT Feed').replace('TikTok Story','TT Story').replace('YouTube Hero','YT Hero')}</td>
+        <td style="text-align:center;"><input class="mp-qty-input" type="number" value="0" min="0" id="paid_${brand}_${i}" oninput="mpRecalc()" style="width:56px;text-align:center;" placeholder="0"></td>
         <td id="paidReach_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--muted);">—</td>
         <td id="paidImps_${brand}_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--muted);">—</td>
         <td id="paidEngs_${brand}_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--muted);">—</td>`;
