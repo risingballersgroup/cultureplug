@@ -1016,7 +1016,7 @@
 
 <!-- ── MEDIA PLAN BUILDER MODAL ── -->
 <div id="mediaPlanModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;overflow-y:auto;padding:20px 16px;">
-  <div style="max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative;">
+  <div style="max-width:1440px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;position:relative;">
     <button onclick="closeMediaPlan()" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;">✕</button>
 
     <!-- STEP INDICATOR -->
@@ -1045,14 +1045,14 @@
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Rising Ballers — Organic</div>
           <table class="mp-table rc-compact" id="rcTableRB">
-            <thead><tr><th>Format</th><th>Plt</th><th style="text-align:center;">Cost</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
+            <thead><tr><th>Format</th><th style="text-align:right;">Plt</th><th style="text-align:center;">Cost</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
             <tbody id="rcBodyRB"></tbody>
           </table>
         </div>
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:5px;">She's A Baller — Organic</div>
           <table class="mp-table rc-compact" id="rcTableSAB">
-            <thead><tr><th>Format</th><th>Plt</th><th style="text-align:center;">Cost</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
+            <thead><tr><th>Format</th><th style="text-align:right;">Plt</th><th style="text-align:center;">Cost</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
             <tbody id="rcBodySAB"></tbody>
           </table>
         </div>
@@ -1063,7 +1063,7 @@
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Rising Ballers USA — Organic</div>
           <table class="mp-table rc-compact" id="rcTableRBUSA">
-            <thead><tr><th>Format</th><th>Plt</th><th style="text-align:center;">Cost</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
+            <thead><tr><th>Format</th><th style="text-align:right;">Plt</th><th style="text-align:center;">Cost</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
             <tbody id="rcBodyRBUSA"></tbody>
           </table>
         </div>
@@ -2897,6 +2897,20 @@ function mpRenderPaidRatecard() {
   });
 }
 
+function abbreviateFormat(f) {
+  return f.replace('Feed Post - Imagery','Feed (Img)')
+          .replace('Feed Post - Reels','Feed (Reel)')
+          .replace('Feed Post','Feed')
+          .replace('Story Takeover (8)','Takeover (8)')
+          .replace('Story Takeover (10)','Takeover (10)')
+          .replace('Story Takeover','Takeover')
+          .replace('Hero Film','Hero Film')
+          .replace('YT Shorts','Shorts');
+}
+function abbreviatePlatform(p) {
+  return p.replace('Instagram','IG').replace('YouTube','YT').replace('TikTok','TT');
+}
+
 function mpRenderRatecard() {
   ['RB','RBUSA','SAB'].forEach(brand => {
     const tbody = document.getElementById('rcBody' + brand);
@@ -2905,13 +2919,13 @@ function mpRenderRatecard() {
     mpRates[brand].forEach((row, i) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${row.format}${row.tiles ? '<span style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);margin-left:6px;">(${row.tiles} tiles)</span>' : ''}</td>
-        <td><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform.replace("Instagram","IG").replace("YouTube","YT").replace("TikTok","TT")}</span></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.cost)}" data-raw="${row.cost}" onchange="mpRates['${brand}'][${i}].cost=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="mpRates['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;text-align:center;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="mpRates['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;text-align:center;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.views)}" data-raw="${row.views}" onchange="mpRates['${brand}'][${i}].views=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;text-align:center;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" data-raw="${row.engs}" onchange="mpRates['${brand}'][${i}].engs=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>`;
+        <td style="max-width:110px;">${abbreviateFormat(row.format)}</td>
+        <td style="text-align:right;padding-right:8px;"><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${abbreviatePlatform(row.platform)}</span></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.cost)}" data-raw="${row.cost}" onchange="mpRates['${brand}'][${i}].cost=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:72px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="mpRates['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:76px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="mpRates['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:76px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.views)}" data-raw="${row.views}" onchange="mpRates['${brand}'][${i}].views=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:76px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" data-raw="${row.engs}" onchange="mpRates['${brand}'][${i}].engs=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:72px;text-align:center;"></td>`;
       tbody.appendChild(tr);
     });
   });
@@ -2928,7 +2942,7 @@ function mpRenderPlanInputs() {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="font-size:11px;">${row.format}${tilesLabel}</td>
-        <td><span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform}</span></td>
+        <td><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${abbreviatePlatform(row.platform)}</span></td>
         <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">${fmtGBP(row.cost)}</td>
         <td><input class="mp-qty-input" type="number" value="0" min="0" id="qty_${brand}_${i}" oninput="mpRecalc()" style="width:52px;"></td>
         <td id="rowCost_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;">£0</td>
