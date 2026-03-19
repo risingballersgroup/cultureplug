@@ -1097,91 +1097,92 @@
 
     <!-- ═══ STEP 2: BUILD PLAN ═══ -->
     <div id="mpStep2" style="display:none;">
-      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:3px;">Step 2 — Build Your Plan</div>
-      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;">
+      <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:6px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);">Step 2 — Build Your Plan</div>
         <h2 style="font-family:'Playfair Display',serif;font-size:20px;color:var(--white);margin:0;white-space:nowrap;">Set budget & post quantities</h2>
         <span style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);">Fill in the client name, total budget, and number of posts per format.</span>
       </div>
 
       <!-- Client + Campaign + Budget + Logo + Channel Toggles -->
-      <div style="display:grid;grid-template-columns:0.8fr 0.8fr 0.5fr auto auto;gap:10px;margin-bottom:10px;align-items:end;">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,0.55fr) auto auto;gap:8px;margin-bottom:8px;align-items:end;">
         <div>
           <label class="mp-label">Client Name</label>
-          <input id="mpClientName" type="text" placeholder="e.g. Nike" class="mp-input">
+          <input id="mpClientName" type="text" placeholder="e.g. Nike" class="mp-input" style="font-size:12px;padding:7px 10px;">
         </div>
         <div>
           <label class="mp-label">Campaign Name</label>
-          <input id="mpCampaignName" type="text" placeholder="e.g. World Cup 2026" class="mp-input">
+          <input id="mpCampaignName" type="text" placeholder="e.g. World Cup 2026" class="mp-input" style="font-size:12px;padding:7px 10px;">
         </div>
         <div>
           <label class="mp-label">Campaign Budget (£)</label>
-          <input id="mpBudget" type="number" placeholder="e.g. 100000" class="mp-input" oninput="mpRecalc()">
+          <input id="mpBudget" type="number" placeholder="e.g. 100000" class="mp-input" oninput="mpRecalc()" style="font-size:12px;padding:7px 10px;">
         </div>
         <div>
           <label class="mp-label">Client Logo</label>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <label style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 12px;cursor:pointer;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <label style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 10px;cursor:pointer;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
               Upload
               <input type="file" accept="image/*" style="display:none" onchange="mpLoadClientLogo(event)">
             </label>
             <div id="mpClientLogoPreview" style="display:none;align-items:center;gap:6px;">
-              <img id="mpClientLogoImg" style="height:28px;object-fit:contain;border-radius:4px;">
+              <img id="mpClientLogoImg" style="height:26px;object-fit:contain;border-radius:4px;">
               <button onclick="mpClearClientLogo()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;" title="Remove">✕</button>
             </div>
-            <span id="mpClientLogoNone" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);">No logo</span>
+            <span id="mpClientLogoNone" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);">None</span>
           </div>
         </div>
-        <div>
-          <label class="mp-label">Show Channels</label>
-          <div style="display:flex;flex-direction:column;gap:4px;margin-top:2px;">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Channels</div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
             <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;">
-              <input type="checkbox" id="toggleRB" checked onchange="mpTogglePanel('RB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> RB
+              <input type="checkbox" id="toggleRB" checked onchange="mpTogglePanel('RB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--gold);">RB</span>
             </label>
             <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;">
-              <input type="checkbox" id="toggleSAB" checked onchange="mpTogglePanel('SAB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> SAB
+              <input type="checkbox" id="toggleSAB" checked onchange="mpTogglePanel('SAB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--pink);">SAB</span>
             </label>
             <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;">
-              <input type="checkbox" id="toggleRBUSA" checked onchange="mpTogglePanel('RBUSA',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> RB USA
+              <input type="checkbox" id="toggleRBUSA" checked onchange="mpTogglePanel('RBUSA',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--gold);">RB USA</span>
             </label>
             <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;">
-              <input type="checkbox" id="togglePaid" checked onchange="mpTogglePanel('Paid',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> Paid
+              <input type="checkbox" id="togglePaid" checked onchange="mpTogglePanel('Paid',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--accent);">Paid</span>
             </label>
           </div>
         </div>
       </div>
 
       <!-- Budget allocation -->
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:8px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Budget Allocation</div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:8px 14px;margin-bottom:6px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Budget Allocation</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
           <div>
             <label class="mp-label">Organic %</label>
-            <input id="mpOrgPct" type="number" value="100" min="0" max="100" class="mp-input" oninput="mpRecalc()">
-            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-top:4px;" id="mpOrgBudgetDisplay">£0</div>
+            <input id="mpOrgPct" type="number" value="100" min="0" max="100" class="mp-input" oninput="mpRecalc()" style="font-size:12px;padding:7px 10px;">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-top:3px;" id="mpOrgBudgetDisplay">£0</div>
           </div>
           <div>
             <label class="mp-label">Amplification %</label>
-            <input id="mpAmpPct" type="number" value="0" min="0" max="100" class="mp-input" oninput="mpRecalc()">
-            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-top:4px;" id="mpAmpBudgetDisplay">£0</div>
+            <input id="mpAmpPct" type="number" value="0" min="0" max="100" class="mp-input" oninput="mpRecalc()" style="font-size:12px;padding:7px 10px;">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-top:3px;" id="mpAmpBudgetDisplay">£0</div>
           </div>
           <div>
             <label class="mp-label">Production %</label>
-            <input id="mpProdPct" type="number" value="0" min="0" max="100" class="mp-input" oninput="mpRecalc()">
-            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-top:4px;" id="mpProdBudgetDisplay">£0</div>
+            <input id="mpProdPct" type="number" value="0" min="0" max="100" class="mp-input" oninput="mpRecalc()" style="font-size:12px;padding:7px 10px;">
+            <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-top:3px;" id="mpProdBudgetDisplay">£0</div>
           </div>
         </div>
-        <div id="mpPctWarning" style="display:none;margin-top:10px;background:rgba(255,80,80,0.1);border:1px solid rgba(255,80,80,0.3);border-radius:6px;padding:7px 12px;font-family:'DM Mono',monospace;font-size:10px;color:#ff6b6b;letter-spacing:0.5px;"></div>
+        <div id="mpPctWarning" style="display:none;margin-top:8px;background:rgba(255,80,80,0.1);border:1px solid rgba(255,80,80,0.3);border-radius:6px;padding:7px 12px;font-family:'DM Mono',monospace;font-size:10px;color:#ff6b6b;letter-spacing:0.5px;"></div>
       </div>
 
       <!-- LIVE SUMMARY BAR — shown first -->
-      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:8px 14px;margin-bottom:10px;">
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:8px 14px;margin-bottom:8px;">
         <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Live Summary</div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;">
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL POSTS</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumPosts">0</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">MEDIA VALUE</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--accent);" id="mpSumValue">£0</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">ADDED VALUE</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--accent);" id="mpSumAdded">£0</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL REACH</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumReach">0</div></div>
-          <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">ENGAGEMENTS</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumEngs">0</div></div>
+          <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL IMPRESSIONS</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumImps">0</div></div>
+          <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL ENGAGEMENTS</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumEngs">0</div></div>
         </div>
       </div>
 
@@ -3073,6 +3074,8 @@ function mpRecalc() {
   document.getElementById('mpSumValue').textContent = fmtGBP(totalCost);
   document.getElementById('mpSumAdded').textContent = fmtGBP(addedValue);
   document.getElementById('mpSumReach').textContent = fmt(totalReach);
+  const impEl = document.getElementById('mpSumImps');
+  if (impEl) impEl.textContent = fmt(totalImps);
   document.getElementById('mpSumEngs').textContent  = fmt(totalEngs);
 
   // Update paid estimated reach/imps/engs based on entered budget
