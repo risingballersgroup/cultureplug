@@ -1305,7 +1305,18 @@
           <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Media Breakdown</div>
           <div style="overflow-x:auto;">
             <table class="mp-table" style="width:100%;">
-              <thead><tr><th>Media Type</th><th>Channels</th><th>Platforms</th><th>Formats</th><th>Asset Types</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th><th>Eng Rate</th><th>Media Value</th></tr></thead>
+              <colgroup>
+  <col style="width:90px">
+  <col style="width:145px">
+  <col style="width:80px">
+  <col style="width:65px">
+  <col style="width:145px">
+  <col style="width:85px">
+  <col style="width:85px">
+  <col style="width:75px">
+  <col style="width:60px">
+  <col style="width:85px">
+</colgroup><thead><tr><th>Media Type</th><th>Channels</th><th>Platforms</th><th>Formats</th><th>Asset Types</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th><th>Eng Rate</th><th>Media Value</th></tr></thead>
               <tbody id="cv_breakdownTable"></tbody>
             </table>
           </div>
@@ -3158,7 +3169,7 @@ function mpRenderLogoBar(hasRB, hasSAB) {
   let h = '';
   // RB logo — check RB or RBUSA posts
   const hasAnyRB = hasRB || (window._brandTotals && window._brandTotals.RBUSA && window._brandTotals.RBUSA.posts > 0);
-  if (hasAnyRB) h += '<img src="' + RB_LOGO_B64 + '" style="height:36px;object-fit:contain;filter:invert(1);opacity:0.9;" title="Rising Ballers">';
+  if (hasAnyRB) h += '<img src="' + RB_LOGO_B64 + '" style="height:36px;object-fit:contain;filter:brightness(0) invert(1);opacity:0.9;" title="Rising Ballers">';
   if (hasAnyRB && hasSAB) h += '<div style="width:1px;height:32px;background:var(--border);"></div>';
   if (hasSAB) h += '<img src="' + SAB_LOGO_B64 + '" style="height:36px;object-fit:contain;" title="She\'s A Baller">';
   if (mpClientLogoB64) {
@@ -3175,7 +3186,7 @@ function mpGenerateClientView() {
   const prodBudget = budget * prodPct;
   const clientName = document.getElementById('mpClientName').value || 'Client';
 
-  // Collect totals per brand
+  // Collect organic totals per brand
   const brandTotals = {};
   ['RB','SAB','RBUSA'].forEach(brand => {
     let posts=0, cost=0, reach=0, imps=0, engs=0;
@@ -3191,6 +3202,23 @@ function mpGenerateClientView() {
       platformMap[row.platform].engs  += qty*row.engs;
     });
     brandTotals[brand] = { posts, cost, reach, imps, engs, platformMap };
+  });
+
+  // Collect paid totals from Step 2 paid inputs
+  let paidReach=0, paidImps=0, paidEngs=0, paidBudget=0;
+  ['RB','SAB'].forEach(brand => {
+    if (!MP_PAID_RATECARD[brand]) return;
+    MP_PAID_RATECARD[brand].forEach((row, i) => {
+      const el = document.getElementById('paid_'+brand+'_'+i);
+      const spend = el ? (parseFloat(el.value)||0) : 0;
+      if (spend > 0) {
+        const ratio = spend / (row.budget || 1000);
+        paidBudget += spend;
+        paidReach  += Math.round(row.reach * ratio);
+        paidImps   += Math.round(row.imps  * ratio);
+        paidEngs   += Math.round(row.engs  * ratio);
+      }
+    });
   });
 
   const totalMediaValue = brandTotals.RB.cost + brandTotals.SAB.cost + brandTotals.RBUSA.cost;
@@ -3243,48 +3271,46 @@ function mpGenerateClientView() {
   });
   document.getElementById('cv_postTable').innerHTML = postTableHTML;
 
-  // ── Dynamic channels & platforms strings ──
+  // Dynamic channels & platforms strings
   const activeBrands = [];
   if (brandTotals.RB.posts > 0) activeBrands.push('RB');
   if (brandTotals.RBUSA.posts > 0) activeBrands.push('RB USA');
   if (brandTotals.SAB.posts > 0) activeBrands.push('SAB');
   const dynChannels = (activeBrands.length ? activeBrands.join(' + ') : 'RB') + ' + PARTNER';
 
-  // Collect which platforms have posts across all active brands
-  const activePlatforms = [];
   const platformOrder = ['Instagram','TikTok','YouTube'];
   const platformLabels = { Instagram:'IG', TikTok:'TT', YouTube:'YT' };
-  platformOrder.forEach(plt => {
-    const hasAny = ['RB','RBUSA','SAB'].some(brand =>
+  const activePlatforms = platformOrder.filter(plt =>
+    ['RB','RBUSA','SAB'].some(brand =>
       mpRates[brand].some((r, i) => {
         const qty = parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;
         return r.platform === plt && qty > 0;
       })
-    );
-    if (hasAny) activePlatforms.push(platformLabels[plt]);
-  });
+    )
+  ).map(p => platformLabels[p]);
   const dynPlatforms = activePlatforms.length ? activePlatforms.join(' + ') : 'IG + TT + YT';
 
-  // Media breakdown
-  const allReach = brandTotals.RB.reach+brandTotals.SAB.reach+brandTotals.RBUSA.reach;
-  const allImps  = brandTotals.RB.imps+brandTotals.SAB.imps+brandTotals.RBUSA.imps;
-  const allEngs  = brandTotals.RB.engs+brandTotals.SAB.engs+brandTotals.RBUSA.engs;
+  // Media breakdown - paid row now pulls real values from step 2
+  const allOrgReach = brandTotals.RB.reach+brandTotals.SAB.reach+brandTotals.RBUSA.reach;
+  const allOrgImps  = brandTotals.RB.imps+brandTotals.SAB.imps+brandTotals.RBUSA.imps;
+  const allOrgEngs  = brandTotals.RB.engs+brandTotals.SAB.engs+brandTotals.RBUSA.engs;
   const bkRows = [
     { type:'ORGANIC', channels:dynChannels, platforms:dynPlatforms, formats:'Mixed', assets:'Launch asset & cutdowns',
-      reach: allReach, imps: allImps, engs: allEngs, value: totalMediaValue },
-    { type:'PAID', channels:dynChannels, platforms:dynPlatforms, formats:'Amplification', assets:'Dark posts + paid boosts', reach:0,imps:0,engs:0,value:0 },
+      reach: allOrgReach, imps: allOrgImps, engs: allOrgEngs, value: totalMediaValue },
+    { type:'PAID', channels:dynChannels, platforms:dynPlatforms, formats:'Amplification', assets:'Dark posts + paid boosts',
+      reach: paidReach, imps: paidImps, engs: paidEngs, value: paidBudget },
     { type:'ADDED VALUE', channels:dynChannels, platforms:dynPlatforms, formats:'Mixed', assets:'Same as above',
-      reach: Math.round(allReach*1.97), imps: Math.round(allImps*1.97), engs: Math.round(allEngs*1.97),
+      reach: Math.round(allOrgReach*1.97), imps: Math.round(allOrgImps*1.97), engs: Math.round(allOrgEngs*1.97),
       value: addedValue > 0 ? addedValue : 0 },
   ];
-  const totalRow = { reach: allReach, imps: allImps, engs: allEngs, value: totalMediaValue };
+  const totalRow = { reach: allOrgReach, imps: allOrgImps, engs: allOrgEngs, value: totalMediaValue };
 
   let bkHTML = bkRows.map(r => `<tr>
     <td style="font-weight:600;color:var(--white);">${r.type}</td>
-    <td style="color:var(--muted);">${r.channels}</td>
+    <td style="color:var(--muted);white-space:normal;word-break:break-word;">${r.channels}</td>
     <td style="color:var(--muted);">${r.platforms}</td>
     <td style="color:var(--muted);">${r.formats}</td>
-    <td style="color:var(--muted);">${r.assets}</td>
+    <td style="color:var(--muted);white-space:normal;word-break:break-word;">${r.assets}</td>
     <td style="font-family:'DM Mono',monospace;">${r.reach>0?fmt(r.reach):'-'}</td>
     <td style="font-family:'DM Mono',monospace;">${r.imps>0?fmt(r.imps):'-'}</td>
     <td style="font-family:'DM Mono',monospace;">${r.engs>0?fmt(r.engs):'-'}</td>
