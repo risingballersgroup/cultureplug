@@ -1305,25 +1305,20 @@
           <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Media Breakdown</div>
           <div style="overflow-x:auto;">
             <table class="mp-table" style="width:100%;">
-              <colgroup>
-  <col style="width:90px">
-  <col style="width:145px">
-  <col style="width:80px">
-  <col style="width:65px">
-  <col style="width:145px">
-  <col style="width:85px">
-  <col style="width:85px">
-  <col style="width:75px">
-  <col style="width:60px">
-  <col style="width:85px">
-</colgroup><thead><tr><th>Media Type</th><th>Channels</th><th>Platforms</th><th>Formats</th><th>Asset Types</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th><th>Eng Rate</th><th>Media Value</th></tr></thead>
+              <colgroup><col style="width:90px"><col style="width:145px"><col style="width:80px"><col style="width:65px"><col style="width:145px"><col style="width:85px"><col style="width:85px"><col style="width:75px"><col style="width:60px"><col style="width:85px"></colgroup><thead><tr><th>Media Type</th><th>Channels</th><th>Platforms</th><th>Formats</th><th>Asset Types</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th><th>Eng Rate</th><th>Media Value</th></tr></thead>
               <tbody id="cv_breakdownTable"></tbody>
             </table>
           </div>
         </div>
 
-        <!-- DETAILED CHANNEL BREAKDOWN -->
-        <div style="margin-bottom:24px;" id="cv_channelDetail"></div>
+        <!-- DETAILED CHANNEL BREAKDOWN — collapsible -->
+        <div style="margin-bottom:24px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+          <div onclick="mpToggleChannelDetail()" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+            <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);">Individual Channel Breakdown</div>
+            <div id="cv_channelDetailToggleIcon" style="font-family:'DM Mono',monospace;font-size:16px;color:var(--gold);line-height:1;transition:transform 0.2s;">+</div>
+          </div>
+          <div id="cv_channelDetail" style="display:none;padding:0 16px 16px;"></div>
+        </div>
 
         <!-- CAMPAIGN NOTES -->
         <div style="border:1px solid var(--border);border-radius:8px;padding:16px;">
@@ -3277,12 +3272,11 @@ function mpGenerateClientView() {
   if (brandTotals.RBUSA.posts > 0) activeBrands.push('RB USA');
   if (brandTotals.SAB.posts > 0) activeBrands.push('SAB');
   const dynChannels = (activeBrands.length ? activeBrands.join(' + ') : 'RB') + ' + PARTNER';
-
   const platformOrder = ['Instagram','TikTok','YouTube'];
   const platformLabels = { Instagram:'IG', TikTok:'TT', YouTube:'YT' };
   const activePlatforms = platformOrder.filter(plt =>
     ['RB','RBUSA','SAB'].some(brand =>
-      mpRates[brand].some((r, i) => {
+      mpRates[brand].some((r,i) => {
         const qty = parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;
         return r.platform === plt && qty > 0;
       })
@@ -3290,7 +3284,7 @@ function mpGenerateClientView() {
   ).map(p => platformLabels[p]);
   const dynPlatforms = activePlatforms.length ? activePlatforms.join(' + ') : 'IG + TT + YT';
 
-  // Media breakdown - paid row now pulls real values from step 2
+  // Media breakdown - paid row pulls real values from step 2
   const allOrgReach = brandTotals.RB.reach+brandTotals.SAB.reach+brandTotals.RBUSA.reach;
   const allOrgImps  = brandTotals.RB.imps+brandTotals.SAB.imps+brandTotals.RBUSA.imps;
   const allOrgEngs  = brandTotals.RB.engs+brandTotals.SAB.engs+brandTotals.RBUSA.engs;
@@ -3358,7 +3352,12 @@ function mpGenerateClientView() {
       <td style="font-family:'DM Mono',monospace;color:${brandLabels[brand].color};">${fmt(bt.engs)}</td>
     </tr></tbody></table></div>`;
   });
-  document.getElementById('cv_channelDetail').innerHTML = detailHTML;
+  const detailEl = document.getElementById('cv_channelDetail');
+  detailEl.innerHTML = detailHTML;
+  // Reset to collapsed each time a new plan is generated
+  detailEl.style.display = 'none';
+  const icon = document.getElementById('cv_channelDetailToggleIcon');
+  if (icon) icon.textContent = '+';
 
   // Campaign notes
   const notes = [
@@ -3376,6 +3375,19 @@ function mpGenerateClientView() {
   document.getElementById('cv_boilerplate').innerHTML = `<strong style="color:var(--white);">Audience:</strong> Our audience is highly engaged, sports-first Gen A, Gen Z & Millennial consumers. Our media plan provides access to a high-intent demographic that brands typically can't reach at scale elsewhere.<br><br><strong style="color:var(--white);">Engagement:</strong> Lower CPM alternatives exist but fail to deliver the same audience relevance or brand affinity. Engagements is something we pride ourselves on — a true metric that goes beyond passive views and therefore provides the ultimate pairing in market to achieve incredible results.<br><br><strong style="color:var(--white);">Added Value:</strong> We always look to overdeliver on the minimums guaranteed. Given our platform expertise and projected growth, we are confident to hit well above these minimums.`;
 
   mpGoStep(3);
+}
+
+function mpToggleChannelDetail() {
+  const el = document.getElementById('cv_channelDetail');
+  const icon = document.getElementById('cv_channelDetailToggleIcon');
+  const isOpen = el.style.display !== 'none';
+  el.style.display = isOpen ? 'none' : 'block';
+  icon.textContent = isOpen ? '+' : '−';
+}
+
+function mpChannelDetailIsOpen() {
+  const el = document.getElementById('cv_channelDetail');
+  return el && el.style.display !== 'none';
 }
 
 function mpExportPDF() {
@@ -3454,7 +3466,7 @@ function mpExportPDF() {
       '<tr><td><strong>ADDED VALUE</strong></td><td>RB+PARTNER</td><td>IG+TT+YT</td><td>Mixed</td><td>Same as above</td><td style="text-align:right">'+fN(Math.round(totalReach*1.97))+'</td><td style="text-align:right">'+fN(Math.round(totalImps*1.97))+'</td><td style="text-align:right">'+fN(Math.round(totalEngs*1.97))+'</td><td>1% Min</td><td style="text-align:right">'+gN(addedValue>0?addedValue:0)+'</td></tr>'+
       '<tr class="tr-grand"><td colspan="5">OVERALL TOTALS</td><td style="text-align:right">'+fN(totalReach)+'</td><td style="text-align:right">'+fN(totalImps)+'</td><td style="text-align:right">'+fN(totalEngs)+'</td><td>1% Min</td><td style="text-align:right">'+gN(totalCost)+'</td></tr>'+
     '</tbody></table>'+
-    '<div class="sec">Detailed Channel Breakdown</div>'+brandHTML+
+    +(mpChannelDetailIsOpen() ? '<div class="sec">Individual Channel Breakdown</div>'+brandHTML : '')+
     '<div class="sec">Campaign Notes</div>'+
     '<div class="ng">'+
       '<div class="nt"><div class="nk">Plan</div><div class="nv">Minimum posts published during the campaign period.</div></div>'+
@@ -3547,14 +3559,16 @@ async function mpExportXLS() {
   });
   sm.push(['OVERALL TOTAL',gP,gT,gC,gR,gI,gE]);
   sm.push([]);
-  ['RB','RBUSA','SAB'].forEach(b => {
-    const d=brandData[b]; if(!d.rows.length) return;
-    sm.push([brandLabels[b]+' — BREAKDOWN']);
-    sm.push(['Format','Platform','Posts','Tiles','Cost (£)','Reach','Impressions','Engagements']);
-    d.rows.forEach(r => sm.push([r.format,r.platform,r.qty,r.tiles,r.cost,r.reach,r.imps,r.engs]));
-    sm.push(['TOTALS','',d.posts,d.tiles,d.cost,d.reach,d.imps,d.engs]);
-    sm.push([]);
-  });
+  if (mpChannelDetailIsOpen()) {
+    ['RB','RBUSA','SAB'].forEach(b => {
+      const d=brandData[b]; if(!d.rows.length) return;
+      sm.push([brandLabels[b]+' — BREAKDOWN']);
+      sm.push(['Format','Platform','Posts','Tiles','Cost (£)','Reach','Impressions','Engagements']);
+      d.rows.forEach(r => sm.push([r.format,r.platform,r.qty,r.tiles,r.cost,r.reach,r.imps,r.engs]));
+      sm.push(['TOTALS','',d.posts,d.tiles,d.cost,d.reach,d.imps,d.engs]);
+      sm.push([]);
+    });
+  }
   const smS = XLSX.utils.aoa_to_sheet(sm);
   smS['!cols'] = [{wch:28},{wch:10},{wch:10},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14}];
   XLSX.utils.book_append_sheet(WB, smS, 'SUMMARY');
