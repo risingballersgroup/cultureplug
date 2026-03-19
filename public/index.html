@@ -3199,7 +3199,7 @@ function mpGenerateClientView() {
     brandTotals[brand] = { posts, cost, reach, imps, engs, platformMap };
   });
 
-  // Collect paid totals per brand from Step 2 paid inputs
+  // Collect paid totals per brand
   const paidTotals = {};
   ['RB','SAB'].forEach(brand => {
     let pBudget=0, pReach=0, pImps=0, pEngs=0;
@@ -3275,7 +3275,7 @@ function mpGenerateClientView() {
   });
   document.getElementById('cv_postTable').innerHTML = postTableHTML;
 
-  // Dynamic channels & platforms strings
+  // Dynamic channels & platforms
   const activeBrands = [];
   if (brandTotals.RB.posts > 0) activeBrands.push('RB');
   if (brandTotals.RBUSA.posts > 0) activeBrands.push('RB USA');
@@ -3293,7 +3293,6 @@ function mpGenerateClientView() {
   ).map(p => platformLabels[p]);
   const dynPlatforms = activePlatforms.length ? activePlatforms.join(' + ') : 'IG + TT + YT';
 
-  // Media breakdown
   const allOrgReach = brandTotals.RB.reach+brandTotals.SAB.reach+brandTotals.RBUSA.reach;
   const allOrgImps  = brandTotals.RB.imps+brandTotals.SAB.imps+brandTotals.RBUSA.imps;
   const allOrgEngs  = brandTotals.RB.engs+brandTotals.SAB.engs+brandTotals.RBUSA.engs;
@@ -3419,11 +3418,6 @@ function mpToggleChannelDetail() {
   icon.textContent = isOpen ? '+' : '−';
 }
 
-function mpChannelDetailIsOpen() {
-  const el = document.getElementById('cv_channelDetail');
-  return el && el.style.display !== 'none';
-}
-
 function mpExportPDF() {
   var clientName = document.getElementById('mpClientName').value || 'Client';
   var budget     = parseFloat((document.getElementById('mpBudget').value||'').replace(/,/g,'')) || 0;
@@ -3433,6 +3427,7 @@ function mpExportPDF() {
   var gN = function(n){ return '£' + fN(n); };
   var brandLabels = { RB: 'Rising Ballers', RBUSA: 'Rising Ballers USA', SAB: "She's A Baller" };
   var brandColors = { RB: '#c9a84c', RBUSA: '#c9a84c', SAB: '#e91e8c' };
+  // ── Collect organic brand data ──
   var brandData = {};
   ['RB','RBUSA','SAB'].forEach(function(brand) {
     var rows=[],bP=0,bT=0,bC=0,bR=0,bI=0,bE=0;
@@ -3446,8 +3441,8 @@ function mpExportPDF() {
     });
     brandData[brand]={rows:rows,posts:bP,tiles:bT,cost:bC,reach:bR,imps:bI,engs:bE};
   });
-  // Collect paid per brand for PDF
-  var paidDataPDF = {};
+  // ── Collect paid data per brand ──
+  var paidDataPDF={};
   ['RB','SAB'].forEach(function(brand){
     var pRows=[],pBudget=0,pReach=0,pImps=0,pEngs=0;
     if(MP_PAID_RATECARD[brand]){
@@ -3464,19 +3459,18 @@ function mpExportPDF() {
     }
     paidDataPDF[brand]={rows:pRows,budget:pBudget,reach:pReach,imps:pImps,engs:pEngs};
   });
-  var totalOrgCost=brandData.RB.cost+brandData.RBUSA.cost+brandData.SAB.cost;
-  var totalPaidBudget=(paidDataPDF.RB?paidDataPDF.RB.budget:0)+(paidDataPDF.SAB?paidDataPDF.SAB.budget:0);
-  var totalCost=totalOrgCost; // media value = organic cost (rates)
+  var totalCost=brandData.RB.cost+brandData.RBUSA.cost+brandData.SAB.cost;
   var totalReach=brandData.RB.reach+brandData.RBUSA.reach+brandData.SAB.reach;
   var totalImps=brandData.RB.imps+brandData.RBUSA.imps+brandData.SAB.imps;
   var totalEngs=brandData.RB.engs+brandData.RBUSA.engs+brandData.SAB.engs;
+  var totalPaidBudget=(paidDataPDF.RB?paidDataPDF.RB.budget:0)+(paidDataPDF.SAB?paidDataPDF.SAB.budget:0);
   var paidReachPDF=(paidDataPDF.RB?paidDataPDF.RB.reach:0)+(paidDataPDF.SAB?paidDataPDF.SAB.reach:0);
   var paidImpsPDF=(paidDataPDF.RB?paidDataPDF.RB.imps:0)+(paidDataPDF.SAB?paidDataPDF.SAB.imps:0);
   var paidEngsPDF=(paidDataPDF.RB?paidDataPDF.RB.engs:0)+(paidDataPDF.SAB?paidDataPDF.SAB.engs:0);
   var addedValue=totalCost-budget;
   var addedPct=budget>0?Math.round((addedValue/budget)*100):0;
   var dateStr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  // Dynamic channels & platforms for PDF
+  // Dynamic channels/platforms
   var pdfActiveBrands=[];
   if(brandData.RB.posts>0)pdfActiveBrands.push('RB');
   if(brandData.RBUSA.posts>0)pdfActiveBrands.push('RB USA');
@@ -3484,10 +3478,7 @@ function mpExportPDF() {
   var pdfChannels=(pdfActiveBrands.length?pdfActiveBrands.join('+'):'RB')+'+PARTNER';
   var pdfPlatforms=['Instagram','TikTok','YouTube'].filter(function(plt){
     return ['RB','RBUSA','SAB'].some(function(b){
-      return mpRates[b].some(function(r,i){
-        var el=document.getElementById('qty_'+b+'_'+i);
-        return r.platform===plt&&(el?(parseInt(el.value)||0):0)>0;
-      });
+      return mpRates[b].some(function(r,i){var el=document.getElementById('qty_'+b+'_'+i);return r.platform===plt&&(el?(parseInt(el.value)||0):0)>0;});
     });
   }).map(function(p){return{Instagram:'IG',TikTok:'TT',YouTube:'YT'}[p];}).join('+');
   if(!pdfPlatforms)pdfPlatforms='IG+TT+YT';
@@ -3510,33 +3501,31 @@ function mpExportPDF() {
     var ig=getCt('Instagram',t),tt=getCt('TikTok',t),yt=getCt('YouTube',t);
     postRows+='<tr'+(t==='TOTAL'?' class="tr-total"':'')+'><td>'+t+'</td><td>'+(ig||0)+'</td><td>'+(tt||0)+'</td><td>'+(yt||0)+'</td><td>'+(ig+tt+yt)+'</td></tr>';
   });
-  // Channel breakdown HTML (conditional on expanded state)
-  var brandHTML='';
-  if(mpChannelDetailIsOpen()){
-    ['RB','RBUSA','SAB'].forEach(function(brand){
-      var d=brandData[brand];
-      var pd=paidDataPDF[brand];
-      var col=brandColors[brand];
-      if(!d.rows.length&&(!pd||!pd.rows.length))return;
-      var orgTable='';
-      if(d.rows.length){
-        var rr='';
-        d.rows.forEach(function(r){rr+='<tr><td>'+r.format+'</td><td style="color:#666">'+r.platform+'</td><td style="text-align:center">'+r.qty+'</td><td style="text-align:right">'+gN(r.cost)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
-        rr+='<tr class="tr-total"><td colspan="2" style="color:'+col+'">ORGANIC TOTALS</td><td style="text-align:center;color:'+col+'">'+d.posts+'</td><td style="text-align:right;color:'+col+'">'+gN(d.cost)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.engs)+'</td></tr>';
-        orgTable='<div style="font-size:7px;text-transform:uppercase;letter-spacing:1px;color:#888;margin:6px 0 4px">Organic</div><table><thead><tr><th>Format</th><th>Platform</th><th style="text-align:center">Posts</th><th style="text-align:right">Cost</th><th style="text-align:right">Reach</th><th style="text-align:right">Impressions</th><th style="text-align:right">Engagements</th></tr></thead><tbody>'+rr+'</tbody></table>';
-      }
-      var paidTable='';
-      if(pd&&pd.rows.length){
-        var pr='';
-        pd.rows.forEach(function(r){pr+='<tr><td>'+r.type+'</td><td style="text-align:right">'+gN(r.spend)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
-        pr+='<tr class="tr-total"><td style="color:'+col+'">PAID TOTALS</td><td style="text-align:right;color:'+col+'">'+gN(pd.budget)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.engs)+'</td></tr>';
-        paidTable='<div style="font-size:7px;text-transform:uppercase;letter-spacing:1px;color:#888;margin:10px 0 4px">Paid</div><table><thead><tr><th>Type</th><th style="text-align:right">Spend</th><th style="text-align:right">Est. Reach</th><th style="text-align:right">Est. Impressions</th><th style="text-align:right">Est. Engagements</th></tr></thead><tbody>'+pr+'</tbody></table>';
-      }
-      brandHTML+='<div style="margin-bottom:18px"><div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:'+col+';font-weight:800;margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid '+col+'">'+brandLabels[brand]+'</div>'+orgTable+paidTable+'</div>';
-    });
-  }
+  // ── Appendix: always build channel breakdown HTML ──
+  var appendixHTML='';
+  ['RB','RBUSA','SAB'].forEach(function(brand){
+    var d=brandData[brand];
+    var pd=paidDataPDF[brand];
+    var col=brandColors[brand];
+    if(!d.rows.length&&(!pd||!pd.rows.length))return;
+    var orgTable='';
+    if(d.rows.length){
+      var rr='';
+      d.rows.forEach(function(r){rr+='<tr><td>'+r.format+'</td><td style="color:#666">'+r.platform+'</td><td style="text-align:center">'+r.qty+'</td><td style="text-align:right">'+gN(r.cost)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
+      rr+='<tr class="tr-total"><td colspan="2" style="color:'+col+'">ORGANIC TOTALS</td><td style="text-align:center;color:'+col+'">'+d.posts+'</td><td style="text-align:right;color:'+col+'">'+gN(d.cost)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.engs)+'</td></tr>';
+      orgTable='<div class="sub-sec">Organic</div><table><thead><tr><th>Format</th><th>Platform</th><th style="text-align:center">Posts</th><th style="text-align:right">Cost</th><th style="text-align:right">Reach</th><th style="text-align:right">Impressions</th><th style="text-align:right">Engagements</th></tr></thead><tbody>'+rr+'</tbody></table>';
+    }
+    var paidTable='';
+    if(pd&&pd.rows.length){
+      var pr='';
+      pd.rows.forEach(function(r){pr+='<tr><td>'+r.type+'</td><td style="text-align:right">'+gN(r.spend)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
+      pr+='<tr class="tr-total"><td style="color:'+col+'">PAID TOTALS</td><td style="text-align:right;color:'+col+'">'+gN(pd.budget)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.engs)+'</td></tr>';
+      paidTable='<div class="sub-sec" style="margin-top:10px">Paid</div><table><thead><tr><th>Type</th><th style="text-align:right">Spend</th><th style="text-align:right">Est. Reach</th><th style="text-align:right">Est. Impressions</th><th style="text-align:right">Est. Engagements</th></tr></thead><tbody>'+pr+'</tbody></table>';
+    }
+    appendixHTML+='<div class="brand-block"><div class="brand-hdr" style="color:'+col+';border-bottom-color:'+col+'">'+brandLabels[brand]+'</div>'+orgTable+paidTable+'</div>';
+  });
   var logoHTML=mpClientLogoB64?'<img src="'+mpClientLogoB64+'" style="height:38px;object-fit:contain">':'<span style="font-size:15px;font-weight:800;color:#1a1a18">'+clientName+'</span>';
-  var css='body{font-family:Arial,sans-serif;font-size:11px;color:#1a1a18;background:#fff;padding:28px 32px}@media print{body{padding:10px 14px}@page{margin:8mm;size:A4 landscape}}.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:3px solid #1a1a18;margin-bottom:18px}.brand{font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase}.sub{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-top:2px}.pt{font-size:20px;font-weight:900;margin-bottom:2px}.pd{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:16px}.tg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}.card{border:1px solid #e8e8e8;border-radius:6px;padding:14px}.cl{font-size:7px;text-transform:uppercase;letter-spacing:2px;color:#999;font-weight:700;margin-bottom:8px}.ir{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:11px}.il{color:#555}.iv{font-weight:600}.ih{background:#f0fdf8;margin:6px -8px -8px;padding:8px 8px 6px;border-radius:0 0 5px 5px;border-top:2px solid #00aa66;display:flex;justify-content:space-between}.ih .il{color:#007a4d;font-weight:800;font-size:12px}.ih .iv{color:#007a4d;font-weight:900;font-size:13px}.ap{font-size:8px;color:#007a4d;text-align:right;padding-top:3px;font-weight:700}table{width:100%;border-collapse:collapse;margin-bottom:4px}th{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#888;padding:5px 7px;border-bottom:2px solid #1a1a18;text-align:left;background:#f8f8f8}td{padding:5px 7px;border-bottom:1px solid #f0f0f0;font-size:10px}.tr-total td{font-weight:700;background:#f5f5f5;border-top:1.5px solid #ddd}.tr-grand td{font-weight:900;background:#1a1a18;color:#00FFAA;padding:6px 7px}.sec{font-size:7px;text-transform:uppercase;letter-spacing:2px;color:#999;font-weight:700;margin:16px 0 8px;padding-bottom:3px;border-bottom:1px solid #e8e8e8}.ng{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}.nt{background:#f8f8f8;border-radius:5px;padding:8px 10px}.nk{font-size:7px;text-transform:uppercase;letter-spacing:1.5px;color:#00aa66;font-weight:700;margin-bottom:3px}.nv{font-size:9px;color:#444;line-height:1.5}.bp{margin-top:12px;padding:10px 12px;background:#f0fdf8;border-radius:5px;font-size:9px;color:#444;line-height:1.6;border-left:3px solid #00aa66}.bp strong{color:#1a1a18}.ft{margin-top:18px;padding-top:10px;border-top:1px solid #e8e8e8;display:flex;justify-content:space-between;font-size:8px;color:#bbb}';
+  var css='body{font-family:Arial,sans-serif;font-size:11px;color:#1a1a18;background:#fff;padding:28px 32px}@media print{body{padding:10px 14px}@page{margin:8mm;size:A4 landscape}.page-break{page-break-before:always}}.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:3px solid #1a1a18;margin-bottom:18px}.brand{font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase}.sub{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-top:2px}.pt{font-size:20px;font-weight:900;margin-bottom:2px}.pd{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:16px}.tg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}.card{border:1px solid #e8e8e8;border-radius:6px;padding:14px}.cl{font-size:7px;text-transform:uppercase;letter-spacing:2px;color:#999;font-weight:700;margin-bottom:8px}.ir{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:11px}.il{color:#555}.iv{font-weight:600}.ih{background:#f0fdf8;margin:6px -8px -8px;padding:8px 8px 6px;border-radius:0 0 5px 5px;border-top:2px solid #00aa66;display:flex;justify-content:space-between}.ih .il{color:#007a4d;font-weight:800;font-size:12px}.ih .iv{color:#007a4d;font-weight:900;font-size:13px}.ap{font-size:8px;color:#007a4d;text-align:right;padding-top:3px;font-weight:700}table{width:100%;border-collapse:collapse;margin-bottom:4px}th{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#888;padding:5px 7px;border-bottom:2px solid #1a1a18;text-align:left;background:#f8f8f8}td{padding:5px 7px;border-bottom:1px solid #f0f0f0;font-size:10px}.tr-total td{font-weight:700;background:#f5f5f5;border-top:1.5px solid #ddd}.tr-grand td{font-weight:900;background:#1a1a18;color:#00FFAA;padding:6px 7px}.sec{font-size:7px;text-transform:uppercase;letter-spacing:2px;color:#999;font-weight:700;margin:16px 0 8px;padding-bottom:3px;border-bottom:1px solid #e8e8e8}.sub-sec{font-size:7px;text-transform:uppercase;letter-spacing:1px;color:#aaa;font-weight:700;margin:8px 0 4px}.ng{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}.nt{background:#f8f8f8;border-radius:5px;padding:8px 10px}.nk{font-size:7px;text-transform:uppercase;letter-spacing:1.5px;color:#00aa66;font-weight:700;margin-bottom:3px}.nv{font-size:9px;color:#444;line-height:1.5}.bp{margin-top:12px;padding:10px 12px;background:#f0fdf8;border-radius:5px;font-size:9px;color:#444;line-height:1.6;border-left:3px solid #00aa66}.bp strong{color:#1a1a18}.ft{margin-top:18px;padding-top:10px;border-top:1px solid #e8e8e8;display:flex;justify-content:space-between;font-size:8px;color:#bbb}.appendix-title{font-size:18px;font-weight:900;margin-bottom:4px}.appendix-sub{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:20px}.brand-block{margin-bottom:24px}.brand-hdr{font-size:9px;text-transform:uppercase;letter-spacing:2px;font-weight:900;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #ccc}';
   var body='<div class="hdr"><div><div class="brand">Rising Ballers &times; She&rsquo;s A Baller</div><div class="sub">Media Plan Proposal &mdash; Confidential</div></div><div>'+logoHTML+'</div></div>'+
     '<div class="pt">Media Plan: '+clientName+'</div><div class="pd">Prepared '+dateStr+'</div>'+
     '<div class="tg"><div class="card"><div class="cl">Summarised Media Plan Investment</div>'+
@@ -3554,7 +3543,6 @@ function mpExportPDF() {
       '<tr><td><strong>ADDED VALUE</strong></td><td>'+pdfChannels+'</td><td>'+pdfPlatforms+'</td><td>Mixed</td><td>Same as above</td><td style="text-align:right">'+fN(Math.round(totalReach*1.97))+'</td><td style="text-align:right">'+fN(Math.round(totalImps*1.97))+'</td><td style="text-align:right">'+fN(Math.round(totalEngs*1.97))+'</td><td>1% Min</td><td style="text-align:right">'+gN(addedValue>0?addedValue:0)+'</td></tr>'+
       '<tr class="tr-grand"><td colspan="5">OVERALL TOTALS</td><td style="text-align:right">'+fN(totalReach)+'</td><td style="text-align:right">'+fN(totalImps)+'</td><td style="text-align:right">'+fN(totalEngs)+'</td><td>1% Min</td><td style="text-align:right">'+gN(totalCost)+'</td></tr>'+
     '</tbody></table>'+
-    (mpChannelDetailIsOpen() ? '<div class="sec">Individual Channel Breakdown</div>'+brandHTML : '')+
     '<div class="sec">Campaign Notes</div>'+
     '<div class="ng">'+
       '<div class="nt"><div class="nk">Plan</div><div class="nv">Minimum posts published during the campaign period.</div></div>'+
@@ -3565,7 +3553,15 @@ function mpExportPDF() {
       '<div class="nt"><div class="nk">Reporting</div><div class="nv">Full performance report within 5 working days of campaign end.</div></div>'+
     '</div>'+
     '<div class="bp"><strong>Audience:</strong> Our audience is highly engaged, sports-first Gen A, Gen Z &amp; Millennial consumers.<br><br><strong>Engagement:</strong> Lower CPM alternatives exist but fail to deliver the same audience relevance or brand affinity.<br><br><strong>Added Value:</strong> We always look to overdeliver on the minimums guaranteed. Given our projected growth, we are confident to hit well above these minimums.</div>'+
-    '<div class="ft"><span>Rising Ballers &times; She&rsquo;s A Baller &mdash; Confidential</span><span>Generated '+dateStr+'</span></div>';
+    '<div class="ft"><span>Rising Ballers &times; She&rsquo;s A Baller &mdash; Confidential</span><span>Generated '+dateStr+'</span></div>'+
+    // ── APPENDIX: always page 2 ──
+    (appendixHTML ? '<div class="page-break"></div>'+
+      '<div class="hdr"><div><div class="brand">Rising Ballers &times; She&rsquo;s A Baller</div><div class="sub">Media Plan Proposal &mdash; Confidential</div></div><div>'+logoHTML+'</div></div>'+
+      '<div class="appendix-title">Appendix &mdash; Channel Breakdown</div>'+
+      '<div class="appendix-sub">Media Plan: '+clientName+' &mdash; '+dateStr+'</div>'+
+      appendixHTML+
+      '<div class="ft"><span>Rising Ballers &times; She&rsquo;s A Baller &mdash; Confidential</span><span>Generated '+dateStr+'</span></div>'
+    : '');
   var w=window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Media Plan - '+clientName+'</title><style>*{box-sizing:border-box;margin:0;padding:0}'+css+'</style></head><body>'+body+'<scr'+'ipt>window.onload=function(){window.print()};<\/scr'+'ipt></body></html>');
   w.document.close();
@@ -3647,44 +3643,48 @@ async function mpExportXLS() {
   });
   sm.push(['OVERALL TOTAL',gP,gT,gC,gR,gI,gE]);
   sm.push([]);
-  if (mpChannelDetailIsOpen()) {
-    ['RB','RBUSA','SAB'].forEach(b => {
-      const d=brandData[b];
-      const hasPaid = (b==='RB'||b==='SAB') && MP_PAID_RATECARD[b];
-      let paidRows=[], paidTot={budget:0,reach:0,imps:0,engs:0};
-      if(hasPaid){
-        MP_PAID_RATECARD[b].forEach((row,i) => {
-          const el=document.getElementById('paid_'+b+'_'+i);
-          const spend=el?(parseFloat(el.value)||0):0;
-          if(spend>0){
-            const ratio=spend/(row.budget||1000);
-            const rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);
-            paidRows.push([row.type,spend,rR,rI,rE]);
-            paidTot.budget+=spend;paidTot.reach+=rR;paidTot.imps+=rI;paidTot.engs+=rE;
-          }
-        });
-      }
-      if(!d.rows.length && !paidRows.length) return;
-      sm.push([brandLabels[b]+' — BREAKDOWN']);
-      if(d.rows.length){
-        sm.push(['ORGANIC']);
-        sm.push(['Format','Platform','Posts','Tiles','Cost (£)','Reach','Impressions','Engagements']);
-        d.rows.forEach(r => sm.push([r.format,r.platform,r.qty,r.tiles,r.cost,r.reach,r.imps,r.engs]));
-        sm.push(['ORGANIC TOTALS','',d.posts,d.tiles,d.cost,d.reach,d.imps,d.engs]);
-      }
-      if(paidRows.length){
-        sm.push([]);
-        sm.push(['PAID']);
-        sm.push(['Type','Spend (£)','Est. Reach','Est. Impressions','Est. Engagements']);
-        paidRows.forEach(r => sm.push(r));
-        sm.push(['PAID TOTALS',paidTot.budget,paidTot.reach,paidTot.imps,paidTot.engs]);
-      }
-      sm.push([]);
-    });
-  }
   const smS = XLSX.utils.aoa_to_sheet(sm);
   smS['!cols'] = [{wch:28},{wch:10},{wch:10},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14}];
   XLSX.utils.book_append_sheet(WB, smS, 'SUMMARY');
+
+  // ── APPENDIX sheet — always included ──
+  const ap = [['APPENDIX — CHANNEL BREAKDOWN'],['Media Plan: '+clientName],[]];
+  ['RB','RBUSA','SAB'].forEach(b => {
+    const d=brandData[b];
+    const hasPaid = (b==='RB'||b==='SAB') && MP_PAID_RATECARD[b];
+    let paidRows=[], paidTot={budget:0,reach:0,imps:0,engs:0};
+    if(hasPaid){
+      MP_PAID_RATECARD[b].forEach((row,i) => {
+        const el=document.getElementById('paid_'+b+'_'+i);
+        const spend=el?(parseFloat(el.value)||0):0;
+        if(spend>0){
+          const ratio=spend/(row.budget||1000);
+          const rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);
+          paidRows.push([row.type,spend,rR,rI,rE]);
+          paidTot.budget+=spend;paidTot.reach+=rR;paidTot.imps+=rI;paidTot.engs+=rE;
+        }
+      });
+    }
+    if(!d.rows.length && !paidRows.length) return;
+    ap.push([brandLabels[b]]);
+    if(d.rows.length){
+      ap.push(['Organic']);
+      ap.push(['Format','Platform','Posts','Tiles','Cost (£)','Reach','Impressions','Engagements']);
+      d.rows.forEach(r => ap.push([r.format,r.platform,r.qty,r.tiles,r.cost,r.reach,r.imps,r.engs]));
+      ap.push(['ORGANIC TOTALS','',d.posts,d.tiles,d.cost,d.reach,d.imps,d.engs]);
+    }
+    if(paidRows.length){
+      ap.push([]);
+      ap.push(['Paid']);
+      ap.push(['Type','Spend (£)','Est. Reach','Est. Impressions','Est. Engagements']);
+      paidRows.forEach(r => ap.push(r));
+      ap.push(['PAID TOTALS',paidTot.budget,paidTot.reach,paidTot.imps,paidTot.engs]);
+    }
+    ap.push([]);
+  });
+  const apS = XLSX.utils.aoa_to_sheet(ap);
+  apS['!cols'] = [{wch:28},{wch:10},{wch:10},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14}];
+  XLSX.utils.book_append_sheet(WB, apS, 'APPENDIX');
 
   // ── MEDIA RATECARD sheet ──
   const rc = [['MEDIA RATECARD'],[]];
