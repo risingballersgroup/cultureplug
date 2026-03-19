@@ -1104,23 +1104,23 @@
       </div>
 
       <!-- Client + Campaign + Budget + Logo + Channel Toggles -->
-      <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,0.55fr) auto auto;gap:8px;margin-bottom:8px;align-items:end;">
+      <div style="display:grid;grid-template-columns:160px 160px 120px auto 1fr;gap:8px;margin-bottom:8px;align-items:end;">
         <div>
           <label class="mp-label">Client Name</label>
           <input id="mpClientName" type="text" placeholder="e.g. Nike" class="mp-input" style="font-size:12px;padding:7px 10px;">
         </div>
         <div>
           <label class="mp-label">Campaign Name</label>
-          <input id="mpCampaignName" type="text" placeholder="e.g. World Cup 2026" class="mp-input" style="font-size:12px;padding:7px 10px;">
+          <input id="mpCampaignName" type="text" placeholder="e.g. WC 2026" class="mp-input" style="font-size:12px;padding:7px 10px;">
         </div>
         <div>
-          <label class="mp-label">Campaign Budget (£)</label>
+          <label class="mp-label">Budget (£)</label>
           <input id="mpBudget" type="number" placeholder="e.g. 100000" class="mp-input" oninput="mpRecalc()" style="font-size:12px;padding:7px 10px;">
         </div>
         <div>
-          <label class="mp-label">Client Logo</label>
+          <label class="mp-label">Logo</label>
           <div style="display:flex;align-items:center;gap:6px;">
-            <label style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:6px 10px;cursor:pointer;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+            <label style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:7px 10px;cursor:pointer;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
               Upload
               <input type="file" accept="image/*" style="display:none" onchange="mpLoadClientLogo(event)">
             </label>
@@ -1131,22 +1131,20 @@
             <span id="mpClientLogoNone" style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);">None</span>
           </div>
         </div>
-        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;">
-          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Channels</div>
-          <div style="display:flex;flex-direction:column;gap:5px;">
-            <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;">
-              <input type="checkbox" id="toggleRB" checked onchange="mpTogglePanel('RB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--gold);">RB</span>
-            </label>
-            <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;">
-              <input type="checkbox" id="toggleSAB" checked onchange="mpTogglePanel('SAB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--pink);">SAB</span>
-            </label>
-            <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;">
-              <input type="checkbox" id="toggleRBUSA" checked onchange="mpTogglePanel('RBUSA',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--gold);">RB USA</span>
-            </label>
-            <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap;">
-              <input type="checkbox" id="togglePaid" checked onchange="mpTogglePanel('Paid',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--accent);">Paid</span>
-            </label>
-          </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 14px;display:flex;align-items:center;gap:20px;">
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;margin-right:4px;">Channels</div>
+          <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;">
+            <input type="checkbox" id="toggleRB" checked onchange="mpTogglePanel('RB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--gold);">RB</span>
+          </label>
+          <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;">
+            <input type="checkbox" id="toggleSAB" checked onchange="mpTogglePanel('SAB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--pink);">SAB</span>
+          </label>
+          <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;">
+            <input type="checkbox" id="toggleRBUSA" checked onchange="mpTogglePanel('RBUSA',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--gold);">RB USA</span>
+          </label>
+          <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;">
+            <input type="checkbox" id="togglePaid" checked onchange="mpTogglePanel('Paid',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--accent);">Paid</span>
+          </label>
         </div>
       </div>
 
@@ -2934,12 +2932,13 @@ function mpRenderPaidRatecard() {
     tbody.innerHTML = '';
     MP_PAID_RATECARD[brand].forEach((row, i) => {
       const tr = document.createElement('tr');
+      const typeLabel = row.type.replace("Instagram Feed Boost","IG Feed Boost").replace("Instagram Feed Dark","IG Feed Dark").replace("Instagram Story Dark","IG Story Dark").replace("TikTok Feed","TT Feed").replace("TikTok Story","TT Story").replace("YouTube Hero","YT Hero");
       tr.innerHTML = `
-        <td style="font-size:10px;">${row.type.replace("Instagram Feed Boost","IG Feed Boost").replace("Instagram Feed Dark","IG Feed Dark").replace("Instagram Story Dark","IG Story Dark").replace("TikTok Feed","TT Feed").replace("TikTok Story","TT Story").replace("YouTube Hero","YT Hero").replace("YT Shorts","YT Shorts")}</td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="£${fmtN(row.budget)}" data-raw="${row.budget}" onchange="MP_PAID_RATECARD['${brand}'][${i}].budget=parseFloat(this.value.replace(/[£,]/g,''));mpRecalc()" style="width:58px;text-align:center;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="MP_PAID_RATECARD['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:62px;text-align:center;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="MP_PAID_RATECARD['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:62px;text-align:center;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" data-raw="${row.engs}" onchange="MP_PAID_RATECARD['${brand}'][${i}].engs=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:58px;text-align:center;"></td>`;
+        <td style="font-size:10px;">${typeLabel}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:10px;text-align:center;" class="rc-val-${brand}-${i}-bdg">£${fmtN(row.budget)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--muted);" class="rc-val-${brand}-${i}-reach">${fmtN(row.reach)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--muted);" class="rc-val-${brand}-${i}-imps">${fmtN(row.imps)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--muted);" class="rc-val-${brand}-${i}-engs">${fmtN(row.engs)}</td>`;
       tbody.appendChild(tr);
     });
   });
