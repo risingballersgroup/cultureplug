@@ -1115,7 +1115,7 @@
         </div>
         <div>
           <label class="mp-label">Budget (£)</label>
-          <input id="mpBudget" type="number" placeholder="e.g. 100000" class="mp-input" oninput="mpRecalc()" style="font-size:12px;padding:7px 10px;">
+          <input id="mpBudget" type="text" inputmode="numeric" placeholder="e.g. 100,000" class="mp-input" oninput="mpRecalc()" style="font-size:12px;padding:7px 10px;">
         </div>
         <div>
           <label class="mp-label">Logo</label>
@@ -1134,16 +1134,16 @@
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 14px;display:flex;align-items:center;gap:20px;">
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);white-space:nowrap;margin-right:4px;">Channels</div>
           <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;">
-            <input type="checkbox" id="toggleRB" checked onchange="mpTogglePanel('RB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--gold);">RB</span>
+            <input type="checkbox" id="toggleRB" onchange="mpTogglePanel('RB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--gold);">RB</span>
           </label>
           <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;">
-            <input type="checkbox" id="toggleSAB" checked onchange="mpTogglePanel('SAB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--pink);">SAB</span>
+            <input type="checkbox" id="toggleSAB" onchange="mpTogglePanel('SAB',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--pink);">SAB</span>
           </label>
           <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;">
-            <input type="checkbox" id="toggleRBUSA" checked onchange="mpTogglePanel('RBUSA',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--gold);">RB USA</span>
+            <input type="checkbox" id="toggleRBUSA" onchange="mpTogglePanel('RBUSA',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--gold);">RB USA</span>
           </label>
           <label style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;">
-            <input type="checkbox" id="togglePaid" checked onchange="mpTogglePanel('Paid',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--accent);">Paid</span>
+            <input type="checkbox" id="togglePaid" onchange="mpTogglePanel('Paid',this.checked)" style="accent-color:var(--accent);width:12px;height:12px;"> <span style="color:var(--accent);">Paid</span>
           </label>
         </div>
       </div>
@@ -1311,11 +1311,11 @@
           </div>
         </div>
 
-        <!-- DETAILED CHANNEL BREAKDOWN — collapsible -->
+        <!-- DETAILED CHANNEL BREAKDOWN collapsible -->
         <div style="margin-bottom:24px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
           <div onclick="mpToggleChannelDetail()" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;user-select:none;" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
             <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);">Individual Channel Breakdown</div>
-            <div id="cv_channelDetailToggleIcon" style="font-family:'DM Mono',monospace;font-size:16px;color:var(--gold);line-height:1;transition:transform 0.2s;">+</div>
+            <div id="cv_channelDetailToggleIcon" style="font-family:'DM Mono',monospace;font-size:16px;color:var(--gold);line-height:1;">+</div>
           </div>
           <div id="cv_channelDetail" style="display:none;padding:0 16px 16px;"></div>
         </div>
@@ -3045,7 +3045,7 @@ function mpRenderPlanInputs() {
 }
 
 function mpRecalc() {
-  const budget = parseFloat(document.getElementById('mpBudget').value) || 0;
+  const budget = parseFloat((document.getElementById('mpBudget').value||'').replace(/,/g,'')) || 0;
   const orgPct  = parseFloat(document.getElementById('mpOrgPct').value) || 0;
   const ampPct  = parseFloat(document.getElementById('mpAmpPct').value) || 0;
   const prodPct = parseFloat(document.getElementById('mpProdPct').value) || 0;
@@ -3176,7 +3176,7 @@ function mpRenderLogoBar(hasRB, hasSAB) {
 }
 
 function mpGenerateClientView() {
-  const budget    = parseFloat(document.getElementById('mpBudget').value) || 0;
+  const budget    = parseFloat((document.getElementById('mpBudget').value||'').replace(/,/g,'')) || 0;
   const prodPct   = parseFloat(document.getElementById('mpProdPct').value) / 100 || 0;
   const prodBudget = budget * prodPct;
   const clientName = document.getElementById('mpClientName').value || 'Client';
@@ -3293,7 +3293,7 @@ function mpGenerateClientView() {
   ).map(p => platformLabels[p]);
   const dynPlatforms = activePlatforms.length ? activePlatforms.join(' + ') : 'IG + TT + YT';
 
-  // Media breakdown - paid row pulls real values
+  // Media breakdown
   const allOrgReach = brandTotals.RB.reach+brandTotals.SAB.reach+brandTotals.RBUSA.reach;
   const allOrgImps  = brandTotals.RB.imps+brandTotals.SAB.imps+brandTotals.RBUSA.imps;
   const allOrgEngs  = brandTotals.RB.engs+brandTotals.SAB.engs+brandTotals.RBUSA.engs;
@@ -3332,16 +3332,14 @@ function mpGenerateClientView() {
 
   // Detailed channel breakdown per brand
   let detailHTML = '';
-  const brandLabels = { RB: { label: 'Rising Ballers', color: 'var(--gold)' }, RBUSA: { label: 'Rising Ballers USA', color: 'var(--gold)' }, SAB: { label: "She's A Baller", color: 'var(--pink)' } };
+  const brandLabels = { RB:{label:'Rising Ballers',color:'var(--gold)'}, RBUSA:{label:'Rising Ballers USA',color:'var(--gold)'}, SAB:{label:"She's A Baller",color:'var(--pink)'} };
   ['RB','RBUSA','SAB'].forEach(brand => {
     const bt = brandTotals[brand];
-    const pt = paidTotals[brand]; // only RB + SAB have paid
+    const pt = paidTotals[brand];
     if (bt.posts === 0 && (!pt || pt.rows.length === 0)) return;
     const col = brandLabels[brand].color;
     detailHTML += `<div style="margin-bottom:24px;">
       <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:${col};margin-bottom:10px;">${brandLabels[brand].label} — Breakdown</div>`;
-
-    // Organic rows
     if (bt.posts > 0) {
       detailHTML += `<div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Organic</div>
       <table class="mp-table" style="margin-bottom:12px;"><thead><tr><th>Format</th><th>Platform</th><th>Posts</th><th>Cost</th><th>Reach</th><th>Impressions</th><th>Engagements</th></tr></thead><tbody>`;
@@ -3367,8 +3365,6 @@ function mpGenerateClientView() {
         <td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.engs)}</td>
       </tr></tbody></table>`;
     }
-
-    // Paid rows (RB + SAB only)
     if (pt && pt.rows.length > 0) {
       detailHTML += `<div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Paid</div>
       <table class="mp-table"><thead><tr><th>Type</th><th>Spend</th><th>Est. Reach</th><th>Est. Impressions</th><th>Est. Engagements</th></tr></thead><tbody>`;
@@ -3389,12 +3385,10 @@ function mpGenerateClientView() {
         <td style="font-family:'DM Mono',monospace;color:${col};">${fmt(pt.engs)}</td>
       </tr></tbody></table>`;
     }
-
     detailHTML += `</div>`;
   });
   const detailEl = document.getElementById('cv_channelDetail');
   detailEl.innerHTML = detailHTML;
-  // Reset to collapsed each time a new plan is generated
   detailEl.style.display = 'none';
   const icon = document.getElementById('cv_channelDetailToggleIcon');
   if (icon) icon.textContent = '+';
@@ -3432,7 +3426,7 @@ function mpChannelDetailIsOpen() {
 
 function mpExportPDF() {
   var clientName = document.getElementById('mpClientName').value || 'Client';
-  var budget     = parseFloat(document.getElementById('mpBudget').value) || 0;
+  var budget     = parseFloat((document.getElementById('mpBudget').value||'').replace(/,/g,'')) || 0;
   var prodPct    = parseFloat(document.getElementById('mpProdPct').value) || 0;
   var prodBudget = budget * prodPct / 100;
   var fN = function(n){ return Number(n).toLocaleString('en-GB'); };
@@ -3452,13 +3446,51 @@ function mpExportPDF() {
     });
     brandData[brand]={rows:rows,posts:bP,tiles:bT,cost:bC,reach:bR,imps:bI,engs:bE};
   });
-  var totalCost=brandData.RB.cost+brandData.RBUSA.cost+brandData.SAB.cost;
+  // Collect paid per brand for PDF
+  var paidDataPDF = {};
+  ['RB','SAB'].forEach(function(brand){
+    var pRows=[],pBudget=0,pReach=0,pImps=0,pEngs=0;
+    if(MP_PAID_RATECARD[brand]){
+      MP_PAID_RATECARD[brand].forEach(function(row,i){
+        var el=document.getElementById('paid_'+brand+'_'+i);
+        var spend=el?(parseFloat(el.value)||0):0;
+        if(spend>0){
+          var ratio=spend/(row.budget||1000);
+          var rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);
+          pRows.push({type:row.type,spend:spend,reach:rR,imps:rI,engs:rE});
+          pBudget+=spend;pReach+=rR;pImps+=rI;pEngs+=rE;
+        }
+      });
+    }
+    paidDataPDF[brand]={rows:pRows,budget:pBudget,reach:pReach,imps:pImps,engs:pEngs};
+  });
+  var totalOrgCost=brandData.RB.cost+brandData.RBUSA.cost+brandData.SAB.cost;
+  var totalPaidBudget=(paidDataPDF.RB?paidDataPDF.RB.budget:0)+(paidDataPDF.SAB?paidDataPDF.SAB.budget:0);
+  var totalCost=totalOrgCost; // media value = organic cost (rates)
   var totalReach=brandData.RB.reach+brandData.RBUSA.reach+brandData.SAB.reach;
   var totalImps=brandData.RB.imps+brandData.RBUSA.imps+brandData.SAB.imps;
   var totalEngs=brandData.RB.engs+brandData.RBUSA.engs+brandData.SAB.engs;
+  var paidReachPDF=(paidDataPDF.RB?paidDataPDF.RB.reach:0)+(paidDataPDF.SAB?paidDataPDF.SAB.reach:0);
+  var paidImpsPDF=(paidDataPDF.RB?paidDataPDF.RB.imps:0)+(paidDataPDF.SAB?paidDataPDF.SAB.imps:0);
+  var paidEngsPDF=(paidDataPDF.RB?paidDataPDF.RB.engs:0)+(paidDataPDF.SAB?paidDataPDF.SAB.engs:0);
   var addedValue=totalCost-budget;
   var addedPct=budget>0?Math.round((addedValue/budget)*100):0;
   var dateStr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  // Dynamic channels & platforms for PDF
+  var pdfActiveBrands=[];
+  if(brandData.RB.posts>0)pdfActiveBrands.push('RB');
+  if(brandData.RBUSA.posts>0)pdfActiveBrands.push('RB USA');
+  if(brandData.SAB.posts>0)pdfActiveBrands.push('SAB');
+  var pdfChannels=(pdfActiveBrands.length?pdfActiveBrands.join('+'):'RB')+'+PARTNER';
+  var pdfPlatforms=['Instagram','TikTok','YouTube'].filter(function(plt){
+    return ['RB','RBUSA','SAB'].some(function(b){
+      return mpRates[b].some(function(r,i){
+        var el=document.getElementById('qty_'+b+'_'+i);
+        return r.platform===plt&&(el?(parseInt(el.value)||0):0)>0;
+      });
+    });
+  }).map(function(p){return{Instagram:'IG',TikTok:'TT',YouTube:'YT'}[p];}).join('+');
+  if(!pdfPlatforms)pdfPlatforms='IG+TT+YT';
   var getCt=function(plt,type){
     var n=0;
     ['RB','RBUSA','SAB'].forEach(function(b){
@@ -3478,34 +3510,31 @@ function mpExportPDF() {
     var ig=getCt('Instagram',t),tt=getCt('TikTok',t),yt=getCt('YouTube',t);
     postRows+='<tr'+(t==='TOTAL'?' class="tr-total"':'')+'><td>'+t+'</td><td>'+(ig||0)+'</td><td>'+(tt||0)+'</td><td>'+(yt||0)+'</td><td>'+(ig+tt+yt)+'</td></tr>';
   });
+  // Channel breakdown HTML (conditional on expanded state)
   var brandHTML='';
-  ['RB','RBUSA','SAB'].forEach(function(brand){
-    var d=brandData[brand];
-    var col=brandColors[brand];
-    var hasPaid = (brand==='RB'||brand==='SAB') && MP_PAID_RATECARD[brand];
-    var paidRows='', paidTotal={budget:0,reach:0,imps:0,engs:0};
-    if(hasPaid){
-      MP_PAID_RATECARD[brand].forEach(function(row,i){
-        var el=document.getElementById('paid_'+brand+'_'+i);
-        var spend=el?(parseFloat(el.value)||0):0;
-        if(spend>0){
-          var ratio=spend/(row.budget||1000);
-          var rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);
-          paidRows+='<tr><td>'+row.type+'</td><td style="text-align:right">'+gN(spend)+'</td><td style="text-align:right">'+fN(rR)+'</td><td style="text-align:right">'+fN(rI)+'</td><td style="text-align:right">'+fN(rE)+'</td></tr>';
-          paidTotal.budget+=spend;paidTotal.reach+=rR;paidTotal.imps+=rI;paidTotal.engs+=rE;
-        }
-      });
-    }
-    if(!d.rows.length && !paidRows) return;
-    var rr='';
-    if(d.rows.length){
-      d.rows.forEach(function(r){rr+='<tr><td>'+r.format+'</td><td style="color:#666">'+r.platform+'</td><td style="text-align:center">'+r.qty+'</td><td style="text-align:center">'+r.tiles+'</td><td style="text-align:right">'+gN(r.cost)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
-      rr+='<tr class="tr-total"><td colspan="2" style="color:'+col+';font-weight:800">ORGANIC TOTALS</td><td style="text-align:center;color:'+col+'">'+d.posts+'</td><td style="text-align:center;color:'+col+'">'+d.tiles+'</td><td style="text-align:right;color:'+col+'">'+gN(d.cost)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.engs)+'</td></tr>';
-    }
-    var organicTable = d.rows.length ? '<div style="font-size:7px;text-transform:uppercase;letter-spacing:1px;color:#888;margin:6px 0 4px;">Organic</div><table><thead><tr><th>Format</th><th>Platform</th><th style="text-align:center">Posts</th><th style="text-align:center">Tiles</th><th style="text-align:right">Cost</th><th style="text-align:right">Reach</th><th style="text-align:right">Impressions</th><th style="text-align:right">Engagements</th></tr></thead><tbody>'+rr+'</tbody></table>' : '';
-    var paidTable = paidRows ? '<div style="font-size:7px;text-transform:uppercase;letter-spacing:1px;color:#888;margin:10px 0 4px;">Paid</div><table><thead><tr><th>Type</th><th style="text-align:right">Spend</th><th style="text-align:right">Est. Reach</th><th style="text-align:right">Est. Impressions</th><th style="text-align:right">Est. Engagements</th></tr></thead><tbody>'+paidRows+'<tr class="tr-total"><td style="color:'+col+';font-weight:800">PAID TOTALS</td><td style="text-align:right;color:'+col+'">'+gN(paidTotal.budget)+'</td><td style="text-align:right;color:'+col+'">'+fN(paidTotal.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(paidTotal.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(paidTotal.engs)+'</td></tr></tbody></table>' : '';
-    brandHTML+='<div style="margin-bottom:18px"><div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:'+col+';font-weight:800;margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid '+col+'">'+brandLabels[brand]+'</div>'+organicTable+paidTable+'</div>';
-  });
+  if(mpChannelDetailIsOpen()){
+    ['RB','RBUSA','SAB'].forEach(function(brand){
+      var d=brandData[brand];
+      var pd=paidDataPDF[brand];
+      var col=brandColors[brand];
+      if(!d.rows.length&&(!pd||!pd.rows.length))return;
+      var orgTable='';
+      if(d.rows.length){
+        var rr='';
+        d.rows.forEach(function(r){rr+='<tr><td>'+r.format+'</td><td style="color:#666">'+r.platform+'</td><td style="text-align:center">'+r.qty+'</td><td style="text-align:right">'+gN(r.cost)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
+        rr+='<tr class="tr-total"><td colspan="2" style="color:'+col+'">ORGANIC TOTALS</td><td style="text-align:center;color:'+col+'">'+d.posts+'</td><td style="text-align:right;color:'+col+'">'+gN(d.cost)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.engs)+'</td></tr>';
+        orgTable='<div style="font-size:7px;text-transform:uppercase;letter-spacing:1px;color:#888;margin:6px 0 4px">Organic</div><table><thead><tr><th>Format</th><th>Platform</th><th style="text-align:center">Posts</th><th style="text-align:right">Cost</th><th style="text-align:right">Reach</th><th style="text-align:right">Impressions</th><th style="text-align:right">Engagements</th></tr></thead><tbody>'+rr+'</tbody></table>';
+      }
+      var paidTable='';
+      if(pd&&pd.rows.length){
+        var pr='';
+        pd.rows.forEach(function(r){pr+='<tr><td>'+r.type+'</td><td style="text-align:right">'+gN(r.spend)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
+        pr+='<tr class="tr-total"><td style="color:'+col+'">PAID TOTALS</td><td style="text-align:right;color:'+col+'">'+gN(pd.budget)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(pd.engs)+'</td></tr>';
+        paidTable='<div style="font-size:7px;text-transform:uppercase;letter-spacing:1px;color:#888;margin:10px 0 4px">Paid</div><table><thead><tr><th>Type</th><th style="text-align:right">Spend</th><th style="text-align:right">Est. Reach</th><th style="text-align:right">Est. Impressions</th><th style="text-align:right">Est. Engagements</th></tr></thead><tbody>'+pr+'</tbody></table>';
+      }
+      brandHTML+='<div style="margin-bottom:18px"><div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:'+col+';font-weight:800;margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid '+col+'">'+brandLabels[brand]+'</div>'+orgTable+paidTable+'</div>';
+    });
+  }
   var logoHTML=mpClientLogoB64?'<img src="'+mpClientLogoB64+'" style="height:38px;object-fit:contain">':'<span style="font-size:15px;font-weight:800;color:#1a1a18">'+clientName+'</span>';
   var css='body{font-family:Arial,sans-serif;font-size:11px;color:#1a1a18;background:#fff;padding:28px 32px}@media print{body{padding:10px 14px}@page{margin:8mm;size:A4 landscape}}.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:3px solid #1a1a18;margin-bottom:18px}.brand{font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase}.sub{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-top:2px}.pt{font-size:20px;font-weight:900;margin-bottom:2px}.pd{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:16px}.tg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}.card{border:1px solid #e8e8e8;border-radius:6px;padding:14px}.cl{font-size:7px;text-transform:uppercase;letter-spacing:2px;color:#999;font-weight:700;margin-bottom:8px}.ir{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:11px}.il{color:#555}.iv{font-weight:600}.ih{background:#f0fdf8;margin:6px -8px -8px;padding:8px 8px 6px;border-radius:0 0 5px 5px;border-top:2px solid #00aa66;display:flex;justify-content:space-between}.ih .il{color:#007a4d;font-weight:800;font-size:12px}.ih .iv{color:#007a4d;font-weight:900;font-size:13px}.ap{font-size:8px;color:#007a4d;text-align:right;padding-top:3px;font-weight:700}table{width:100%;border-collapse:collapse;margin-bottom:4px}th{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#888;padding:5px 7px;border-bottom:2px solid #1a1a18;text-align:left;background:#f8f8f8}td{padding:5px 7px;border-bottom:1px solid #f0f0f0;font-size:10px}.tr-total td{font-weight:700;background:#f5f5f5;border-top:1.5px solid #ddd}.tr-grand td{font-weight:900;background:#1a1a18;color:#00FFAA;padding:6px 7px}.sec{font-size:7px;text-transform:uppercase;letter-spacing:2px;color:#999;font-weight:700;margin:16px 0 8px;padding-bottom:3px;border-bottom:1px solid #e8e8e8}.ng{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}.nt{background:#f8f8f8;border-radius:5px;padding:8px 10px}.nk{font-size:7px;text-transform:uppercase;letter-spacing:1.5px;color:#00aa66;font-weight:700;margin-bottom:3px}.nv{font-size:9px;color:#444;line-height:1.5}.bp{margin-top:12px;padding:10px 12px;background:#f0fdf8;border-radius:5px;font-size:9px;color:#444;line-height:1.6;border-left:3px solid #00aa66}.bp strong{color:#1a1a18}.ft{margin-top:18px;padding-top:10px;border-top:1px solid #e8e8e8;display:flex;justify-content:space-between;font-size:8px;color:#bbb}';
   var body='<div class="hdr"><div><div class="brand">Rising Ballers &times; She&rsquo;s A Baller</div><div class="sub">Media Plan Proposal &mdash; Confidential</div></div><div>'+logoHTML+'</div></div>'+
@@ -3520,11 +3549,12 @@ function mpExportPDF() {
       '<table><thead><tr><th></th><th style="text-align:center">Instagram</th><th style="text-align:center">TikTok</th><th style="text-align:center">YouTube</th><th style="text-align:center">Total</th></tr></thead><tbody>'+postRows+'</tbody></table></div></div>'+
     '<div class="sec">Media Breakdown</div>'+
     '<table><thead><tr><th>Media Type</th><th>Channels</th><th>Platforms</th><th>Formats</th><th>Asset Types</th><th style="text-align:right">Reach</th><th style="text-align:right">Imps</th><th style="text-align:right">Engs</th><th>Eng Rate</th><th style="text-align:right">Media Value</th></tr></thead><tbody>'+
-      '<tr><td><strong>ORGANIC</strong></td><td>RB+PARTNER</td><td>IG+TT+YT</td><td>Mixed</td><td>Launch asset &amp; cutdowns</td><td style="text-align:right">'+fN(totalReach)+'</td><td style="text-align:right">'+fN(totalImps)+'</td><td style="text-align:right">'+fN(totalEngs)+'</td><td>1% Min</td><td style="text-align:right">'+gN(budget)+'</td></tr>'+
-      '<tr><td><strong>ADDED VALUE</strong></td><td>RB+PARTNER</td><td>IG+TT+YT</td><td>Mixed</td><td>Same as above</td><td style="text-align:right">'+fN(Math.round(totalReach*1.97))+'</td><td style="text-align:right">'+fN(Math.round(totalImps*1.97))+'</td><td style="text-align:right">'+fN(Math.round(totalEngs*1.97))+'</td><td>1% Min</td><td style="text-align:right">'+gN(addedValue>0?addedValue:0)+'</td></tr>'+
+      '<tr><td><strong>ORGANIC</strong></td><td>'+pdfChannels+'</td><td>'+pdfPlatforms+'</td><td>Mixed</td><td>Launch asset &amp; cutdowns</td><td style="text-align:right">'+fN(totalReach)+'</td><td style="text-align:right">'+fN(totalImps)+'</td><td style="text-align:right">'+fN(totalEngs)+'</td><td>1% Min</td><td style="text-align:right">'+gN(totalCost)+'</td></tr>'+
+      (totalPaidBudget>0?'<tr><td><strong>PAID</strong></td><td>'+pdfChannels+'</td><td>'+pdfPlatforms+'</td><td>Amplification</td><td>Dark posts + paid boosts</td><td style="text-align:right">'+fN(paidReachPDF)+'</td><td style="text-align:right">'+fN(paidImpsPDF)+'</td><td style="text-align:right">'+fN(paidEngsPDF)+'</td><td>1% Min</td><td style="text-align:right">'+gN(totalPaidBudget)+'</td></tr>':'')+
+      '<tr><td><strong>ADDED VALUE</strong></td><td>'+pdfChannels+'</td><td>'+pdfPlatforms+'</td><td>Mixed</td><td>Same as above</td><td style="text-align:right">'+fN(Math.round(totalReach*1.97))+'</td><td style="text-align:right">'+fN(Math.round(totalImps*1.97))+'</td><td style="text-align:right">'+fN(Math.round(totalEngs*1.97))+'</td><td>1% Min</td><td style="text-align:right">'+gN(addedValue>0?addedValue:0)+'</td></tr>'+
       '<tr class="tr-grand"><td colspan="5">OVERALL TOTALS</td><td style="text-align:right">'+fN(totalReach)+'</td><td style="text-align:right">'+fN(totalImps)+'</td><td style="text-align:right">'+fN(totalEngs)+'</td><td>1% Min</td><td style="text-align:right">'+gN(totalCost)+'</td></tr>'+
     '</tbody></table>'+
-    +(mpChannelDetailIsOpen() ? '<div class="sec">Individual Channel Breakdown</div>'+brandHTML : '')+
+    (mpChannelDetailIsOpen() ? '<div class="sec">Individual Channel Breakdown</div>'+brandHTML : '')+
     '<div class="sec">Campaign Notes</div>'+
     '<div class="ng">'+
       '<div class="nt"><div class="nk">Plan</div><div class="nv">Minimum posts published during the campaign period.</div></div>'+
@@ -3544,7 +3574,7 @@ function mpExportPDF() {
 
 async function mpExportXLS() {
   const clientName = document.getElementById('mpClientName').value || 'Client';
-  const budget = parseFloat(document.getElementById('mpBudget').value) || 0;
+  const budget = parseFloat((document.getElementById('mpBudget').value||'').replace(/,/g,'')) || 0;
   const prodPct = parseFloat(document.getElementById('mpProdPct').value) || 0;
   const prodBudget = budget * prodPct / 100;
 
