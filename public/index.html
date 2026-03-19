@@ -592,7 +592,21 @@
 
 /* ── MEDIA PLAN BUILDER ── */
 
-/* Compact Media Plan tables */
+/* Compact ratecard tables for 2x2 layout */
+.rc-compact th, .rc-compact td {
+  padding: 3px 5px !important;
+  font-size: 10px !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rc-compact .mp-qty-input {
+  width: 62px !important;
+  font-size: 10px !important;
+  padding: 2px 4px !important;
+}
+
+
 #mpStep1 .mp-table th, #mpStep1 .mp-table td,
 #mpStep2 .mp-table th, #mpStep2 .mp-table td {
   padding: 5px 8px;
@@ -1026,58 +1040,47 @@
         </label>
       </div>
 
-      <!-- RB RATECARD TABLE -->
-      <div style="margin-bottom:6px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Rising Ballers — Organic</div>
-        <div style="overflow-x:auto;">
-          <table class="mp-table" id="rcTableRB">
-            <thead><tr><th>Format</th><th>Platform</th><th style="text-align:center;">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Impressions</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engagements</th></tr></thead>
+      <!-- ROW 1: RB + SAB side by side -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px;">
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Rising Ballers — Organic</div>
+          <table class="mp-table rc-compact" id="rcTableRB">
+            <thead><tr><th>Format</th><th>Plt</th><th style="text-align:center;">Cost</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
             <tbody id="rcBodyRB"></tbody>
           </table>
         </div>
-      </div>
-
-      <!-- SAB RATECARD TABLE -->
-      <div style="margin-bottom:6px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:8px;">She's A Baller — Organic</div>
-        <div style="overflow-x:auto;">
-          <table class="mp-table" id="rcTableSAB">
-            <thead><tr><th>Format</th><th>Platform</th><th style="text-align:center;">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Impressions</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engagements</th></tr></thead>
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:5px;">She's A Baller — Organic</div>
+          <table class="mp-table rc-compact" id="rcTableSAB">
+            <thead><tr><th>Format</th><th>Plt</th><th style="text-align:center;">Cost</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
             <tbody id="rcBodySAB"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- RB USA RATECARD TABLE -->
-      <div style="margin-bottom:6px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Rising Ballers USA — Organic</div>
-        <div style="overflow-x:auto;">
-          <table class="mp-table" id="rcTableRBUSA">
-            <thead><tr><th>Format</th><th>Platform</th><th style="text-align:center;">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Impressions</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engagements</th></tr></thead>
+      <!-- ROW 2: RB USA + Paid side by side -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Rising Ballers USA — Organic</div>
+          <table class="mp-table rc-compact" id="rcTableRBUSA">
+            <thead><tr><th>Format</th><th>Plt</th><th style="text-align:center;">Cost</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
             <tbody id="rcBodyRBUSA"></tbody>
           </table>
         </div>
-      </div>
-
-      <!-- PAID MEDIA RATECARD -->
-      <div style="margin-bottom:16px;">
-        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">Paid Media — Amplification Cheatsheet</div>
-        <div style="font-family:'DM Sans',sans-serif;font-size:11px;color:var(--muted);margin-bottom:8px;">Up to 3% of overall budget can be assigned to paid. Rates shown are per £1,000 spend.</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-          <div>
-            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Rising Ballers (£0.03 CPV avg)</div>
-            <div style="overflow-x:auto;">
-              <table class="mp-table" id="rcPaidTableRB">
-                <thead><tr><th>Type</th><th style="text-align:center;">Budget</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
+        <div>
+          <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;">Paid Media — per £1,000 spend <span style="color:var(--muted);font-size:8px;text-transform:none;letter-spacing:0;">(up to 3% of budget)</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+            <div>
+              <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--gold);margin-bottom:4px;">RB (£0.03 CPV)</div>
+              <table class="mp-table rc-compact" id="rcPaidTableRB">
+                <thead><tr><th>Type</th><th style="text-align:center;">Bdg</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Engs</th></tr></thead>
                 <tbody id="rcPaidBodyRB"></tbody>
               </table>
             </div>
-          </div>
-          <div>
-            <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:6px;">She's A Baller (£0.015 CPV avg)</div>
-            <div style="overflow-x:auto;">
-              <table class="mp-table" id="rcPaidTableSAB">
-                <thead><tr><th>Type</th><th style="text-align:center;">Budget</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
+            <div>
+              <div style="font-family:'DM Mono',monospace;font-size:8px;color:var(--pink);margin-bottom:4px;">SAB (£0.015 CPV)</div>
+              <table class="mp-table rc-compact" id="rcPaidTableSAB">
+                <thead><tr><th>Type</th><th style="text-align:center;">Bdg</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Engs</th></tr></thead>
                 <tbody id="rcPaidBodySAB"></tbody>
               </table>
             </div>
@@ -2884,12 +2887,11 @@ function mpRenderPaidRatecard() {
     MP_PAID_RATECARD[brand].forEach((row, i) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="font-size:11px;">${row.type}</td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="£${fmtN(row.budget)}" data-raw="${row.budget}" onchange="MP_PAID_RATECARD['${brand}'][${i}].budget=parseFloat(this.value.replace(/[£,]/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="MP_PAID_RATECARD['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="MP_PAID_RATECARD['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.views)}" data-raw="${row.views}" onchange="MP_PAID_RATECARD['${brand}'][${i}].views=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" data-raw="${row.engs}" onchange="MP_PAID_RATECARD['${brand}'][${i}].engs=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:70px;text-align:center;"></td>`;
+        <td style="font-size:10px;max-width:90px;">${row.type}</td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="£${fmtN(row.budget)}" data-raw="${row.budget}" onchange="MP_PAID_RATECARD['${brand}'][${i}].budget=parseFloat(this.value.replace(/[£,]/g,''));mpRecalc()" style="width:58px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="MP_PAID_RATECARD['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:62px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="MP_PAID_RATECARD['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:62px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" data-raw="${row.engs}" onchange="MP_PAID_RATECARD['${brand}'][${i}].engs=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:58px;text-align:center;"></td>`;
       tbody.appendChild(tr);
     });
   });
@@ -2904,7 +2906,7 @@ function mpRenderRatecard() {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${row.format}${row.tiles ? '<span style="font-family:DM Mono,monospace;font-size:9px;color:var(--muted);margin-left:6px;">(${row.tiles} tiles)</span>' : ''}</td>
-        <td><span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform}</span></td>
+        <td><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform.replace("Instagram","IG").replace("YouTube","YT").replace("TikTok","TT")}</span></td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.cost)}" data-raw="${row.cost}" onchange="mpRates['${brand}'][${i}].cost=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:80px;text-align:center;"></td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="mpRates['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;text-align:center;"></td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="mpRates['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:90px;text-align:center;"></td>
@@ -3157,7 +3159,7 @@ function mpGenerateClientView() {
       if (qty === 0) return;
       detailHTML += `<tr>
         <td>${row.format}</td>
-        <td><span style="font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform}</span></td>
+        <td><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform.replace("Instagram","IG").replace("YouTube","YT").replace("TikTok","TT")}</span></td>
         <td style="font-family:'DM Mono',monospace;">${qty}</td>
         <td style="font-family:'DM Mono',monospace;">${fmtGBP(qty*row.cost)}</td>
         <td style="font-family:'DM Mono',monospace;">${fmt(qty*row.reach)}</td>
