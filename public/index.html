@@ -2887,7 +2887,7 @@ function mpRenderPaidRatecard() {
     MP_PAID_RATECARD[brand].forEach((row, i) => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td style="font-size:10px;max-width:90px;">${row.type}</td>
+        <td style="font-size:10px;max-width:90px;">${row.type.replace("Instagram","IG").replace("TikTok","TT").replace("YouTube","YT")}</td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="£${fmtN(row.budget)}" data-raw="${row.budget}" onchange="MP_PAID_RATECARD['${brand}'][${i}].budget=parseFloat(this.value.replace(/[£,]/g,''));mpRecalc()" style="width:58px;text-align:center;"></td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="MP_PAID_RATECARD['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:62px;text-align:center;"></td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="MP_PAID_RATECARD['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:62px;text-align:center;"></td>
@@ -2901,9 +2901,9 @@ function abbreviateFormat(f) {
   return f.replace('Feed Post - Imagery','Feed (Img)')
           .replace('Feed Post - Reels','Feed (Reel)')
           .replace('Feed Post','Feed')
-          .replace('Story Takeover (8)','Takeover (8)')
-          .replace('Story Takeover (10)','Takeover (10)')
-          .replace('Story Takeover','Takeover')
+          .replace('Story Takeover (8)','Story T/O (8)')
+          .replace('Story Takeover (10)','Story T/O (10)')
+          .replace('Story Takeover','Story T/O')
           .replace('Hero Film','Hero Film')
           .replace('YT Shorts','Shorts');
 }
