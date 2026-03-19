@@ -3199,22 +3199,31 @@ function mpGenerateClientView() {
     brandTotals[brand] = { posts, cost, reach, imps, engs, platformMap };
   });
 
-  // Collect paid totals from Step 2 paid inputs
-  let paidReach=0, paidImps=0, paidEngs=0, paidBudget=0;
+  // Collect paid totals per brand from Step 2 paid inputs
+  const paidTotals = {};
   ['RB','SAB'].forEach(brand => {
-    if (!MP_PAID_RATECARD[brand]) return;
-    MP_PAID_RATECARD[brand].forEach((row, i) => {
-      const el = document.getElementById('paid_'+brand+'_'+i);
-      const spend = el ? (parseFloat(el.value)||0) : 0;
-      if (spend > 0) {
-        const ratio = spend / (row.budget || 1000);
-        paidBudget += spend;
-        paidReach  += Math.round(row.reach * ratio);
-        paidImps   += Math.round(row.imps  * ratio);
-        paidEngs   += Math.round(row.engs  * ratio);
-      }
-    });
+    let pBudget=0, pReach=0, pImps=0, pEngs=0;
+    const pRows = [];
+    if (MP_PAID_RATECARD[brand]) {
+      MP_PAID_RATECARD[brand].forEach((row, i) => {
+        const el = document.getElementById('paid_'+brand+'_'+i);
+        const spend = el ? (parseFloat(el.value)||0) : 0;
+        if (spend > 0) {
+          const ratio = spend / (row.budget || 1000);
+          const rReach = Math.round(row.reach * ratio);
+          const rImps  = Math.round(row.imps  * ratio);
+          const rEngs  = Math.round(row.engs  * ratio);
+          pBudget += spend; pReach += rReach; pImps += rImps; pEngs += rEngs;
+          pRows.push({ type: row.type, spend, reach: rReach, imps: rImps, engs: rEngs });
+        }
+      });
+    }
+    paidTotals[brand] = { budget: pBudget, reach: pReach, imps: pImps, engs: pEngs, rows: pRows };
   });
+  const paidReach  = paidTotals.RB.reach  + paidTotals.SAB.reach;
+  const paidImps   = paidTotals.RB.imps   + paidTotals.SAB.imps;
+  const paidEngs   = paidTotals.RB.engs   + paidTotals.SAB.engs;
+  const paidBudget = paidTotals.RB.budget + paidTotals.SAB.budget;
 
   const totalMediaValue = brandTotals.RB.cost + brandTotals.SAB.cost + brandTotals.RBUSA.cost;
   const addedValue = totalMediaValue - budget;
@@ -3284,7 +3293,7 @@ function mpGenerateClientView() {
   ).map(p => platformLabels[p]);
   const dynPlatforms = activePlatforms.length ? activePlatforms.join(' + ') : 'IG + TT + YT';
 
-  // Media breakdown - paid row pulls real values from step 2
+  // Media breakdown - paid row pulls real values
   const allOrgReach = brandTotals.RB.reach+brandTotals.SAB.reach+brandTotals.RBUSA.reach;
   const allOrgImps  = brandTotals.RB.imps+brandTotals.SAB.imps+brandTotals.RBUSA.imps;
   const allOrgEngs  = brandTotals.RB.engs+brandTotals.SAB.engs+brandTotals.RBUSA.engs;
@@ -3326,31 +3335,62 @@ function mpGenerateClientView() {
   const brandLabels = { RB: { label: 'Rising Ballers', color: 'var(--gold)' }, RBUSA: { label: 'Rising Ballers USA', color: 'var(--gold)' }, SAB: { label: "She's A Baller", color: 'var(--pink)' } };
   ['RB','RBUSA','SAB'].forEach(brand => {
     const bt = brandTotals[brand];
-    if (bt.posts === 0) return;
-    detailHTML += `<div style="margin-bottom:20px;">
-      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:${brandLabels[brand].color};margin-bottom:10px;">${brandLabels[brand].label} — Breakdown</div>
-      <table class="mp-table"><thead><tr><th>Format</th><th>Platform</th><th>Posts</th><th>Cost</th><th>Reach</th><th>Impressions</th><th>Engagements</th></tr></thead><tbody>`;
-    mpRates[brand].forEach((row, i) => {
-      const qty = parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;
-      if (qty === 0) return;
-      detailHTML += `<tr>
-        <td>${row.format}</td>
-        <td><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform.replace("Instagram","IG").replace("YouTube","YT").replace("TikTok","TT")}</span></td>
-        <td style="font-family:'DM Mono',monospace;">${qty}</td>
-        <td style="font-family:'DM Mono',monospace;">${fmtGBP(qty*row.cost)}</td>
-        <td style="font-family:'DM Mono',monospace;">${fmt(qty*row.reach)}</td>
-        <td style="font-family:'DM Mono',monospace;">${fmt(qty*row.imps)}</td>
-        <td style="font-family:'DM Mono',monospace;">${fmt(qty*row.engs)}</td>
-      </tr>`;
-    });
-    detailHTML += `<tr style="background:rgba(255,255,255,0.03);font-weight:700;">
-      <td colspan="2" style="color:${brandLabels[brand].color};">TOTALS</td>
-      <td style="font-family:'DM Mono',monospace;color:${brandLabels[brand].color};">${fmt(bt.posts)}</td>
-      <td style="font-family:'DM Mono',monospace;color:${brandLabels[brand].color};">${fmtGBP(bt.cost)}</td>
-      <td style="font-family:'DM Mono',monospace;color:${brandLabels[brand].color};">${fmt(bt.reach)}</td>
-      <td style="font-family:'DM Mono',monospace;color:${brandLabels[brand].color};">${fmt(bt.imps)}</td>
-      <td style="font-family:'DM Mono',monospace;color:${brandLabels[brand].color};">${fmt(bt.engs)}</td>
-    </tr></tbody></table></div>`;
+    const pt = paidTotals[brand]; // only RB + SAB have paid
+    if (bt.posts === 0 && (!pt || pt.rows.length === 0)) return;
+    const col = brandLabels[brand].color;
+    detailHTML += `<div style="margin-bottom:24px;">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:${col};margin-bottom:10px;">${brandLabels[brand].label} — Breakdown</div>`;
+
+    // Organic rows
+    if (bt.posts > 0) {
+      detailHTML += `<div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Organic</div>
+      <table class="mp-table" style="margin-bottom:12px;"><thead><tr><th>Format</th><th>Platform</th><th>Posts</th><th>Cost</th><th>Reach</th><th>Impressions</th><th>Engagements</th></tr></thead><tbody>`;
+      mpRates[brand].forEach((row, i) => {
+        const qty = parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;
+        if (qty === 0) return;
+        detailHTML += `<tr>
+          <td>${row.format}</td>
+          <td><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform.replace("Instagram","IG").replace("YouTube","YT").replace("TikTok","TT")}</span></td>
+          <td style="font-family:'DM Mono',monospace;">${qty}</td>
+          <td style="font-family:'DM Mono',monospace;">${fmtGBP(qty*row.cost)}</td>
+          <td style="font-family:'DM Mono',monospace;">${fmt(qty*row.reach)}</td>
+          <td style="font-family:'DM Mono',monospace;">${fmt(qty*row.imps)}</td>
+          <td style="font-family:'DM Mono',monospace;">${fmt(qty*row.engs)}</td>
+        </tr>`;
+      });
+      detailHTML += `<tr style="background:rgba(255,255,255,0.03);font-weight:700;">
+        <td colspan="2" style="color:${col};">TOTALS</td>
+        <td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.posts)}</td>
+        <td style="font-family:'DM Mono',monospace;color:${col};">${fmtGBP(bt.cost)}</td>
+        <td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.reach)}</td>
+        <td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.imps)}</td>
+        <td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.engs)}</td>
+      </tr></tbody></table>`;
+    }
+
+    // Paid rows (RB + SAB only)
+    if (pt && pt.rows.length > 0) {
+      detailHTML += `<div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Paid</div>
+      <table class="mp-table"><thead><tr><th>Type</th><th>Spend</th><th>Est. Reach</th><th>Est. Impressions</th><th>Est. Engagements</th></tr></thead><tbody>`;
+      pt.rows.forEach(r => {
+        detailHTML += `<tr>
+          <td>${r.type}</td>
+          <td style="font-family:'DM Mono',monospace;">${fmtGBP(r.spend)}</td>
+          <td style="font-family:'DM Mono',monospace;">${fmt(r.reach)}</td>
+          <td style="font-family:'DM Mono',monospace;">${fmt(r.imps)}</td>
+          <td style="font-family:'DM Mono',monospace;">${fmt(r.engs)}</td>
+        </tr>`;
+      });
+      detailHTML += `<tr style="background:rgba(255,255,255,0.03);font-weight:700;">
+        <td style="color:${col};">PAID TOTALS</td>
+        <td style="font-family:'DM Mono',monospace;color:${col};">${fmtGBP(pt.budget)}</td>
+        <td style="font-family:'DM Mono',monospace;color:${col};">${fmt(pt.reach)}</td>
+        <td style="font-family:'DM Mono',monospace;color:${col};">${fmt(pt.imps)}</td>
+        <td style="font-family:'DM Mono',monospace;color:${col};">${fmt(pt.engs)}</td>
+      </tr></tbody></table>`;
+    }
+
+    detailHTML += `</div>`;
   });
   const detailEl = document.getElementById('cv_channelDetail');
   detailEl.innerHTML = detailHTML;
@@ -3441,12 +3481,30 @@ function mpExportPDF() {
   var brandHTML='';
   ['RB','RBUSA','SAB'].forEach(function(brand){
     var d=brandData[brand];
-    if(!d.rows.length)return;
     var col=brandColors[brand];
+    var hasPaid = (brand==='RB'||brand==='SAB') && MP_PAID_RATECARD[brand];
+    var paidRows='', paidTotal={budget:0,reach:0,imps:0,engs:0};
+    if(hasPaid){
+      MP_PAID_RATECARD[brand].forEach(function(row,i){
+        var el=document.getElementById('paid_'+brand+'_'+i);
+        var spend=el?(parseFloat(el.value)||0):0;
+        if(spend>0){
+          var ratio=spend/(row.budget||1000);
+          var rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);
+          paidRows+='<tr><td>'+row.type+'</td><td style="text-align:right">'+gN(spend)+'</td><td style="text-align:right">'+fN(rR)+'</td><td style="text-align:right">'+fN(rI)+'</td><td style="text-align:right">'+fN(rE)+'</td></tr>';
+          paidTotal.budget+=spend;paidTotal.reach+=rR;paidTotal.imps+=rI;paidTotal.engs+=rE;
+        }
+      });
+    }
+    if(!d.rows.length && !paidRows) return;
     var rr='';
-    d.rows.forEach(function(r){rr+='<tr><td>'+r.format+'</td><td style="color:#666">'+r.platform+'</td><td style="text-align:center">'+r.qty+'</td><td style="text-align:center">'+r.tiles+'</td><td style="text-align:right">'+gN(r.cost)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
-    rr+='<tr class="tr-total"><td colspan="2" style="color:'+col+';font-weight:800">TOTALS</td><td style="text-align:center;color:'+col+'">'+d.posts+'</td><td style="text-align:center;color:'+col+'">'+d.tiles+'</td><td style="text-align:right;color:'+col+'">'+gN(d.cost)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.engs)+'</td></tr>';
-    brandHTML+='<div style="margin-bottom:18px"><div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:'+col+';font-weight:800;margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid '+col+'">'+brandLabels[brand]+'</div><table><thead><tr><th>Format</th><th>Platform</th><th style="text-align:center">Posts</th><th style="text-align:center">Tiles</th><th style="text-align:right">Cost</th><th style="text-align:right">Reach</th><th style="text-align:right">Impressions</th><th style="text-align:right">Engagements</th></tr></thead><tbody>'+rr+'</tbody></table></div>';
+    if(d.rows.length){
+      d.rows.forEach(function(r){rr+='<tr><td>'+r.format+'</td><td style="color:#666">'+r.platform+'</td><td style="text-align:center">'+r.qty+'</td><td style="text-align:center">'+r.tiles+'</td><td style="text-align:right">'+gN(r.cost)+'</td><td style="text-align:right">'+fN(r.reach)+'</td><td style="text-align:right">'+fN(r.imps)+'</td><td style="text-align:right">'+fN(r.engs)+'</td></tr>';});
+      rr+='<tr class="tr-total"><td colspan="2" style="color:'+col+';font-weight:800">ORGANIC TOTALS</td><td style="text-align:center;color:'+col+'">'+d.posts+'</td><td style="text-align:center;color:'+col+'">'+d.tiles+'</td><td style="text-align:right;color:'+col+'">'+gN(d.cost)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(d.engs)+'</td></tr>';
+    }
+    var organicTable = d.rows.length ? '<div style="font-size:7px;text-transform:uppercase;letter-spacing:1px;color:#888;margin:6px 0 4px;">Organic</div><table><thead><tr><th>Format</th><th>Platform</th><th style="text-align:center">Posts</th><th style="text-align:center">Tiles</th><th style="text-align:right">Cost</th><th style="text-align:right">Reach</th><th style="text-align:right">Impressions</th><th style="text-align:right">Engagements</th></tr></thead><tbody>'+rr+'</tbody></table>' : '';
+    var paidTable = paidRows ? '<div style="font-size:7px;text-transform:uppercase;letter-spacing:1px;color:#888;margin:10px 0 4px;">Paid</div><table><thead><tr><th>Type</th><th style="text-align:right">Spend</th><th style="text-align:right">Est. Reach</th><th style="text-align:right">Est. Impressions</th><th style="text-align:right">Est. Engagements</th></tr></thead><tbody>'+paidRows+'<tr class="tr-total"><td style="color:'+col+';font-weight:800">PAID TOTALS</td><td style="text-align:right;color:'+col+'">'+gN(paidTotal.budget)+'</td><td style="text-align:right;color:'+col+'">'+fN(paidTotal.reach)+'</td><td style="text-align:right;color:'+col+'">'+fN(paidTotal.imps)+'</td><td style="text-align:right;color:'+col+'">'+fN(paidTotal.engs)+'</td></tr></tbody></table>' : '';
+    brandHTML+='<div style="margin-bottom:18px"><div style="font-size:8px;text-transform:uppercase;letter-spacing:2px;color:'+col+';font-weight:800;margin-bottom:6px;padding-bottom:4px;border-bottom:2px solid '+col+'">'+brandLabels[brand]+'</div>'+organicTable+paidTable+'</div>';
   });
   var logoHTML=mpClientLogoB64?'<img src="'+mpClientLogoB64+'" style="height:38px;object-fit:contain">':'<span style="font-size:15px;font-weight:800;color:#1a1a18">'+clientName+'</span>';
   var css='body{font-family:Arial,sans-serif;font-size:11px;color:#1a1a18;background:#fff;padding:28px 32px}@media print{body{padding:10px 14px}@page{margin:8mm;size:A4 landscape}}.hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:12px;border-bottom:3px solid #1a1a18;margin-bottom:18px}.brand{font-size:12px;font-weight:900;letter-spacing:2px;text-transform:uppercase}.sub{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-top:2px}.pt{font-size:20px;font-weight:900;margin-bottom:2px}.pd{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#888;margin-bottom:16px}.tg{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}.card{border:1px solid #e8e8e8;border-radius:6px;padding:14px}.cl{font-size:7px;text-transform:uppercase;letter-spacing:2px;color:#999;font-weight:700;margin-bottom:8px}.ir{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:11px}.il{color:#555}.iv{font-weight:600}.ih{background:#f0fdf8;margin:6px -8px -8px;padding:8px 8px 6px;border-radius:0 0 5px 5px;border-top:2px solid #00aa66;display:flex;justify-content:space-between}.ih .il{color:#007a4d;font-weight:800;font-size:12px}.ih .iv{color:#007a4d;font-weight:900;font-size:13px}.ap{font-size:8px;color:#007a4d;text-align:right;padding-top:3px;font-weight:700}table{width:100%;border-collapse:collapse;margin-bottom:4px}th{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:#888;padding:5px 7px;border-bottom:2px solid #1a1a18;text-align:left;background:#f8f8f8}td{padding:5px 7px;border-bottom:1px solid #f0f0f0;font-size:10px}.tr-total td{font-weight:700;background:#f5f5f5;border-top:1.5px solid #ddd}.tr-grand td{font-weight:900;background:#1a1a18;color:#00FFAA;padding:6px 7px}.sec{font-size:7px;text-transform:uppercase;letter-spacing:2px;color:#999;font-weight:700;margin:16px 0 8px;padding-bottom:3px;border-bottom:1px solid #e8e8e8}.ng{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px}.nt{background:#f8f8f8;border-radius:5px;padding:8px 10px}.nk{font-size:7px;text-transform:uppercase;letter-spacing:1.5px;color:#00aa66;font-weight:700;margin-bottom:3px}.nv{font-size:9px;color:#444;line-height:1.5}.bp{margin-top:12px;padding:10px 12px;background:#f0fdf8;border-radius:5px;font-size:9px;color:#444;line-height:1.6;border-left:3px solid #00aa66}.bp strong{color:#1a1a18}.ft{margin-top:18px;padding-top:10px;border-top:1px solid #e8e8e8;display:flex;justify-content:space-between;font-size:8px;color:#bbb}';
@@ -3561,11 +3619,36 @@ async function mpExportXLS() {
   sm.push([]);
   if (mpChannelDetailIsOpen()) {
     ['RB','RBUSA','SAB'].forEach(b => {
-      const d=brandData[b]; if(!d.rows.length) return;
+      const d=brandData[b];
+      const hasPaid = (b==='RB'||b==='SAB') && MP_PAID_RATECARD[b];
+      let paidRows=[], paidTot={budget:0,reach:0,imps:0,engs:0};
+      if(hasPaid){
+        MP_PAID_RATECARD[b].forEach((row,i) => {
+          const el=document.getElementById('paid_'+b+'_'+i);
+          const spend=el?(parseFloat(el.value)||0):0;
+          if(spend>0){
+            const ratio=spend/(row.budget||1000);
+            const rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);
+            paidRows.push([row.type,spend,rR,rI,rE]);
+            paidTot.budget+=spend;paidTot.reach+=rR;paidTot.imps+=rI;paidTot.engs+=rE;
+          }
+        });
+      }
+      if(!d.rows.length && !paidRows.length) return;
       sm.push([brandLabels[b]+' — BREAKDOWN']);
-      sm.push(['Format','Platform','Posts','Tiles','Cost (£)','Reach','Impressions','Engagements']);
-      d.rows.forEach(r => sm.push([r.format,r.platform,r.qty,r.tiles,r.cost,r.reach,r.imps,r.engs]));
-      sm.push(['TOTALS','',d.posts,d.tiles,d.cost,d.reach,d.imps,d.engs]);
+      if(d.rows.length){
+        sm.push(['ORGANIC']);
+        sm.push(['Format','Platform','Posts','Tiles','Cost (£)','Reach','Impressions','Engagements']);
+        d.rows.forEach(r => sm.push([r.format,r.platform,r.qty,r.tiles,r.cost,r.reach,r.imps,r.engs]));
+        sm.push(['ORGANIC TOTALS','',d.posts,d.tiles,d.cost,d.reach,d.imps,d.engs]);
+      }
+      if(paidRows.length){
+        sm.push([]);
+        sm.push(['PAID']);
+        sm.push(['Type','Spend (£)','Est. Reach','Est. Impressions','Est. Engagements']);
+        paidRows.forEach(r => sm.push(r));
+        sm.push(['PAID TOTALS',paidTot.budget,paidTot.reach,paidTot.imps,paidTot.engs]);
+      }
       sm.push([]);
     });
   }
