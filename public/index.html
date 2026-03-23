@@ -3305,7 +3305,7 @@ function mpGenerateClientView() {
     `<div><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">${k}</div><div style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);line-height:1.6;">${v}</div></div>`
   ).join('');
 
-  document.getElementById('cv_boilerplate').innerHTML = `<strong style="color:var(--white);">Audience:</strong> Highly engaged, sports-first Gen A, Gen Z & Millennial consumers. This plan provides access to a high-intent demo that brands can't reach at scale elsewhere.<br><br><strong style="color:var(--white);">Engagement:</strong> Lower CPM alternatives exist but fail to deliver the same audience relevance or brand affinity. Engagements is something we pride ourselves on — a true metric beyond passive views, to achieve incredible results.<br><br><strong style="color:var(--white);">Added Value:</strong> We always look to overdeliver on the minimums shared. Given our platform expertise and projected growth, we are confident we can do so.`;
+  document.getElementById('cv_boilerplate').innerHTML = `<p style="margin:0 0 6px 0"><strong style="color:var(--white);">Audience:</strong> Highly engaged, sports-first Gen A, Gen Z & Millennial consumers. This plan provides access to a high-intent demo that brands can't reach at scale elsewhere.</p><p style="margin:0 0 6px 0"><strong style="color:var(--white);">Engagement:</strong> Lower CPM alternatives exist but fail to deliver the same audience relevance or brand affinity. Engagements is something we pride ourselves on — a true metric beyond passive views, to achieve incredible results.</p><p style="margin:0"><strong style="color:var(--white);">Added Value:</strong> We always look to overdeliver on the minimums shared. Given our platform expertise and projected growth, we are confident we can do so.</p>`;
 
   mpGoStep(3);
 }
@@ -3369,7 +3369,22 @@ function mpExportPDF() {
     '@page{size:A4 landscape!important;margin:0!important}' +
     'html{background:#0e0e0c!important;margin:0;padding:0}' +
     'body{margin:0!important;background:#0e0e0c!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;overflow:visible!important}' +
-    '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}';
+    '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}' +
+    /* Tighten spacing for print to fit one page */
+    '#cv_logoBar{padding-bottom:8px!important;margin-bottom:8px!important}' +
+    '#mpStep3 h2{font-size:20px!important;margin-bottom:8px!important}' +
+    '#mpStep3 .mp-card, #mpStep3 [style*="border:1px solid"]{margin-bottom:8px!important}' +
+    '#cv_boilerplate{line-height:1.4!important;font-size:11px!important}' +
+    '#cv_boilerplate br{display:none!important}' +
+    /* Remove gaps between Audience/Engagement/Added Value paragraphs */
+    '#cv_boilerplate strong{display:inline!important}' +
+    '[id*="cv_"] [style*="margin-bottom:24px"]{margin-bottom:8px!important}' +
+    '[id*="cv_"] [style*="margin-bottom:16px"]{margin-bottom:6px!important}' +
+    '[id*="cv_"] [style*="margin-bottom:20px"]{margin-bottom:8px!important}' +
+    '[style*="padding-top:14px"]{padding-top:8px!important}' +
+    '[style*="margin-bottom:24px"]{margin-bottom:8px!important}' +
+    '[style*="margin-bottom:20px"]{margin-bottom:6px!important}' +
+    '[style*="margin-bottom:16px"]{margin-bottom:6px!important}';
 
   var w = window.open('','_blank');
   w.document.write('<!DOCTYPE html><html style="background:#0e0e0c;margin:0;padding:0"><head><meta charset="utf-8"><title>'+pdfFileName+'</title>' +
