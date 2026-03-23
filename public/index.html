@@ -3145,6 +3145,15 @@ function mpRecalc() {
     if (rEl2) rEl2.textContent = anySpend ? fmt(pReach) : '—';
     if (iEl2) iEl2.textContent = anySpend ? fmt(pImps)  : '—';
     if (eEl2) eEl2.textContent = anySpend ? fmt(pEngs)  : '—';
+    // Roll paid into live summary
+    const totalCostWithPaid = totalCost + pBudget;
+    const addedValueWithPaid = totalCostWithPaid - budget;
+    document.getElementById('mpSumValue').textContent = fmtGBP(totalCostWithPaid);
+    document.getElementById('mpSumAdded').textContent = fmtGBP(addedValueWithPaid);
+    document.getElementById('mpSumReach').textContent = fmt(totalReach + pReach);
+    const impEl2 = document.getElementById('mpSumImps');
+    if (impEl2) impEl2.textContent = fmt(totalImps + pImps);
+    document.getElementById('mpSumEngs').textContent = fmt(totalEngs + pEngs);
   }
 }
 
@@ -3358,10 +3367,7 @@ function mpExportPDF() {
   var styles = Array.from(document.querySelectorAll('style')).map(function(s){return s.innerHTML;}).join('\n');
 
   var footer = '<div style="margin-top:12px;padding-top:6px;border-top:1px solid #272723;display:flex;justify-content:space-between;align-items:baseline">' +
-    '<div>' +
-    '<div style="font-weight:700;color:#f0ede6;font-size:10px;margin-bottom:2px">Rising Ballers &times; She&rsquo;s A Baller</div>' +
     '<div style="font-size:8px;color:#555;line-height:1.4;max-width:900px">Prepared exclusively for <strong style="color:#f0ede6">'+clientName+'</strong>. Strictly confidential; not to be shared, reproduced or distributed without prior written consent. Expires <strong style="color:#f0ede6">'+expireStr+'</strong>; pricing and availability are subject to change thereafter.</div>' +
-    '</div>' +
     '<div style="color:#8a8880;font-size:8px;white-space:nowrap;margin-left:20px">Generated '+dateStr+'</div>' +
     '</div>';
 
