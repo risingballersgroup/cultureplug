@@ -2919,21 +2919,20 @@ const MP_PAID_RATECARD = {
 };
 
 function mpRenderPaidRatecard() {
-  ['RB','SAB'].forEach(brand => {
-    const tbody = document.getElementById('rcPaidBody' + brand);
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    MP_PAID_RATECARD[brand].forEach((row, i) => {
-      const tr = document.createElement('tr');
-      const typeLabel = row.type.replace("Instagram Feed Boost","IG Feed Boost").replace("Instagram Feed Dark","IG Feed Dark").replace("Instagram Story Dark","IG Story Dark").replace("TikTok Feed","TT Feed").replace("TikTok Story","TT Story").replace("YouTube Hero","YT Hero");
-      tr.innerHTML = `
-        <td style="font-size:10px;">${typeLabel}</td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="£${fmtN(row.budget)}" onchange="MP_PAID_RATECARD['${brand}'][${i}].budget=parseFloat(this.value.replace(/[£,]/g,''));" style="width:56px;text-align:center;border:none;background:transparent;color:var(--white);font-family:'DM Mono',monospace;font-size:10px;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" onchange="MP_PAID_RATECARD['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));" style="width:60px;text-align:center;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" onchange="MP_PAID_RATECARD['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));" style="width:60px;text-align:center;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;"></td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" onchange="MP_PAID_RATECARD['${brand}'][${i}].engs=parseFloat(this.value.replace(/,/g,''));" style="width:52px;text-align:center;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;"></td>`;
-      tbody.appendChild(tr);
-    });
+  // SAB only — plain text display matching organic table row heights exactly
+  const tbody = document.getElementById('rcPaidBodySAB');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  MP_PAID_RATECARD['SAB'].forEach((row, i) => {
+    const tr = document.createElement('tr');
+    const typeLabel = row.type.replace("Instagram Feed Boost","IG Feed Boost").replace("Instagram Feed Dark","IG Feed Dark").replace("Instagram Story Dark","IG Story Dark").replace("TikTok Feed","TT Feed").replace("TikTok Story","TT Story").replace("YouTube Hero","YT Hero");
+    tr.innerHTML = `
+      <td style="font-size:10px;">${typeLabel}</td>
+      <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--white);">£${fmtN(row.budget)}</td>
+      <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.reach)}</td>
+      <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.imps)}</td>
+      <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.engs)}</td>`;
+    tbody.appendChild(tr);
   });
 }
 
