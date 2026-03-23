@@ -3362,7 +3362,8 @@ function mpExportPDF() {
 
   var printCSS =
     '@page{size:A4 landscape!important;margin:0!important}' +
-    'html,body{margin:0!important;padding:0!important;background:#0e0e0c!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}' +
+    'html{background:#0e0e0c!important;margin:0;padding:0}' +
+    'body{margin:0!important;background:#0e0e0c!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;overflow:visible!important}' +
     '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}';
 
   var w = window.open('','_blank');
@@ -3370,7 +3371,7 @@ function mpExportPDF() {
     '<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">' +
     '<style>'+styles+'</style>' +
     '<style>'+printCSS+'</style>' +
-    '</head><body style="background:#0e0e0c;padding:20px 28px;color:#f0ede6;margin:0">' +
+    '</head><body style="background:#0e0e0c;padding:16px 24px;color:#f0ede6;margin:0;overflow:visible">' +
     innerHTML + footer +
     '<scr'+'ipt>window.onload=function(){window.print();};<\/scr'+'ipt>' +
     '</body></html>');
