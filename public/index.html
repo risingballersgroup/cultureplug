@@ -3357,12 +3357,12 @@ function mpExportPDF() {
   // Grab the full page CSS (all <style> tags)
   var styles = Array.from(document.querySelectorAll('style')).map(function(s){return s.innerHTML;}).join('\n');
 
-  var footer = '<div style="margin-top:20px;padding-top:8px;border-top:1px solid #272723;display:flex;justify-content:space-between;align-items:flex-start">' +
+  var footer = '<div style="margin-top:12px;padding-top:6px;border-top:1px solid #272723;display:flex;justify-content:space-between;align-items:baseline">' +
     '<div>' +
-    '<div style="font-weight:700;color:#f0ede6;font-size:11px;margin-bottom:2px">Rising Ballers &times; She&rsquo;s A Baller</div>' +
-    '<div style="font-size:9px;color:#555;line-height:1.5;max-width:900px">Prepared exclusively for <strong style="color:#f0ede6">'+clientName+'</strong>. <strong style="color:#f0ede6">Strictly confidential</strong> &mdash; not to be shared, reproduced or distributed without prior written consent. Commercially sensitive pricing is proprietary to Rising Ballers &amp; She&rsquo;s A Baller. This proposal <strong style="color:#f0ede6">expires '+expireStr+'</strong>; pricing and availability are subject to change thereafter. Acceptance constitutes agreement to our standard terms &amp; conditions.</div>' +
+    '<div style="font-weight:700;color:#f0ede6;font-size:10px;margin-bottom:2px">Rising Ballers &times; She&rsquo;s A Baller</div>' +
+    '<div style="font-size:8px;color:#555;line-height:1.4;max-width:900px">Prepared exclusively for <strong style="color:#f0ede6">'+clientName+'</strong>. Strictly confidential; not to be shared, reproduced or distributed without prior written consent. Expires <strong style="color:#f0ede6">'+expireStr+'</strong>; pricing and availability are subject to change thereafter.</div>' +
     '</div>' +
-    '<div style="color:#8a8880;font-size:9px;white-space:nowrap;margin-left:20px">Generated '+dateStr+'</div>' +
+    '<div style="color:#8a8880;font-size:8px;white-space:nowrap;margin-left:20px">Generated '+dateStr+'</div>' +
     '</div>';
 
   var printCSS =
