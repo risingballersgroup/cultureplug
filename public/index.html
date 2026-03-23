@@ -3172,14 +3172,19 @@ function mpClearClientLogo() {
 function mpRenderLogoBar(hasRB, hasSAB) {
   const bar = document.getElementById('cv_logoBar');
   if (!bar) return;
+  const clientName = document.getElementById('mpClientName')?.value || '';
+  const campaignName = document.getElementById('mpCampaignName')?.value || '';
+  const centreText = [clientName, campaignName].filter(Boolean).join(' — ');
   let h = '';
-  // RB logo — check RB or RBUSA posts
   const hasAnyRB = hasRB || (window._brandTotals && window._brandTotals.RBUSA && window._brandTotals.RBUSA.posts > 0);
   if (hasAnyRB) h += '<img src="' + RB_LOGO_B64 + '" style="height:36px;object-fit:contain;opacity:0.9;" title="Rising Ballers">';
   if (hasAnyRB && hasSAB) h += '<div style="width:1px;height:32px;background:var(--border);"></div>';
   if (hasSAB) h += '<img src="' + SAB_LOGO_B64 + '" style="height:36px;object-fit:contain;" title="She\'s A Baller">';
+  // Centre — client + campaign name
+  h += '<div style="flex:1;display:flex;justify-content:center;align-items:center;">';
+  if (centreText) h += '<div style="font-family:\'Playfair Display\',serif;font-size:15px;font-weight:700;color:var(--white);letter-spacing:0.01em;">' + centreText + '</div>';
+  h += '</div>';
   if (mpClientLogoB64) {
-    h += '<div style="flex:1;"></div>';
     h += '<div style="width:1px;height:32px;background:var(--border);"></div>';
     h += '<img src="' + mpClientLogoB64 + '" style="height:36px;object-fit:contain;margin-left:8px;" title="Client">';
   }
