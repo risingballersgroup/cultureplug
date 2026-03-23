@@ -1073,8 +1073,8 @@
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;min-height:24px;display:flex;align-items:flex-end;">Paid Benchmarking — per £1,000 spend <span style="color:var(--muted);font-size:8px;text-transform:none;letter-spacing:0;margin-left:4px;">(up to 3% of budget)</span></div>
           <table class="mp-table rc-compact" id="rcPaidTableSAB" style="table-layout:fixed;width:484px;">
-            <colgroup><col style="width:180px"><col style="width:30px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:62px"></colgroup>
-            <thead><tr><th>Type</th><th style="text-align:center;">Plt</th><th style="text-align:center;">Bdg</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Engs</th></tr></thead>
+            <colgroup><col style="width:180px"><col style="width:30px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:72px"><col style="width:62px"></colgroup>
+            <thead><tr><th>Type</th><th style="text-align:center;">Plt</th><th style="text-align:center;">Bdg</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th></th><th style="text-align:center;">Engs</th></tr></thead>
             <tbody id="rcPaidBodySAB"></tbody>
           </table>
         </div>
@@ -2938,6 +2938,7 @@ function mpRenderPaidRatecard() {
       <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--white);">£${fmtN(row.budget)}</td>
       <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.reach)}</td>
       <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.imps)}</td>
+      <td></td>
       <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.engs)}</td>`;
     tbody.appendChild(tr);
   });
