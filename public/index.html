@@ -1072,9 +1072,9 @@
         </div>
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;min-height:24px;display:flex;align-items:flex-end;">Paid Benchmarking — per £1,000 spend <span style="color:var(--muted);font-size:8px;text-transform:none;letter-spacing:0;margin-left:4px;">(up to 3% of budget)</span></div>
-          <table class="mp-table rc-compact" id="rcPaidTableSAB" style="table-layout:fixed;width:414px;">
-            <colgroup><col style="width:140px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:62px"></colgroup>
-            <thead><tr><th>Type</th><th style="text-align:center;">Bdg</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Engs</th></tr></thead>
+          <table class="mp-table rc-compact" id="rcPaidTableSAB" style="table-layout:fixed;width:444px;">
+            <colgroup><col style="width:140px"><col style="width:30px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:62px"></colgroup>
+            <thead><tr><th>Type</th><th style="text-align:center;">Plt</th><th style="text-align:center;">Bdg</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Engs</th></tr></thead>
             <tbody id="rcPaidBodySAB"></tbody>
           </table>
         </div>
@@ -2920,14 +2920,21 @@ const MP_PAID_RATECARD = {
 
 function mpRenderPaidRatecard() {
   // SAB only — plain text display
+  const typeToFullPlt = {
+    'Instagram Feed Boost': 'Instagram', 'Instagram Feed Dark': 'Instagram', 'Instagram Story Dark': 'Instagram',
+    'TikTok Feed': 'TikTok', 'TikTok Story': 'TikTok',
+    'YouTube Hero': 'YouTube', 'YT Shorts': 'YouTube',
+  };
   const tbody = document.getElementById('rcPaidBodySAB');
   if (!tbody) return;
   tbody.innerHTML = '';
   MP_PAID_RATECARD['SAB'].forEach((row, i) => {
+    const platform = typeToFullPlt[row.type] || 'Instagram';
     const tr = document.createElement('tr');
     const typeLabel = row.type.replace("Instagram Feed Boost","IG Feed Boost").replace("Instagram Feed Dark","IG Feed Dark").replace("Instagram Story Dark","IG Story Dark").replace("TikTok Feed","TT Feed").replace("TikTok Story","TT Story").replace("YouTube Hero","YT Hero");
     tr.innerHTML = `
       <td style="font-size:10px;">${typeLabel}</td>
+      <td style="text-align:center;">${pltBadge(platform)}</td>
       <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--white);">£${fmtN(row.budget)}</td>
       <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.reach)}</td>
       <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.imps)}</td>
