@@ -2953,7 +2953,16 @@ function mpRenderPaidRatecard() {
   });
 }
 
-function abbreviateFormat(f) {
+function pltColor(platform) {
+  if (platform === 'Instagram') return { bg: 'rgba(131,58,180,0.25)', color: '#c77dff' };
+  if (platform === 'TikTok')    return { bg: 'rgba(0,242,234,0.15)', color: '#00f2ea' };
+  if (platform === 'YouTube')   return { bg: 'rgba(255,0,0,0.2)',     color: '#ff6b6b' };
+  return { bg: 'rgba(255,255,255,0.06)', color: 'var(--muted)' };
+}
+function pltBadge(platform) {
+  const c = pltColor(platform);
+  return `<span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:${c.bg};color:${c.color};font-weight:600;">${abbreviatePlatform(platform)}</span>`;
+}
   // Normalise all story takeover variants to a single label
   var out = f.replace('Feed Post - Imagery','Feed (Img)')
               .replace('Feed Post - Reels','Feed (Reel)')
@@ -2971,22 +2980,21 @@ function abbreviatePlatform(p) {
 
 function mpRenderPaidPlanInputs() {
   // SAB only — single paid benchmarking source
-  // Map type to platform abbreviation for the Plt column
-  const typeToPlt = {
-    'Instagram Feed Boost': 'IG', 'Instagram Feed Dark': 'IG', 'Instagram Story Dark': 'IG',
-    'TikTok Feed': 'TT', 'TikTok Story': 'TT',
-    'YouTube Hero': 'YT', 'YT Shorts': 'YT',
+  const typeToFullPlt = {
+    'Instagram Feed Boost': 'Instagram', 'Instagram Feed Dark': 'Instagram', 'Instagram Story Dark': 'Instagram',
+    'TikTok Feed': 'TikTok', 'TikTok Story': 'TikTok',
+    'YouTube Hero': 'YouTube', 'YT Shorts': 'YouTube',
   };
   const typeLabel = t => t.replace('Instagram Feed Boost','IG Feed Boost').replace('Instagram Feed Dark','IG Feed Dark').replace('Instagram Story Dark','IG Story Dark').replace('TikTok Feed','TT Feed').replace('TikTok Story','TT Story').replace('YouTube Hero','YT Hero');
   const tbody = document.getElementById('mpPaidBodySAB');
   if (!tbody) return;
   tbody.innerHTML = '';
   MP_PAID_RATECARD['SAB'].forEach((row, i) => {
-    const plt = typeToPlt[row.type] || '—';
+    const platform = typeToFullPlt[row.type] || 'Instagram';
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td style="font-size:10px;">${typeLabel(row.type)}</td>
-      <td style="text-align:center;"><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${plt}</span></td>
+      <td style="text-align:center;">${pltBadge(platform)}</td>
       <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">£${fmtN(row.budget)}</td>
       <td style="text-align:center;"><input class="mp-qty-input" type="text" inputmode="numeric" value="" id="paid_SAB_${i}" oninput="mpRecalc()" style="width:56px;" placeholder="0"></td>
       <td id="paidReach_SAB_${i}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
@@ -3006,7 +3014,7 @@ function mpRenderRatecard() {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="max-width:110px;">${abbreviateFormat(row.format)}</td>
-        <td style="text-align:center;"><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${abbreviatePlatform(row.platform)}</span></td>
+        <td style="text-align:center;">${pltBadge(row.platform)}</td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.cost)}" data-raw="${row.cost}" onchange="mpRates['${brand}'][${i}].cost=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:72px;text-align:center;"></td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="mpRates['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:76px;text-align:center;"></td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="mpRates['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:76px;text-align:center;"></td>
@@ -3027,7 +3035,7 @@ function mpRenderPlanInputs() {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td style="font-size:11px;">${abbreviateFormat(row.format)}</td>
-        <td style="text-align:center;"><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${abbreviatePlatform(row.platform)}</span></td>
+        <td style="text-align:center;">${pltBadge(row.platform)}</td>
         <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">${fmtGBP(row.cost)}</td>
         <td><input class="mp-qty-input" type="number" value="0" min="0" id="qty_${brand}_${i}" oninput="mpRecalc()" style="width:48px;"></td>
         <td id="rowCost_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;">£0</td>
