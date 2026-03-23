@@ -3317,135 +3317,67 @@ function mpChannelDetailIsOpen(){
   return el&&el.style.display!=='none';
 }
 function mpExportPDF() {
+  // Grab Step 3 content directly from the DOM — no rebuilding
+  var step3 = document.getElementById('mpStep3');
+  if (!step3) { alert('Please generate the client view first.'); return; }
+
   var clientName = document.getElementById('mpClientName').value || 'Client';
-  var budget     = parseFloat((document.getElementById('mpBudget').value||'').replace(/,/g,'')) || 0;
-  var prodPct    = parseFloat(document.getElementById('mpProdPct').value) || 0;
-  var prodBudget = budget * prodPct / 100;
-  var fN = function(n){ return Number(n).toLocaleString('en-GB'); };
-  var gN = function(n){ return '£' + fN(n); };
-  var brandLabels = { RB: 'Rising Ballers', RBUSA: 'Rising Ballers USA', SAB: "She's A Baller" };
-  var brandColors = { RB: '#c9a84c', RBUSA: '#c9a84c', SAB: '#e91e8c' };
-  var brandData={};['RB','RBUSA','SAB'].forEach(function(brand){var rows=[],bP=0,bT=0,bC=0,bR=0,bI=0,bE=0;mpRates[brand].forEach(function(row,i){var el=document.getElementById('qty_'+brand+'_'+i);var qty=el?(parseInt(el.value)||0):0;if(!qty)return;var tiles=qty*(row.tiles||1);rows.push({format:row.format,platform:row.platform,qty:qty,tiles:tiles,cost:qty*row.cost,reach:qty*row.reach,imps:qty*row.imps,engs:qty*row.engs});bP+=qty;bT+=tiles;bC+=qty*row.cost;bR+=qty*row.reach;bI+=qty*row.imps;bE+=qty*row.engs;});brandData[brand]={rows:rows,posts:bP,tiles:bT,cost:bC,reach:bR,imps:bI,engs:bE};});
-  var paidPDFRows=[],paidPDFBudget=0,paidPDFReach=0,paidPDFImps=0,paidPDFEngs=0;
-  if(MP_PAID_RATECARD['SAB']){MP_PAID_RATECARD['SAB'].forEach(function(row,i){var el=document.getElementById('paid_SAB_'+i);var spend=el?(parseFloat(el.value)||0):0;if(spend>0){var ratio=spend/(row.budget||1000);var rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);paidPDFRows.push({type:row.type,spend:spend,reach:rR,imps:rI,engs:rE});paidPDFBudget+=spend;paidPDFReach+=rR;paidPDFImps+=rI;paidPDFEngs+=rE;}});}
-  var totalCost=brandData.RB.cost+brandData.RBUSA.cost+brandData.SAB.cost;
-  var totalReach=brandData.RB.reach+brandData.RBUSA.reach+brandData.SAB.reach;
-  var totalImps=brandData.RB.imps+brandData.RBUSA.imps+brandData.SAB.imps;
-  var totalEngs=brandData.RB.engs+brandData.RBUSA.engs+brandData.SAB.engs;
-  var addedValue=totalCost-budget;var addedPct=budget>0?Math.round((addedValue/budget)*100):0;
-  var dateStr=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  var pdfAB=[];if(brandData.RB.posts>0)pdfAB.push('RB');if(brandData.RBUSA.posts>0)pdfAB.push('RB USA');if(brandData.SAB.posts>0)pdfAB.push('SAB');
-  var pdfCh=(pdfAB.length?pdfAB.join('+'):'RB')+'+'+clientName;
-  var pdfPlt=['Instagram','TikTok','YouTube'].filter(function(plt){return['RB','RBUSA','SAB'].some(function(b){return mpRates[b].some(function(r,i){var el=document.getElementById('qty_'+b+'_'+i);return r.platform===plt&&(el?(parseInt(el.value)||0):0)>0;});});}).map(function(p){return{Instagram:'IG',TikTok:'TT',YouTube:'YT'}[p];}).join('+');if(!pdfPlt)pdfPlt='IG+TT+YT';
-  var getCt=function(plt,type){var n=0;['RB','RBUSA','SAB'].forEach(function(b){mpRates[b].forEach(function(r,i){var el=document.getElementById('qty_'+b+'_'+i);var q=el?(parseInt(el.value)||0):0;if(r.platform!==plt)return;var fl=r.format.toLowerCase();if(type==='Feed'){if(plt==='YouTube'){n+=q;}else if(fl.indexOf('feed')>=0||fl.indexOf('reel')>=0||fl.indexOf('film')>=0||fl.indexOf('short')>=0){n+=q;}}else if(type==='Story'){if(plt!=='YouTube'&&fl.indexOf('story')>=0)n+=q;}else if(type==='TOTAL'){n+=q;}});});return n;};
-  var BG='#0e0e0c',SURFACE='#161614',BORDER='#272723',WHITE='#f0ede6',MUTED='#8a8880',ACCENT='#00FFAA',GOLD='#c9a84c';
-  var D=function(s){return'style="'+s+'"';};
-  var postRows='';['Feed','Story','TOTAL'].forEach(function(t){var ig=getCt('Instagram',t),tt=getCt('TikTok',t),yt=getCt('YouTube',t),tot=ig+tt+yt;var isT=t==='TOTAL';postRows+='<tr><td '+D('padding:3px 4px 3px 0;font-size:9px;color:'+(isT?WHITE:MUTED))+'">'+t+'</td><td '+D('text-align:center;font-size:9px;color:'+(isT?WHITE:MUTED))+'">'+ig+'</td><td '+D('text-align:center;font-size:9px;color:'+(isT?WHITE:MUTED))+'">'+tt+'</td><td '+D('text-align:center;font-size:9px;color:'+(isT?WHITE:MUTED))+'">'+yt+'</td><td '+D('text-align:center;font-size:9px;font-weight:700;color:'+WHITE)+'">'+tot+'</td></tr>';});
-  var appendixHTML='';
-  if(mpChannelDetailIsOpen()){
-    ['RB','RBUSA','SAB'].forEach(function(brand){var d=brandData[brand];if(!d.rows.length)return;var col=brandColors[brand];var rr='';d.rows.forEach(function(r){rr+='<tr><td '+D('padding:4px 6px;font-size:10px;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+r.format+'</td><td '+D('padding:4px 6px;font-size:10px;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">'+r.platform+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:center;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+r.qty+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+gN(r.cost)+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+fN(r.reach)+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+fN(r.imps)+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+fN(r.engs)+'</td></tr>';});rr+='<tr '+D('background:'+SURFACE)+'><td colspan="2" '+D('padding:5px 6px;font-weight:700;color:'+col)+'">ORGANIC TOTALS</td><td '+D('padding:5px 6px;font-weight:700;text-align:center;color:'+col)+'">'+d.posts+'</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+col)+'">'+gN(d.cost)+'</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+col)+'">'+fN(d.reach)+'</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+col)+'">'+fN(d.imps)+'</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+col)+'">'+fN(d.engs)+'</td></tr>';appendixHTML+='<div '+D('margin-bottom:20px')+'"><div '+D('font-size:9px;text-transform:uppercase;letter-spacing:2px;font-weight:700;color:'+col+';margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid '+col)+'">'+brandLabels[brand]+' — Organic</div><table '+D('width:100%;border-collapse:collapse;margin-bottom:8px')+'"><thead><tr><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:left')+'">Format</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED)+'">Platform</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:center')+'">Posts</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Cost</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Reach</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Imps</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Engs</th></tr></thead><tbody>'+rr+'</tbody></table></div>';});
-    if(paidPDFRows.length>0){var pr='';paidPDFRows.forEach(function(r){pr+='<tr><td '+D('padding:4px 6px;font-size:10px;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+r.type+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+gN(r.spend)+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+fN(r.reach)+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+fN(r.imps)+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+fN(r.engs)+'</td></tr>';});pr+='<tr '+D('background:'+SURFACE)+'><td '+D('padding:5px 6px;font-weight:700;color:'+ACCENT)+'">PAID TOTALS</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+ACCENT)+'">'+gN(paidPDFBudget)+'</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+ACCENT)+'">'+fN(paidPDFReach)+'</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+ACCENT)+'">'+fN(paidPDFImps)+'</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+ACCENT)+'">'+fN(paidPDFEngs)+'</td></tr>';appendixHTML+='<div '+D('margin-bottom:20px')+'"><div '+D('font-size:9px;text-transform:uppercase;letter-spacing:2px;font-weight:700;color:'+ACCENT+';margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid '+ACCENT)+'">Paid Benchmarking</div><table '+D('width:100%;border-collapse:collapse;margin-bottom:8px')+'"><thead><tr><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:left')+'">Type</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Spend</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Est. Reach</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Est. Imps</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Est. Engs</th></tr></thead><tbody>'+pr+'</tbody></table></div>';}
-  }
-  var mkTH=function(l,a){return'<th '+D('padding:4px 5px;font-size:7px;text-transform:uppercase;letter-spacing:1px;color:'+MUTED+';text-align:'+(a||'left')+';border-bottom:1px solid '+BORDER)+'">'+l+'</th>';};
-  var mkTD=function(v,a,c,b){return'<td '+D('padding:4px 5px;font-size:9px;color:'+(c||WHITE)+';text-align:'+(a||'left')+';border-bottom:1px solid '+BORDER+(b?';font-weight:700':''))+'">'+(v||'')+'</td>';};
-  var clientLogoHTML=mpClientLogoB64?'<img src="'+mpClientLogoB64+'" '+D('height:32px;object-fit:contain')+'">':'<span '+D('font-weight:700;color:'+WHITE+';font-size:13px')+'">'+clientName+'</span>';
-  var hdr=function(){return'<div '+D('display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:1px solid '+BORDER+';margin-bottom:14px')+'"><div '+D('display:flex;align-items:center;gap:10px')+'"><img src="'+RB_LOGO_B64+'" '+D('height:24px;object-fit:contain;opacity:0.9')+'"><img src="'+SAB_LOGO_B64+'" '+D('height:24px;object-fit:contain')+'"></div>'+clientLogoHTML+'</div>';};
-  var expireDate=new Date();expireDate.setDate(expireDate.getDate()+2);var expireStr=expireDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});var ft='<div '+D('margin-top:10px;padding-top:6px;border-top:1px solid '+BORDER)+'"><div '+D('display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px')+'"><span '+D('font-size:8px;font-weight:700;color:'+WHITE)+'">Rising Ballers &times; She&rsquo;s A Baller</span><span '+D('font-size:7px;color:'+MUTED)+'">Generated '+dateStr+'</span></div><div '+D('font-size:7px;color:'+MUTED+';line-height:1.4')+'">Prepared exclusively for <strong '+D('color:'+WHITE)+'">'+clientName+'</strong>. <strong '+D('color:'+WHITE)+'">Strictly confidential</strong> &mdash; not to be shared, reproduced or distributed without prior written consent. Commercially sensitive pricing is proprietary to Rising Ballers &amp; She&rsquo;s A Baller. This proposal <strong '+D('color:'+WHITE)+'">expires '+expireStr+'</strong>; pricing and availability are subject to change thereafter. Acceptance constitutes agreement to our standard terms &amp; conditions.</div></div>';
-  var notesHTML=(function(){
-    var nd=document.getElementById('cv_notes');
-    if(!nd)return '';
-    var items=nd.querySelectorAll(':scope>div');
-    if(!items.length)return '';
-    return Array.from(items).map(function(item){
-      var kEl=item.querySelector('div:first-child');
-      var vEl=item.querySelector('div:last-child');
-      var k=kEl?kEl.textContent:'';
-      var v=vEl?vEl.textContent:'';
-      return '<div '+D('background:'+SURFACE+';border:1px solid '+BORDER+';border-radius:5px;padding:7px 8px')+'"><div '+D('font-size:7px;text-transform:uppercase;letter-spacing:1.5px;color:'+ACCENT+';font-weight:600;margin-bottom:3px')+'">'+k+'</div><div '+D('font-size:8px;color:'+MUTED+';line-height:1.4')+'">'+v+'</div></div>';
-    }).join('');
-  })();
-  var bkRows='<tr>'+mkTD('ORGANIC','left',WHITE,true)+mkTD(pdfCh,'left',MUTED)+mkTD(pdfPlt,'left',MUTED)+mkTD('Mixed','left',MUTED)+mkTD('Launch asset &amp; cutdowns','left',MUTED)+mkTD(fN(totalReach),'right')+mkTD(fN(totalImps),'right')+mkTD(fN(totalEngs),'right')+'<td '+D('padding:4px 5px;font-size:9px;color:'+ACCENT+';text-align:right;border-bottom:1px solid '+BORDER)+'">1% Min</td>'+mkTD(gN(totalCost),'right',GOLD,true)+'</tr>'+(paidPDFBudget>0?'<tr>'+mkTD('PAID','left',WHITE,true)+mkTD(pdfCh,'left',MUTED)+mkTD(pdfPlt,'left',MUTED)+mkTD('Amplification','left',MUTED)+mkTD('Dark posts + paid boosts','left',MUTED)+mkTD(fN(paidPDFReach),'right')+mkTD(fN(paidPDFImps),'right')+mkTD(fN(paidPDFEngs),'right')+'<td '+D('padding:4px 5px;font-size:9px;color:'+ACCENT+';text-align:right;border-bottom:1px solid '+BORDER)+'">1% Min</td>'+mkTD(gN(paidPDFBudget),'right',GOLD,true)+'</tr>':'')+
-    '<tr>'+mkTD('ADDED VALUE','left',WHITE,true)+mkTD(pdfCh,'left',MUTED)+mkTD(pdfPlt,'left',MUTED)+mkTD('Mixed','left',MUTED)+mkTD('Same as above','left',MUTED)+mkTD(fN(Math.round(totalReach*1.97)),'right')+mkTD(fN(Math.round(totalImps*1.97)),'right')+mkTD(fN(Math.round(totalEngs*1.97)),'right')+'<td '+D('padding:4px 5px;font-size:9px;color:'+ACCENT+';text-align:right;border-bottom:1px solid '+BORDER)+'">1% Min</td>'+mkTD(gN(addedValue>0?addedValue:0),'right',GOLD,true)+'</tr>'+
-    '<tr '+D('background:'+SURFACE)+'><td colspan="5" '+D('padding:4px 5px;font-size:9px;font-weight:700;color:'+ACCENT)+'">OVERALL TOTALS</td>'+mkTD(fN(totalReach),'right',ACCENT,true)+mkTD(fN(totalImps),'right',ACCENT,true)+mkTD(fN(totalEngs),'right',ACCENT,true)+'<td '+D('padding:5px 7px;font-size:10px;color:'+ACCENT+';text-align:right')+'">1% Min</td>'+mkTD(gN(totalCost),'right',ACCENT,true)+'</tr>';
-  var singlePage=!appendixHTML;
-  var css='*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}'+
-    'html,body{height:100%;background:'+BG+'!important}'+
-    'body{font-family:Arial,sans-serif;color:'+WHITE+';background:'+BG+';display:flex;flex-direction:column;padding:2.2% 2.8%;overflow:hidden}'+
-    '@media print{html,body{background:'+BG+'!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}@page{margin:0;background:'+BG+';size:A4 landscape}.pg{page-break-before:always}}';
+  var dateStr = new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  var pdfDate = new Date();
+  var pdfYYMMDD = (pdfDate.getFullYear()+'').slice(2)+(('0'+(pdfDate.getMonth()+1)).slice(-2))+(('0'+pdfDate.getDate()).slice(-2));
 
-  var D2=function(s){return 'style="'+s+'"';};
-  var clientLogoHTML2=mpClientLogoB64?'<img src="'+mpClientLogoB64+'" '+D2('height:26px;object-fit:contain')+'">':'<span '+D2('font-weight:700;color:'+WHITE+';font-size:9px')+'">'+clientName+'</span>';
-  var hdr2='<div '+D2('display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid '+BORDER+';padding-bottom:5px;margin-bottom:5px;flex-shrink:0')+'">'+
-    '<div '+D2('display:flex;gap:6px;align-items:center')+'"><img src="'+RB_LOGO_B64+'" '+D2('height:22px;object-fit:contain;opacity:0.9')+'"><img src="'+SAB_LOGO_B64+'" '+D2('height:22px;object-fit:contain')+'"></div>'+
-    clientLogoHTML2+'</div>';
+  var pdfAB=[];
+  ['RB','RBUSA','SAB'].forEach(function(b){
+    var anyQty=mpRates[b].some(function(r,i){var el=document.getElementById('qty_'+b+'_'+i);return el&&(parseInt(el.value)||0)>0;});
+    if(anyQty){if(b==='RB')pdfAB.push('RB');else if(b==='RBUSA')pdfAB.push('RB USA');else if(b==='SAB')pdfAB.push('SAB');}
+  });
+  var pdfFileName = 'MEDIAPLAN - '+pdfAB.join(' x ')+' - '+clientName+' - '+pdfYYMMDD;
 
-  var titleBlock='<div '+D2('flex-shrink:0;margin-bottom:6px')+'">'+
-    '<div '+D2('font-size:15px;font-weight:700;color:'+WHITE+';line-height:1.2')+'">Media Plan: '+clientName+'</div>'+
-    '<div '+D2('font-size:5.5px;letter-spacing:2px;text-transform:uppercase;color:'+MUTED+';margin-top:1px')+'">Prepared '+dateStr+'</div></div>';
+  var expireDate = new Date(); expireDate.setDate(expireDate.getDate()+2);
+  var expireStr = expireDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
 
-  var invCard='<div '+D2('background:'+SURFACE+';border:1px solid '+BORDER+';border-radius:4px;padding:7px 9px;display:flex;flex-direction:column')+'">'+
-    '<div '+D2('font-size:6px;text-transform:uppercase;letter-spacing:1.5px;color:'+GOLD+';font-weight:600;margin-bottom:5px;flex-shrink:0')+'">Summarised Media Plan Investment</div>'+
-    '<table '+D2('width:100%;border-collapse:collapse;flex-shrink:0')+'">'+
-    '<tr><td '+D2('padding:3px 0;font-size:7.5px;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Total Partner Budget</td><td '+D2('padding:3px 0;font-size:7.5px;color:'+WHITE+';text-align:right;border-bottom:1px solid '+BORDER)+'">'+gN(budget)+'</td></tr>'+
-    '<tr><td '+D2('padding:3px 0;font-size:7.5px;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Media Value (Organic+Paid)</td><td '+D2('padding:3px 0;font-size:7.5px;color:'+WHITE+';text-align:right;border-bottom:1px solid '+BORDER)+'">'+gN(totalCost)+'</td></tr>'+
-    '<tr><td '+D2('padding:3px 0;font-size:7.5px;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Other (Production)</td><td '+D2('padding:3px 0;font-size:7.5px;color:'+WHITE+';text-align:right;border-bottom:1px solid '+BORDER)+'">'+gN(prodBudget)+'</td></tr>'+
-    '</table>'+
-    '<div '+D2('display:flex;justify-content:space-between;padding-top:5px;margin-top:auto')+'"><span '+D2('font-size:10px;font-weight:700;color:'+ACCENT)+'">Min Added Value</span><span '+D2('font-size:10px;font-weight:700;color:'+ACCENT)+'">'+gN(addedValue)+'</span></div>'+
-    '<div '+D2('font-size:6px;color:'+ACCENT+';text-align:right;margin-top:1px')+'">'+addedPct+'% Added Value</div></div>';
+  // Clone the step 3 inner content, removing the action buttons and accordion toggle header
+  var clone = step3.cloneNode(true);
+  // Remove the top action bar (Edit Plan / Export buttons row)
+  var actionBar = clone.querySelector('[style*="justify-content:space-between"]');
+  if (actionBar) actionBar.remove();
+  // Remove the accordion toggle header (keep the content inside if open)
+  var accordionHdr = clone.querySelector('[onclick*="mpToggleChannelDetail"]');
+  if (accordionHdr) accordionHdr.remove();
 
-  var postCard='<div '+D2('background:'+SURFACE+';border:1px solid '+BORDER+';border-radius:4px;padding:7px 9px;display:flex;flex-direction:column')+'">'+
-    '<div '+D2('font-size:6px;text-transform:uppercase;letter-spacing:1.5px;color:'+GOLD+';font-weight:600;margin-bottom:5px;flex-shrink:0')+'">Post Summary</div>'+
-    '<div '+D2('flex:1;display:flex;flex-direction:column;justify-content:center')+'">'+
-    '<table '+D2('width:100%;border-collapse:collapse')+'"><thead><tr>'+
-    '<th '+D2('padding:3px 4px 3px 0;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:left;border-bottom:1px solid '+BORDER)+'">Posts</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:center;border-bottom:1px solid '+BORDER)+'">Instagram</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:center;border-bottom:1px solid '+BORDER)+'">TikTok</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:center;border-bottom:1px solid '+BORDER)+'">YouTube</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+WHITE+';text-align:center;border-bottom:1px solid '+BORDER)+'">Total</th>'+
-    '</tr></thead><tbody>'+postRows+'</tbody></table></div></div>';
+  var innerHTML = clone.innerHTML;
 
-  var twoCol='<div '+D2('display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1;margin-bottom:6px;min-height:0')+'">'+invCard+postCard+'</div>';
+  // Grab the full page CSS (all <style> tags)
+  var styles = Array.from(document.querySelectorAll('style')).map(function(s){return s.innerHTML;}).join('\n');
 
-  var bkSection='<div '+D2('flex:1.2;display:flex;flex-direction:column;margin-bottom:6px;min-height:0')+'">'+
-    '<div '+D2('font-size:6px;text-transform:uppercase;letter-spacing:2px;color:'+GOLD+';font-weight:600;border-bottom:1px solid '+BORDER+';padding-bottom:3px;margin-bottom:4px;flex-shrink:0')+'">Media Breakdown</div>'+
-    '<table '+D2('width:100%;border-collapse:collapse')+'"><thead><tr>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:left;border-bottom:1px solid '+BORDER)+'">Media Type</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Channels</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Platforms</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Formats</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Asset Types</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:right;border-bottom:1px solid '+BORDER)+'">Total Reach</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:right;border-bottom:1px solid '+BORDER)+'">Total Imps</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:right;border-bottom:1px solid '+BORDER)+'">Total Engs</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:right;border-bottom:1px solid '+BORDER)+'">Eng Rate</th>'+
-    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:right;border-bottom:1px solid '+BORDER)+'">Media Value</th>'+
-    '</tr></thead><tbody>'+bkRows+'</tbody></table></div>';
+  var footer = '<div style="margin-top:20px;padding-top:8px;border-top:1px solid #272723;display:flex;justify-content:space-between;align-items:flex-start">' +
+    '<div>' +
+    '<div style="font-weight:700;color:#f0ede6;font-size:11px;margin-bottom:2px">Rising Ballers &times; She&rsquo;s A Baller</div>' +
+    '<div style="font-size:9px;color:#555;line-height:1.5;max-width:900px">Prepared exclusively for <strong style="color:#f0ede6">'+clientName+'</strong>. <strong style="color:#f0ede6">Strictly confidential</strong> &mdash; not to be shared, reproduced or distributed without prior written consent. Commercially sensitive pricing is proprietary to Rising Ballers &amp; She&rsquo;s A Baller. This proposal <strong style="color:#f0ede6">expires '+expireStr+'</strong>; pricing and availability are subject to change thereafter. Acceptance constitutes agreement to our standard terms &amp; conditions.</div>' +
+    '</div>' +
+    '<div style="color:#8a8880;font-size:9px;white-space:nowrap;margin-left:20px">Generated '+dateStr+'</div>' +
+    '</div>';
 
-  var notesSection='<div '+D2('flex:1;display:flex;flex-direction:column;margin-bottom:6px;min-height:0')+'">'+
-    '<div '+D2('font-size:6px;text-transform:uppercase;letter-spacing:2px;color:'+GOLD+';font-weight:600;border-bottom:1px solid '+BORDER+';padding-bottom:3px;margin-bottom:4px;flex-shrink:0')+'">Campaign Notes</div>'+
-    '<div '+D2('display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;flex:1;min-height:0')+'">'+notesHTML+'</div></div>';
+  var printCSS = '@media print{' +
+    '-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;' +
+    '@page{margin:10mm;size:A4 landscape}' +
+    'body{background:#0e0e0c!important}' +
+    '.mp-step-nav,.mode-tabs,.export-btn,button{display:none!important}' +
+    '}' +
+    'html,body{background:#0e0e0c!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}' +
+    '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}';
 
-  var bpEl=document.getElementById('cv_boilerplate');
-  var bpHtml=bpEl?bpEl.innerHTML:'';
-  var bpClean=bpHtml.replace(/color:var\(--white\)/g,'color:'+WHITE).replace(/color:var\(--muted\)/g,'color:'+MUTED).replace(/color:var\(--accent\)/g,'color:'+ACCENT).replace(/<br><br>/g,'</p><p style=\"font-size:5.5px;color:'+MUTED+';line-height:1.5;margin-top:2px\">');
-  var bpSection='<div style=\"flex-shrink:0;background:'+SURFACE+';border-left:2px solid '+ACCENT+';border-radius:0 3px 3px 0;padding:5px 8px;margin-bottom:5px\"><p style=\"font-size:5.5px;color:'+MUTED+';line-height:1.5\">'+bpClean+'</p></div>';
-
-  var expireDate2=new Date();expireDate2.setDate(expireDate2.getDate()+2);
-  var expireStr2=expireDate2.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
-  var ft2='<div style=\"border-top:1px solid '+BORDER+';padding-top:4px;display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0\">'+
-    '<div><div style=\"font-weight:700;color:'+WHITE+';font-size:6px;margin-bottom:1px\">Rising Ballers &times; She&rsquo;s A Baller</div>'+
-    '<div style=\"font-size:4px;color:#555;line-height:1.5;max-width:88%\">Prepared exclusively for <strong style=\"color:'+WHITE+'\">'+clientName+'</strong>. <strong style=\"color:'+WHITE+'\">Strictly confidential</strong> &mdash; not to be shared or reproduced without prior written consent. Pricing is proprietary to Rising Ballers &amp; She&rsquo;s A Baller. This proposal <strong style=\"color:'+WHITE+'\">expires '+expireStr2+'</strong>. Acceptance constitutes agreement to our standard terms &amp; conditions.</div></div>'+
-    '<div style=\"color:#8a8880;font-size:4.5px;white-space:nowrap\">Generated '+dateStr+'</div></div>';
-
-  var body=hdr2+titleBlock+twoCol+bkSection+notesSection+bpSection+ft2+
-    (appendixHTML?'<div class="pg"></div>'+hdr2+'<div '+D2('font-size:18px;font-weight:700;margin-bottom:4px;color:'+WHITE)+'">Appendix &mdash; Channel Breakdown</div><div '+D2('font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:'+MUTED+';margin-bottom:16px')+'">Media Plan: '+clientName+' &mdash; '+dateStr+'</div>'+appendixHTML+ft2:'');
-  var w=window.open('','_blank');
-  var pdfDate=new Date();var pdfYYMMDD=(pdfDate.getFullYear()+'').slice(2)+(('0'+(pdfDate.getMonth()+1)).slice(-2))+(('0'+pdfDate.getDate()).slice(-2));
-  var pdfFileName='MEDIAPLAN - '+pdfAB.join(' x ')+' - '+clientName+' - '+pdfYYMMDD;
-  w.document.write('<!DOCTYPE html><html style="background:'+BG+';-webkit-print-color-adjust:exact;print-color-adjust:exact"><head><meta charset="utf-8"><title>'+pdfFileName+'</title><style>'+css+'</style></head><body style="background:'+BG+'!important;color:'+WHITE+'">'+body+'<scr'+'ipt>window.onload=function(){window.print();};<\/scr'+'ipt></body></html>');
+  var w = window.open('','_blank');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+pdfFileName+'</title>' +
+    '<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">' +
+    '<style>'+styles+'</style>' +
+    '<style>'+printCSS+'</style>' +
+    '</head><body style="background:#0e0e0c;padding:20px 28px;color:#f0ede6">' +
+    innerHTML + footer +
+    '<scr'+'ipt>window.onload=function(){window.print();};<\/scr'+'ipt>' +
+    '</body></html>');
   w.document.close();
 }
-
 
 async function mpExportXLS() {
   const clientName = document.getElementById('mpClientName').value || 'Client';
