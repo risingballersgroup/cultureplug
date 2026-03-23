@@ -3368,33 +3368,81 @@ function mpExportPDF() {
     '<tr>'+mkTD('ADDED VALUE','left',WHITE,true)+mkTD(pdfCh,'left',MUTED)+mkTD(pdfPlt,'left',MUTED)+mkTD('Mixed','left',MUTED)+mkTD('Same as above','left',MUTED)+mkTD(fN(Math.round(totalReach*1.97)),'right')+mkTD(fN(Math.round(totalImps*1.97)),'right')+mkTD(fN(Math.round(totalEngs*1.97)),'right')+'<td '+D('padding:4px 5px;font-size:9px;color:'+ACCENT+';text-align:right;border-bottom:1px solid '+BORDER)+'">1% Min</td>'+mkTD(gN(addedValue>0?addedValue:0),'right',GOLD,true)+'</tr>'+
     '<tr '+D('background:'+SURFACE)+'><td colspan="5" '+D('padding:4px 5px;font-size:9px;font-weight:700;color:'+ACCENT)+'">OVERALL TOTALS</td>'+mkTD(fN(totalReach),'right',ACCENT,true)+mkTD(fN(totalImps),'right',ACCENT,true)+mkTD(fN(totalEngs),'right',ACCENT,true)+'<td '+D('padding:5px 7px;font-size:10px;color:'+ACCENT+';text-align:right')+'">1% Min</td>'+mkTD(gN(totalCost),'right',ACCENT,true)+'</tr>';
   var singlePage=!appendixHTML;
-  var css='*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}body{font-family:Arial,sans-serif;color:'+WHITE+';background:'+BG+';padding:14px 20px}@media print{html,body{background:'+BG+'!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}@page{margin:0;background:'+BG+';size:A4 landscape}.pg{page-break-before:always}}';
-  var body=hdr()+'<div '+D('font-size:18px;font-weight:700;margin-bottom:2px;color:'+WHITE)+'">Media Plan: '+clientName+'</div><div '+D('font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:'+MUTED+';margin-bottom:12px')+'">Prepared '+dateStr+'</div>'+
-    '<div '+D('display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px')+'"><div '+D('background:'+SURFACE+';border:1px solid '+BORDER+';border-radius:6px;padding:10px')+'"><div '+D('font-size:8px;text-transform:uppercase;letter-spacing:2px;color:'+GOLD+';font-weight:600;margin-bottom:8px')+'">Summarised Media Plan Investment</div><table '+D('width:100%;border-collapse:collapse')+'"><tr><td '+D('padding:3px 0;font-size:10px;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Total Partner Budget</td><td '+D('padding:3px 0;font-size:10px;color:'+WHITE+';text-align:right;border-bottom:1px solid '+BORDER)+'">'+gN(budget)+'</td></tr><tr><td '+D('padding:3px 0;font-size:10px;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Media Value (Organic+Paid)</td><td '+D('padding:3px 0;font-size:10px;color:'+WHITE+';text-align:right;border-bottom:1px solid '+BORDER)+'">'+gN(totalCost)+'</td></tr><tr><td '+D('padding:3px 0;font-size:10px;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Other (Production)</td><td '+D('padding:3px 0;font-size:10px;color:'+WHITE+';text-align:right;border-bottom:1px solid '+BORDER)+'">'+gN(prodBudget)+'</td></tr><tr><td '+D('padding:6px 0 3px;font-size:12px;font-weight:700;color:'+ACCENT)+'">Min Added Value</td><td '+D('padding:6px 0 3px;font-size:12px;font-weight:700;color:'+ACCENT+';text-align:right')+'">'+gN(addedValue)+'</td></tr><tr><td colspan="2" '+D('padding:2px 0;font-size:8px;color:'+ACCENT+';text-align:right')+'">'+addedPct+'% Added Value</td></tr></table></div>'+
-    '<div '+D('background:'+SURFACE+';border:1px solid '+BORDER+';border-radius:6px;padding:10px')+'"><div '+D('font-size:8px;text-transform:uppercase;letter-spacing:2px;color:'+GOLD+';font-weight:600;margin-bottom:8px')+'">Post Summary</div><table '+D('width:100%;border-collapse:collapse')+'"><thead><tr><th '+D('padding:3px 4px 3px 0;font-size:7px;text-transform:uppercase;color:'+MUTED+';text-align:left')+'">Posts</th><th '+D('padding:3px 4px;font-size:7px;text-transform:uppercase;color:'+MUTED+';text-align:center')+'">Instagram</th><th '+D('padding:3px 4px;font-size:7px;text-transform:uppercase;color:'+MUTED+';text-align:center')+'">TikTok</th><th '+D('padding:3px 4px;font-size:7px;text-transform:uppercase;color:'+MUTED+';text-align:center')+'">YouTube</th><th '+D('padding:3px 4px;font-size:7px;text-transform:uppercase;color:'+WHITE+';text-align:center')+'">Total</th></tr></thead><tbody>'+postRows+'</tbody></table></div></div>'+
-    '<div '+D('font-size:8px;text-transform:uppercase;letter-spacing:2px;color:'+GOLD+';font-weight:600;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid '+BORDER)+'">Media Breakdown</div>'+
-    '<table '+D('width:100%;border-collapse:collapse;margin-bottom:14px')+'"><thead><tr>'+mkTH('Media Type')+mkTH('Channels')+mkTH('Platforms')+mkTH('Formats')+mkTH('Asset Types')+mkTH('Total Reach','right')+mkTH('Total Imps','right')+mkTH('Total Engs','right')+mkTH('Eng Rate','right')+mkTH('Media Value','right')+'</tr></thead><tbody>'+bkRows+'</tbody></table>'+
-    '<div '+D('font-size:8px;text-transform:uppercase;letter-spacing:2px;color:'+GOLD+';font-weight:600;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid '+BORDER)+'">Campaign Notes</div>'+
-    '<div '+D('display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px')+'">'+notesHTML+'</div>'+
-    (function(){var bpEl=document.getElementById('cv_boilerplate');var bpHtml=bpEl?bpEl.innerHTML:'';return '<div '+D('padding:8px 12px;background:'+SURFACE+';border-radius:6px;font-size:8px;color:'+MUTED+';line-height:1.5;border-left:3px solid '+ACCENT)+'">'+bpHtml.replace(/color:var\(--white\)/g,'color:'+WHITE).replace(/color:var\(--muted\)/g,'color:'+MUTED).replace(/color:var\(--accent\)/g,'color:'+ACCENT)+'</div>';})()+
-    ft+(appendixHTML?'<div class="pg"></div>'+hdr()+'<div '+D('font-size:18px;font-weight:700;margin-bottom:4px;color:'+WHITE)+'">Appendix &mdash; Channel Breakdown</div><div '+D('font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:'+MUTED+';margin-bottom:16px')+'">Media Plan: '+clientName+' &mdash; '+dateStr+'</div>'+appendixHTML+ft:'');
+  var css='*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}'+
+    'html,body{height:100%;background:'+BG+'!important}'+
+    'body{font-family:Arial,sans-serif;color:'+WHITE+';background:'+BG+';display:flex;flex-direction:column;padding:2.2% 2.8%;overflow:hidden}'+
+    '@media print{html,body{background:'+BG+'!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}@page{margin:0;background:'+BG+';size:A4 landscape}.pg{page-break-before:always}}';
+
+  var D2=function(s){return 'style="'+s+'"';};
+  var clientLogoHTML2=mpClientLogoB64?'<img src="'+mpClientLogoB64+'" '+D2('height:26px;object-fit:contain')+'">':'<span '+D2('font-weight:700;color:'+WHITE+';font-size:9px')+'">'+clientName+'</span>';
+  var hdr2='<div '+D2('display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid '+BORDER+';padding-bottom:5px;margin-bottom:5px;flex-shrink:0')+'">'+
+    '<div '+D2('display:flex;gap:6px;align-items:center')+'"><img src="'+RB_LOGO_B64+'" '+D2('height:22px;object-fit:contain;opacity:0.9')+'"><img src="'+SAB_LOGO_B64+'" '+D2('height:22px;object-fit:contain')+'"></div>'+
+    clientLogoHTML2+'</div>';
+
+  var titleBlock='<div '+D2('flex-shrink:0;margin-bottom:6px')+'">'+
+    '<div '+D2('font-size:15px;font-weight:700;color:'+WHITE+';line-height:1.2')+'">Media Plan: '+clientName+'</div>'+
+    '<div '+D2('font-size:5.5px;letter-spacing:2px;text-transform:uppercase;color:'+MUTED+';margin-top:1px')+'">Prepared '+dateStr+'</div></div>';
+
+  var invCard='<div '+D2('background:'+SURFACE+';border:1px solid '+BORDER+';border-radius:4px;padding:7px 9px;display:flex;flex-direction:column')+'">'+
+    '<div '+D2('font-size:6px;text-transform:uppercase;letter-spacing:1.5px;color:'+GOLD+';font-weight:600;margin-bottom:5px;flex-shrink:0')+'">Summarised Media Plan Investment</div>'+
+    '<table '+D2('width:100%;border-collapse:collapse;flex-shrink:0')+'">'+
+    '<tr><td '+D2('padding:3px 0;font-size:7.5px;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Total Partner Budget</td><td '+D2('padding:3px 0;font-size:7.5px;color:'+WHITE+';text-align:right;border-bottom:1px solid '+BORDER)+'">'+gN(budget)+'</td></tr>'+
+    '<tr><td '+D2('padding:3px 0;font-size:7.5px;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Media Value (Organic+Paid)</td><td '+D2('padding:3px 0;font-size:7.5px;color:'+WHITE+';text-align:right;border-bottom:1px solid '+BORDER)+'">'+gN(totalCost)+'</td></tr>'+
+    '<tr><td '+D2('padding:3px 0;font-size:7.5px;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Other (Production)</td><td '+D2('padding:3px 0;font-size:7.5px;color:'+WHITE+';text-align:right;border-bottom:1px solid '+BORDER)+'">'+gN(prodBudget)+'</td></tr>'+
+    '</table>'+
+    '<div '+D2('display:flex;justify-content:space-between;padding-top:5px;margin-top:auto')+'"><span '+D2('font-size:10px;font-weight:700;color:'+ACCENT)+'">Min Added Value</span><span '+D2('font-size:10px;font-weight:700;color:'+ACCENT)+'">'+gN(addedValue)+'</span></div>'+
+    '<div '+D2('font-size:6px;color:'+ACCENT+';text-align:right;margin-top:1px')+'">'+addedPct+'% Added Value</div></div>';
+
+  var postCard='<div '+D2('background:'+SURFACE+';border:1px solid '+BORDER+';border-radius:4px;padding:7px 9px;display:flex;flex-direction:column')+'">'+
+    '<div '+D2('font-size:6px;text-transform:uppercase;letter-spacing:1.5px;color:'+GOLD+';font-weight:600;margin-bottom:5px;flex-shrink:0')+'">Post Summary</div>'+
+    '<div '+D2('flex:1;display:flex;flex-direction:column;justify-content:center')+'">'+
+    '<table '+D2('width:100%;border-collapse:collapse')+'"><thead><tr>'+
+    '<th '+D2('padding:3px 4px 3px 0;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:left;border-bottom:1px solid '+BORDER)+'">Posts</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:center;border-bottom:1px solid '+BORDER)+'">Instagram</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:center;border-bottom:1px solid '+BORDER)+'">TikTok</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:center;border-bottom:1px solid '+BORDER)+'">YouTube</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+WHITE+';text-align:center;border-bottom:1px solid '+BORDER)+'">Total</th>'+
+    '</tr></thead><tbody>'+postRows+'</tbody></table></div></div>';
+
+  var twoCol='<div '+D2('display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1;margin-bottom:6px;min-height:0')+'">'+invCard+postCard+'</div>';
+
+  var bkSection='<div '+D2('flex:1.2;display:flex;flex-direction:column;margin-bottom:6px;min-height:0')+'">'+
+    '<div '+D2('font-size:6px;text-transform:uppercase;letter-spacing:2px;color:'+GOLD+';font-weight:600;border-bottom:1px solid '+BORDER+';padding-bottom:3px;margin-bottom:4px;flex-shrink:0')+'">Media Breakdown</div>'+
+    '<table '+D2('width:100%;border-collapse:collapse')+'"><thead><tr>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:left;border-bottom:1px solid '+BORDER)+'">Media Type</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Channels</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Platforms</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Formats</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">Asset Types</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:right;border-bottom:1px solid '+BORDER)+'">Total Reach</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:right;border-bottom:1px solid '+BORDER)+'">Total Imps</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:right;border-bottom:1px solid '+BORDER)+'">Total Engs</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:right;border-bottom:1px solid '+BORDER)+'">Eng Rate</th>'+
+    '<th '+D2('padding:3px 4px;font-size:5.5px;text-transform:uppercase;color:'+MUTED+';text-align:right;border-bottom:1px solid '+BORDER)+'">Media Value</th>'+
+    '</tr></thead><tbody>'+bkRows+'</tbody></table></div>';
+
+  var notesSection='<div '+D2('flex:1;display:flex;flex-direction:column;margin-bottom:6px;min-height:0')+'">'+
+    '<div '+D2('font-size:6px;text-transform:uppercase;letter-spacing:2px;color:'+GOLD+';font-weight:600;border-bottom:1px solid '+BORDER+';padding-bottom:3px;margin-bottom:4px;flex-shrink:0')+'">Campaign Notes</div>'+
+    '<div '+D2('display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;flex:1;min-height:0')+'">'+notesHTML+'</div></div>';
+
+  var bpEl=document.getElementById('cv_boilerplate');
+  var bpHtml=bpEl?bpEl.innerHTML:'';
+  var bpClean=bpHtml.replace(/color:var\(--white\)/g,'color:'+WHITE).replace(/color:var\(--muted\)/g,'color:'+MUTED).replace(/color:var\(--accent\)/g,'color:'+ACCENT).replace(/<br><br>/g,'</p><p style=\"font-size:5.5px;color:'+MUTED+';line-height:1.5;margin-top:2px\">');
+  var bpSection='<div style=\"flex-shrink:0;background:'+SURFACE+';border-left:2px solid '+ACCENT+';border-radius:0 3px 3px 0;padding:5px 8px;margin-bottom:5px\"><p style=\"font-size:5.5px;color:'+MUTED+';line-height:1.5\">'+bpClean+'</p></div>';
+
+  var expireDate2=new Date();expireDate2.setDate(expireDate2.getDate()+2);
+  var expireStr2=expireDate2.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  var ft2='<div style=\"border-top:1px solid '+BORDER+';padding-top:4px;display:flex;justify-content:space-between;align-items:flex-start;flex-shrink:0\">'+
+    '<div><div style=\"font-weight:700;color:'+WHITE+';font-size:6px;margin-bottom:1px\">Rising Ballers &times; She&rsquo;s A Baller</div>'+
+    '<div style=\"font-size:4px;color:#555;line-height:1.5;max-width:88%\">Prepared exclusively for <strong style=\"color:'+WHITE+'\">'+clientName+'</strong>. <strong style=\"color:'+WHITE+'\">Strictly confidential</strong> &mdash; not to be shared or reproduced without prior written consent. Pricing is proprietary to Rising Ballers &amp; She&rsquo;s A Baller. This proposal <strong style=\"color:'+WHITE+'\">expires '+expireStr2+'</strong>. Acceptance constitutes agreement to our standard terms &amp; conditions.</div></div>'+
+    '<div style=\"color:#8a8880;font-size:4.5px;white-space:nowrap\">Generated '+dateStr+'</div></div>';
+
+  var body=hdr2+titleBlock+twoCol+bkSection+notesSection+bpSection+ft2+
+    (appendixHTML?'<div class="pg"></div>'+hdr2+'<div '+D2('font-size:18px;font-weight:700;margin-bottom:4px;color:'+WHITE)+'">Appendix &mdash; Channel Breakdown</div><div '+D2('font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:'+MUTED+';margin-bottom:16px')+'">Media Plan: '+clientName+' &mdash; '+dateStr+'</div>'+appendixHTML+ft2:'');
   var w=window.open('','_blank');
   var pdfDate=new Date();var pdfYYMMDD=(pdfDate.getFullYear()+'').slice(2)+(('0'+(pdfDate.getMonth()+1)).slice(-2))+(('0'+pdfDate.getDate()).slice(-2));
   var pdfFileName='MEDIAPLAN - '+pdfAB.join(' x ')+' - '+clientName+' - '+pdfYYMMDD;
-  w.document.write('<!DOCTYPE html><html style="background:'+BG+';-webkit-print-color-adjust:exact;print-color-adjust:exact"><head><meta charset="utf-8"><title>'+pdfFileName+'</title><style>'+css+'</style></head><body id="pdfbody" style="background:'+BG+'!important;color:'+WHITE+'">'+body+'<scr'+'ipt>window.onload=function(){'+
-    // A4 landscape at 96dpi = 1122 x 794px. With @page margin:0 the full area is available.
-    // Scale body so content fills exactly the page height and width.
-    'var W=1122,H=794;'+
-    'var b=document.getElementById("pdfbody");'+
-    'var bW=b.scrollWidth,bH=b.scrollHeight;'+
-    'var scW=W/bW,scH=H/bH;'+
-    'var sc=Math.min(scW,scH);'+
-    'b.style.transformOrigin="top left";'+
-    'b.style.transform="scale("+sc+")";'+
-    'b.style.width=(bW)+"px";'+
-    'b.style.height=(H/sc)+"px";'+
-    'setTimeout(function(){window.print();},300);'+
-    '};<\/scr'+'ipt></body></html>');
+  w.document.write('<!DOCTYPE html><html style="background:'+BG+';-webkit-print-color-adjust:exact;print-color-adjust:exact"><head><meta charset="utf-8"><title>'+pdfFileName+'</title><style>'+css+'</style></head><body style="background:'+BG+'!important;color:'+WHITE+'">'+body+'<scr'+'ipt>window.onload=function(){window.print();};<\/scr'+'ipt></body></html>');
   w.document.close();
 }
 
