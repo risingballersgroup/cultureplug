@@ -2963,6 +2963,7 @@ function pltBadge(platform) {
   const c = pltColor(platform);
   return `<span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:${c.bg};color:${c.color};font-weight:600;">${abbreviatePlatform(platform)}</span>`;
 }
+function abbreviateFormat(f) {
   // Normalise all story takeover variants to a single label
   var out = f.replace('Feed Post - Imagery','Feed (Img)')
               .replace('Feed Post - Reels','Feed (Reel)')
