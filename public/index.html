@@ -1072,12 +1072,11 @@
         </div>
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;">Paid Benchmarking — per £1,000 spend <span style="color:var(--muted);font-size:8px;text-transform:none;letter-spacing:0;">(up to 3% of budget)</span></div>
-          <div>
-            <table class="mp-table rc-compact" id="rcPaidTableSAB" style="max-width:420px;">
-              <colgroup><col style="width:auto"><col style="width:62px"><col style="width:66px"><col style="width:66px"><col style="width:54px"></colgroup><thead><tr><th>Type</th><th style="text-align:center;">Bdg</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Engs</th></tr></thead>
-              <tbody id="rcPaidBodySAB"></tbody>
-            </table>
-          </div>
+          <table class="mp-table rc-compact" id="rcPaidTableSAB">
+            <colgroup><col style="width:140px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:62px"></colgroup>
+            <thead><tr><th>Type</th><th style="text-align:center;">Bdg</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Engs</th></tr></thead>
+            <tbody id="rcPaidBodySAB"></tbody>
+          </table>
         </div>
       </div>
 
@@ -1205,15 +1204,16 @@
         <div id="mpPanelPaid">
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">Paid Benchmarking <span style="color:var(--muted);font-size:8px;text-transform:none;letter-spacing:0;">(enter spend per placement)</span></div>
           <table class="mp-table rc-compact">
-            <colgroup><col style="width:120px"><col style="width:72px"><col style="width:70px"><col style="width:70px"><col style="width:60px"></colgroup>
-            <thead><tr><th>Type</th><th style="text-align:center;">Budget</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Engs</th></tr></thead>
+            <colgroup><col class="col-format"><col class="col-plt"><col style="width:62px"><col style="width:56px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:60px"></colgroup>
+            <thead><tr><th>Type</th><th style="text-align:center;">Plt</th><th>Rate</th><th>Qty</th><th>Est. Reach</th><th>Est. Imps</th><th>Est. Engs</th><th>Spend</th></tr></thead>
             <tbody id="mpPaidBodySAB"></tbody>
-            <tfoot><tr style="background:rgba(255,179,198,0.06);">
-              <td colspan="1" style="font-weight:700;color:var(--accent);font-size:10px;">TOTALS</td>
-              <td id="mpPaidTotalBudgetSAB" style="font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:var(--accent);text-align:center;">£0</td>
-              <td id="mpPaidTotalReachSAB"  style="font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:var(--accent);text-align:center;">—</td>
-              <td id="mpPaidTotalImpsSAB"   style="font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:var(--accent);text-align:center;">—</td>
-              <td id="mpPaidTotalEngsSAB"   style="font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:var(--accent);text-align:center;">—</td>
+            <tfoot><tr style="background:rgba(0,255,170,0.05);">
+              <td colspan="3" style="font-weight:700;color:var(--accent);">TOTALS</td>
+              <td id="mpPaidTotalBudgetSAB" style="font-weight:700;color:var(--accent);">£0</td>
+              <td id="mpPaidTotalReachSAB"  style="font-weight:700;color:var(--accent);">—</td>
+              <td id="mpPaidTotalImpsSAB"   style="font-weight:700;color:var(--accent);">—</td>
+              <td id="mpPaidTotalEngsSAB"   style="font-weight:700;color:var(--accent);">—</td>
+              <td></td>
             </tr></tfoot>
           </table>
         </div>
@@ -2878,6 +2878,13 @@ function mpGoStep(n) {
     const pill = document.getElementById('mpPill' + i);
     pill.className = 'mp-step-pill' + (i === n ? ' active' : (i < n ? ' done' : ''));
   });
+  // Re-apply panel visibility based on current checkbox state when entering step 2
+  if (n === 2) {
+    ['RB','SAB','RBUSA','Paid'].forEach(p => {
+      const cb = document.getElementById('toggle' + p);
+      mpTogglePanel(p, cb ? cb.checked : false);
+    });
+  }
 }
 
 function fmt(n) { return isNaN(n) ? '0' : Math.round(n).toLocaleString('en-GB'); }
@@ -2912,20 +2919,21 @@ const MP_PAID_RATECARD = {
 };
 
 function mpRenderPaidRatecard() {
-  // Only render SAB — used as the single paid benchmarking source
-  const tbody = document.getElementById('rcPaidBodySAB');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  MP_PAID_RATECARD['SAB'].forEach((row, i) => {
-    const tr = document.createElement('tr');
-    const typeLabel = row.type.replace("Instagram Feed Boost","IG Feed Boost").replace("Instagram Feed Dark","IG Feed Dark").replace("Instagram Story Dark","IG Story Dark").replace("TikTok Feed","TT Feed").replace("TikTok Story","TT Story").replace("YouTube Hero","YT Hero");
-    tr.innerHTML = `
-      <td style="font-size:10px;">${typeLabel}</td>
-      <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="£${fmtN(row.budget)}" onchange="MP_PAID_RATECARD['SAB'][${i}].budget=parseFloat(this.value.replace(/[£,]/g,''));" style="width:56px;text-align:center;border:none;background:transparent;color:var(--white);font-family:'DM Mono',monospace;font-size:10px;"></td>
-      <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" onchange="MP_PAID_RATECARD['SAB'][${i}].reach=parseFloat(this.value.replace(/,/g,''));" style="width:60px;text-align:center;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;"></td>
-      <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" onchange="MP_PAID_RATECARD['SAB'][${i}].imps=parseFloat(this.value.replace(/,/g,''));" style="width:60px;text-align:center;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;"></td>
-      <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" onchange="MP_PAID_RATECARD['SAB'][${i}].engs=parseFloat(this.value.replace(/,/g,''));" style="width:52px;text-align:center;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;"></td>`;
-    tbody.appendChild(tr);
+  ['RB','SAB'].forEach(brand => {
+    const tbody = document.getElementById('rcPaidBody' + brand);
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    MP_PAID_RATECARD[brand].forEach((row, i) => {
+      const tr = document.createElement('tr');
+      const typeLabel = row.type.replace("Instagram Feed Boost","IG Feed Boost").replace("Instagram Feed Dark","IG Feed Dark").replace("Instagram Story Dark","IG Story Dark").replace("TikTok Feed","TT Feed").replace("TikTok Story","TT Story").replace("YouTube Hero","YT Hero");
+      tr.innerHTML = `
+        <td style="font-size:10px;">${typeLabel}</td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="£${fmtN(row.budget)}" onchange="MP_PAID_RATECARD['${brand}'][${i}].budget=parseFloat(this.value.replace(/[£,]/g,''));" style="width:56px;text-align:center;border:none;background:transparent;color:var(--white);font-family:'DM Mono',monospace;font-size:10px;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" onchange="MP_PAID_RATECARD['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));" style="width:60px;text-align:center;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" onchange="MP_PAID_RATECARD['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));" style="width:60px;text-align:center;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" onchange="MP_PAID_RATECARD['${brand}'][${i}].engs=parseFloat(this.value.replace(/,/g,''));" style="width:52px;text-align:center;border:none;background:transparent;color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;"></td>`;
+      tbody.appendChild(tr);
+    });
   });
 }
 
@@ -2947,17 +2955,28 @@ function abbreviatePlatform(p) {
 
 function mpRenderPaidPlanInputs() {
   // SAB only — single paid benchmarking source
+  // Map type to platform abbreviation for the Plt column
+  const typeToPlt = {
+    'Instagram Feed Boost': 'IG', 'Instagram Feed Dark': 'IG', 'Instagram Story Dark': 'IG',
+    'TikTok Feed': 'TT', 'TikTok Story': 'TT',
+    'YouTube Hero': 'YT', 'YT Shorts': 'YT',
+  };
+  const typeLabel = t => t.replace('Instagram Feed Boost','IG Feed Boost').replace('Instagram Feed Dark','IG Feed Dark').replace('Instagram Story Dark','IG Story Dark').replace('TikTok Feed','TT Feed').replace('TikTok Story','TT Story').replace('YouTube Hero','YT Hero');
   const tbody = document.getElementById('mpPaidBodySAB');
   if (!tbody) return;
   tbody.innerHTML = '';
   MP_PAID_RATECARD['SAB'].forEach((row, i) => {
+    const plt = typeToPlt[row.type] || '—';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="font-size:10px;">${row.type.replace('Instagram Feed Boost','IG Feed Boost').replace('Instagram Feed Dark','IG Feed Dark').replace('Instagram Story Dark','IG Story Dark').replace('TikTok Feed','TT Feed').replace('TikTok Story','TT Story').replace('YouTube Hero','YT Hero')}</td>
-      <td style="text-align:center;"><input class="mp-qty-input" type="text" inputmode="numeric" value="0" id="paid_SAB_${i}" oninput="mpRecalc()" style="width:72px;" placeholder="0"></td>
-      <td id="paidReach_SAB_${i}" style="font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--muted);">—</td>
-      <td id="paidImps_SAB_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--muted);">—</td>
-      <td id="paidEngs_SAB_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--muted);">—</td>`;
+      <td style="font-size:10px;">${typeLabel(row.type)}</td>
+      <td style="text-align:center;"><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${plt}</span></td>
+      <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">£${fmtN(row.budget)}</td>
+      <td style="text-align:center;"><input class="mp-qty-input" type="text" inputmode="numeric" value="" id="paid_SAB_${i}" oninput="mpRecalc()" style="width:56px;" placeholder="0"></td>
+      <td id="paidReach_SAB_${i}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
+      <td id="paidImps_SAB_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
+      <td id="paidEngs_SAB_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
+      <td id="paidSpend_SAB_${i}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -3058,7 +3077,7 @@ function mpRecalc() {
   if (impEl) impEl.textContent = fmt(totalImps);
   document.getElementById('mpSumEngs').textContent  = fmt(totalEngs);
 
-  // Update paid estimated reach/imps/engs — SAB only (single paid benchmarking source)
+  // Update paid estimates — SAB only (single benchmarking source)
   if (MP_PAID_RATECARD['SAB']) {
     MP_PAID_RATECARD['SAB'].forEach((row, i) => {
       const el = document.getElementById('paid_SAB_'+i);
@@ -3068,9 +3087,11 @@ function mpRecalc() {
       const rEl = document.getElementById('paidReach_SAB_'+i);
       const iEl = document.getElementById('paidImps_SAB_'+i);
       const eEl = document.getElementById('paidEngs_SAB_'+i);
+      const sEl = document.getElementById('paidSpend_SAB_'+i);
       if (rEl) rEl.textContent = spend > 0 ? fmt(Math.round(row.reach * ratio)) : '—';
       if (iEl) iEl.textContent = spend > 0 ? fmt(Math.round(row.imps  * ratio)) : '—';
       if (eEl) eEl.textContent = spend > 0 ? fmt(Math.round(row.engs  * ratio)) : '—';
+      if (sEl) sEl.textContent = spend > 0 ? fmtGBP(spend) : '—';
     });
     let pBudget=0, pReach=0, pImps=0, pEngs=0, anySpend=false;
     MP_PAID_RATECARD['SAB'].forEach((row, i) => {
@@ -3145,21 +3166,9 @@ function mpGenerateClientView() {
     mpRates[brand].forEach((row,i)=>{const qty=parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;posts+=qty;cost+=qty*row.cost;reach+=qty*row.reach;imps+=qty*row.imps;engs+=qty*row.engs;if(!platformMap[row.platform])platformMap[row.platform]={posts:0,cost:0,reach:0,imps:0,engs:0};platformMap[row.platform].posts+=qty;platformMap[row.platform].cost+=qty*row.cost;platformMap[row.platform].reach+=qty*row.reach;platformMap[row.platform].imps+=qty*row.imps;platformMap[row.platform].engs+=qty*row.engs;});
     brandTotals[brand]={posts,cost,reach,imps,engs,platformMap};
   });
-  // Paid: SAB only — single benchmarking source
-  let paidBudget=0,paidReach=0,paidImps=0,paidEngs=0;
-  const paidRows=[];
-  if(MP_PAID_RATECARD['SAB']){
-    MP_PAID_RATECARD['SAB'].forEach((row,i)=>{
-      const el=document.getElementById('paid_SAB_'+i);
-      const spend=el?(parseFloat(el.value)||0):0;
-      if(spend>0){
-        const ratio=spend/(row.budget||1000);
-        const rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);
-        paidBudget+=spend;paidReach+=rR;paidImps+=rI;paidEngs+=rE;
-        paidRows.push({type:row.type,spend,reach:rR,imps:rI,engs:rE});
-      }
-    });
-  }
+  // Paid — SAB rates only, single benchmarking source
+  let paidBudget=0,paidReach=0,paidImps=0,paidEngs=0;const paidRows=[];
+  if(MP_PAID_RATECARD['SAB']){MP_PAID_RATECARD['SAB'].forEach((row,i)=>{const el=document.getElementById('paid_SAB_'+i);const spend=el?(parseFloat(el.value)||0):0;if(spend>0){const ratio=spend/(row.budget||1000);const rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);paidBudget+=spend;paidReach+=rR;paidImps+=rI;paidEngs+=rE;paidRows.push({type:row.type,spend,reach:rR,imps:rI,engs:rE});}});}
   const paidTotals={SAB:{budget:paidBudget,reach:paidReach,imps:paidImps,engs:paidEngs,rows:paidRows}};
   const totalMediaValue=brandTotals.RB.cost+brandTotals.SAB.cost+brandTotals.RBUSA.cost;
   const addedValue=totalMediaValue-budget;
@@ -3227,7 +3236,6 @@ function mpGenerateClientView() {
   // Detailed channel breakdown per brand
   let detailHTML='';
   const brandLabels={RB:{label:'Rising Ballers',color:'var(--gold)'},RBUSA:{label:'Rising Ballers USA',color:'var(--gold)'},SAB:{label:"She's A Baller",color:'var(--pink)'}};
-  // Organic per brand
   ['RB','RBUSA','SAB'].forEach(brand=>{
     const bt=brandTotals[brand];if(bt.posts===0)return;
     const col=brandLabels[brand].color;
@@ -3236,7 +3244,6 @@ function mpGenerateClientView() {
     mpRates[brand].forEach((row,i)=>{const qty=parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;if(!qty)return;detailHTML+=`<tr><td>${row.format}</td><td><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform.replace("Instagram","IG").replace("YouTube","YT").replace("TikTok","TT")}</span></td><td style="font-family:'DM Mono',monospace;">${qty}</td><td style="font-family:'DM Mono',monospace;">${fmtGBP(qty*row.cost)}</td><td style="font-family:'DM Mono',monospace;">${fmt(qty*row.reach)}</td><td style="font-family:'DM Mono',monospace;">${fmt(qty*row.imps)}</td><td style="font-family:'DM Mono',monospace;">${fmt(qty*row.engs)}</td></tr>`;});
     detailHTML+=`<tr style="background:rgba(255,255,255,0.03);font-weight:700;"><td colspan="2" style="color:${col};">TOTALS</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.posts)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmtGBP(bt.cost)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.reach)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.imps)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.engs)}</td></tr></tbody></table></div>`;
   });
-  // Paid benchmarking — SAB only, shown once (not per-brand)
   if(paidRows.length>0){
     detailHTML+=`<div style="margin-bottom:24px;"><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Paid Benchmarking</div>
     <table class="mp-table"><thead><tr><th>Type</th><th>Spend</th><th>Est. Reach</th><th>Est. Impressions</th><th>Est. Engagements</th></tr></thead><tbody>`;
@@ -3285,9 +3292,7 @@ function mpExportPDF() {
   var gN = function(n){ return '£' + fN(n); };
   var brandLabels = { RB: 'Rising Ballers', RBUSA: 'Rising Ballers USA', SAB: "She's A Baller" };
   var brandColors = { RB: '#c9a84c', RBUSA: '#c9a84c', SAB: '#e91e8c' };
-  // ── Collect data ──
   var brandData={};['RB','RBUSA','SAB'].forEach(function(brand){var rows=[],bP=0,bT=0,bC=0,bR=0,bI=0,bE=0;mpRates[brand].forEach(function(row,i){var el=document.getElementById('qty_'+brand+'_'+i);var qty=el?(parseInt(el.value)||0):0;if(!qty)return;var tiles=qty*(row.tiles||1);rows.push({format:row.format,platform:row.platform,qty:qty,tiles:tiles,cost:qty*row.cost,reach:qty*row.reach,imps:qty*row.imps,engs:qty*row.engs});bP+=qty;bT+=tiles;bC+=qty*row.cost;bR+=qty*row.reach;bI+=qty*row.imps;bE+=qty*row.engs;});brandData[brand]={rows:rows,posts:bP,tiles:bT,cost:bC,reach:bR,imps:bI,engs:bE};});
-  // Paid: SAB only
   var paidPDFRows=[],paidPDFBudget=0,paidPDFReach=0,paidPDFImps=0,paidPDFEngs=0;
   if(MP_PAID_RATECARD['SAB']){MP_PAID_RATECARD['SAB'].forEach(function(row,i){var el=document.getElementById('paid_SAB_'+i);var spend=el?(parseFloat(el.value)||0):0;if(spend>0){var ratio=spend/(row.budget||1000);var rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);paidPDFRows.push({type:row.type,spend:spend,reach:rR,imps:rI,engs:rE});paidPDFBudget+=spend;paidPDFReach+=rR;paidPDFImps+=rI;paidPDFEngs+=rE;}});}
   var totalCost=brandData.RB.cost+brandData.RBUSA.cost+brandData.SAB.cost;
@@ -3303,7 +3308,6 @@ function mpExportPDF() {
   var BG='#0e0e0c',SURFACE='#161614',BORDER='#272723',WHITE='#f0ede6',MUTED='#8a8880',ACCENT='#00FFAA',GOLD='#c9a84c';
   var D=function(s){return'style="'+s+'"';};
   var postRows='';['Feed','Story','TOTAL'].forEach(function(t){var ig=getCt('Instagram',t),tt=getCt('TikTok',t),yt=getCt('YouTube',t),tot=ig+tt+yt;var isT=t==='TOTAL';postRows+='<tr><td '+D('padding:5px 8px 5px 0;font-size:11px;color:'+(isT?WHITE:MUTED))+'">'+t+'</td><td '+D('text-align:center;font-size:11px;color:'+(isT?WHITE:MUTED))+'">'+ig+'</td><td '+D('text-align:center;font-size:11px;color:'+(isT?WHITE:MUTED))+'">'+tt+'</td><td '+D('text-align:center;font-size:11px;color:'+(isT?WHITE:MUTED))+'">'+yt+'</td><td '+D('text-align:center;font-size:11px;font-weight:700;color:'+WHITE)+'">'+tot+'</td></tr>';});
-  // Appendix (if accordion open): organic by brand + single paid benchmarking section
   var appendixHTML='';
   if(mpChannelDetailIsOpen()){
     ['RB','RBUSA','SAB'].forEach(function(brand){var d=brandData[brand];if(!d.rows.length)return;var col=brandColors[brand];var rr='';d.rows.forEach(function(r){rr+='<tr><td '+D('padding:4px 6px;font-size:10px;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+r.format+'</td><td '+D('padding:4px 6px;font-size:10px;color:'+MUTED+';border-bottom:1px solid '+BORDER)+'">'+r.platform+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:center;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+r.qty+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+gN(r.cost)+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+fN(r.reach)+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+fN(r.imps)+'</td><td '+D('padding:4px 6px;font-size:10px;text-align:right;color:'+WHITE+';border-bottom:1px solid '+BORDER)+'">'+fN(r.engs)+'</td></tr>';});rr+='<tr '+D('background:'+SURFACE)+'><td colspan="2" '+D('padding:5px 6px;font-weight:700;color:'+col)+'">ORGANIC TOTALS</td><td '+D('padding:5px 6px;font-weight:700;text-align:center;color:'+col)+'">'+d.posts+'</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+col)+'">'+gN(d.cost)+'</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+col)+'">'+fN(d.reach)+'</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+col)+'">'+fN(d.imps)+'</td><td '+D('padding:5px 6px;font-weight:700;text-align:right;color:'+col)+'">'+fN(d.engs)+'</td></tr>';appendixHTML+='<div '+D('margin-bottom:20px')+'"><div '+D('font-size:9px;text-transform:uppercase;letter-spacing:2px;font-weight:700;color:'+col+';margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid '+col)+'">'+brandLabels[brand]+' — Organic</div><table '+D('width:100%;border-collapse:collapse;margin-bottom:8px')+'"><thead><tr><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:left')+'">Format</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED)+'">Platform</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:center')+'">Posts</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Cost</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Reach</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Imps</th><th '+D('padding:4px 6px;font-size:8px;text-transform:uppercase;color:'+MUTED+';text-align:right')+'">Engs</th></tr></thead><tbody>'+rr+'</tbody></table></div>';});
@@ -3410,13 +3414,11 @@ async function mpExportXLS() {
   sm.push(['OVERALL TOTAL',gP,gT,gC,gR,gI,gE]);sm.push([]);
   const smS=XLSX.utils.aoa_to_sheet(sm);smS['!cols']=[{wch:28},{wch:10},{wch:10},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14}];
   XLSX.utils.book_append_sheet(WB,smS,'SUMMARY');
-  // APPENDIX: organic by brand + single paid benchmarking section
   const ap=[['APPENDIX — CHANNEL BREAKDOWN'],['Media Plan: '+clientName],[]];
   ['RB','RBUSA','SAB'].forEach(b=>{const d=brandData[b];if(!d.rows.length)return;ap.push([brandLabels[b]+' — Organic']);ap.push(['Format','Platform','Posts','Tiles','Cost (£)','Reach','Impressions','Engagements']);d.rows.forEach(r=>ap.push([r.format,r.platform,r.qty,r.tiles,r.cost,r.reach,r.imps,r.engs]));ap.push(['ORGANIC TOTALS','',d.posts,d.tiles,d.cost,d.reach,d.imps,d.engs]);ap.push([]);});
-  // Paid benchmarking — SAB rates, single block
-  const xlsPaidRows=[],xlsPT={budget:0,reach:0,imps:0,engs:0};
-  if(MP_PAID_RATECARD['SAB']){MP_PAID_RATECARD['SAB'].forEach((row,i)=>{const el=document.getElementById('paid_SAB_'+i);const spend=el?(parseFloat(el.value)||0):0;if(spend>0){const ratio=spend/(row.budget||1000);const rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);xlsPaidRows.push([row.type,spend,rR,rI,rE]);xlsPT.budget+=spend;xlsPT.reach+=rR;xlsPT.imps+=rI;xlsPT.engs+=rE;}});}
-  if(xlsPaidRows.length){ap.push(['Paid Benchmarking']);ap.push(['Type','Spend (£)','Est. Reach','Est. Impressions','Est. Engagements']);xlsPaidRows.forEach(r=>ap.push(r));ap.push(['PAID TOTALS',xlsPT.budget,xlsPT.reach,xlsPT.imps,xlsPT.engs]);ap.push([]);}
+  const xlsPR=[],xlsPT={budget:0,reach:0,imps:0,engs:0};
+  if(MP_PAID_RATECARD['SAB']){MP_PAID_RATECARD['SAB'].forEach((row,i)=>{const el=document.getElementById('paid_SAB_'+i);const spend=el?(parseFloat(el.value)||0):0;if(spend>0){const ratio=spend/(row.budget||1000);const rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);xlsPR.push([row.type,spend,rR,rI,rE]);xlsPT.budget+=spend;xlsPT.reach+=rR;xlsPT.imps+=rI;xlsPT.engs+=rE;}});}
+  if(xlsPR.length){ap.push(['Paid Benchmarking']);ap.push(['Type','Spend (£)','Est. Reach','Est. Impressions','Est. Engagements']);xlsPR.forEach(r=>ap.push(r));ap.push(['PAID TOTALS',xlsPT.budget,xlsPT.reach,xlsPT.imps,xlsPT.engs]);ap.push([]);}
   const apS=XLSX.utils.aoa_to_sheet(ap);apS['!cols']=[{wch:28},{wch:10},{wch:10},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14}];
   XLSX.utils.book_append_sheet(WB,apS,'APPENDIX');
 
@@ -3486,7 +3488,6 @@ function toggleNotesEdit() {
 
 
 function mpTogglePanel(panel, show) {
-  // Map panel name to element IDs
   const panelMap = {
     'RB':    ['mpPanelRB'],
     'SAB':   ['mpPanelSAB'],
@@ -3496,19 +3497,22 @@ function mpTogglePanel(panel, show) {
   const ids = panelMap[panel] || [];
   ids.forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.style.visibility = show ? 'visible' : 'hidden';
+    if (el) el.style.display = show ? '' : 'none';
   });
-
-  // Hide entire row if both panels in it are hidden
-  const rbVisible    = document.getElementById('toggleRB')    ? document.getElementById('toggleRB').checked    : true;
-  const sabVisible   = document.getElementById('toggleSAB')   ? document.getElementById('toggleSAB').checked   : true;
-  const rbuVisible   = document.getElementById('toggleRBUSA') ? document.getElementById('toggleRBUSA').checked : true;
-  const paidVisible  = document.getElementById('togglePaid')  ? document.getElementById('togglePaid').checked  : true;
-
+  // Collapse entire row when all panels in it are hidden
+  const rbV   = document.getElementById('toggleRB')?.checked;
+  const sabV  = document.getElementById('toggleSAB')?.checked;
+  const rbuV  = document.getElementById('toggleRBUSA')?.checked;
+  const paidV = document.getElementById('togglePaid')?.checked;
   const row1 = document.getElementById('mpPanelRow1');
   const row2 = document.getElementById('mpPanelRow2');
-  if (row1) row1.style.display = (!rbVisible && !sabVisible) ? 'none' : 'grid';
-  if (row2) row2.style.display = (!rbuVisible && !paidVisible) ? 'none' : 'grid';
+  if (row1) row1.style.display = (!rbV && !sabV) ? 'none' : 'grid';
+  if (row2) row2.style.display = (!rbuV && !paidV) ? 'none' : 'grid';
+}
+
+// Initialise: hide all panels since checkboxes start unchecked
+function mpInitPanels() {
+  ['RB','SAB','RBUSA','Paid'].forEach(p => mpTogglePanel(p, false));
 }
 
 function toggleBpEdit() {
