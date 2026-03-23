@@ -3091,7 +3091,7 @@ function mpRecalc() {
       document.getElementById('rowReach_'+brand+'_'+i).textContent = fmt(rReach);
       document.getElementById('rowImps_'+brand+'_'+i).textContent  = fmt(rImps);
       document.getElementById('rowEngs_'+brand+'_'+i).textContent  = fmt(rEngs);
-      bPosts += tiles; bTiles += tiles; bCost += rCost; bReach += rReach; bImps += rImps; bEngs += rEngs;
+      bPosts += qty; bTiles += tiles; bCost += rCost; bReach += rReach; bImps += rImps; bEngs += rEngs;
     });
     document.getElementById('mp'+brand+'TotalPosts').textContent = fmt(bPosts);
     document.getElementById('mp'+brand+'TotalCost').textContent  = fmtGBP(bCost);
@@ -3217,7 +3217,7 @@ function mpGenerateClientView() {
   let paidBudget=0,paidReach=0,paidImps=0,paidEngs=0;const paidRows=[];
   if(MP_PAID_RATECARD['SAB']){MP_PAID_RATECARD['SAB'].forEach((row,i)=>{const el=document.getElementById('paid_SAB_'+i);const spend=el?(parseFloat(el.value)||0):0;if(spend>0){const ratio=spend/(row.budget||1000);const rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);paidBudget+=spend;paidReach+=rR;paidImps+=rI;paidEngs+=rE;paidRows.push({type:row.type,spend,reach:rR,imps:rI,engs:rE});}});}
   const paidTotals={SAB:{budget:paidBudget,reach:paidReach,imps:paidImps,engs:paidEngs,rows:paidRows}};
-  const totalMediaValue=brandTotals.RB.cost+brandTotals.SAB.cost+brandTotals.RBUSA.cost;
+  const totalMediaValue=brandTotals.RB.cost+brandTotals.SAB.cost+brandTotals.RBUSA.cost+paidBudget;
   const addedValue=totalMediaValue-budget;
   const addedPct = budget > 0 ? Math.round((addedValue / budget) * 100) : 0;
 
