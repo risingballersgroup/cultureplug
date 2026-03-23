@@ -3336,12 +3336,14 @@ function mpExportPDF() {
   var expireDate = new Date(); expireDate.setDate(expireDate.getDate()+2);
   var expireStr = expireDate.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
 
-  // Clone the step 3 inner content, removing the action buttons and accordion toggle header
+  // Clone the step 3 inner content, removing only the action buttons
   var clone = step3.cloneNode(true);
-  // Remove the top action bar (Edit Plan / Export buttons row)
-  var actionBar = clone.querySelector('[style*="justify-content:space-between"]');
-  if (actionBar) actionBar.remove();
-  // Remove the accordion toggle header (keep the content inside if open)
+  // Remove only the very top action bar (contains "Edit Plan" button) - first child div
+  var firstDiv = clone.querySelector('div');
+  if (firstDiv && firstDiv.innerHTML.includes('mpGoStep')) firstDiv.remove();
+  // Remove all edit buttons
+  clone.querySelectorAll('button').forEach(function(b){ b.remove(); });
+  // Remove accordion toggle header but keep its content
   var accordionHdr = clone.querySelector('[onclick*="mpToggleChannelDetail"]');
   if (accordionHdr) accordionHdr.remove();
 
@@ -3358,22 +3360,17 @@ function mpExportPDF() {
     '<div style="color:#8a8880;font-size:9px;white-space:nowrap;margin-left:20px">Generated '+dateStr+'</div>' +
     '</div>';
 
-  var printCSS = '@media print{' +
-    '-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;' +
-    '@page{margin:10mm;size:A4 landscape}' +
-    'body{background:#0e0e0c!important}' +
-    '.mp-step-nav,.mode-tabs,.export-btn,button{display:none!important}' +
-    '}' +
-    'html,body{background:#0e0e0c!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}' +
+  var printCSS =
+    '@page{size:A4 landscape!important;margin:0!important}' +
+    'html,body{margin:0!important;padding:0!important;background:#0e0e0c!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}' +
     '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}';
 
   var w = window.open('','_blank');
-  w.document.write('<!DOCTYPE html><html style="background:#0e0e0c"><head><meta charset="utf-8"><title>'+pdfFileName+'</title>' +
+  w.document.write('<!DOCTYPE html><html style="background:#0e0e0c;margin:0;padding:0"><head><meta charset="utf-8"><title>'+pdfFileName+'</title>' +
     '<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">' +
     '<style>'+styles+'</style>' +
     '<style>'+printCSS+'</style>' +
-    '<style>@page{size:A4 landscape!important;margin:10mm}@media print{@page{size:A4 landscape!important;margin:10mm}}</style>' +
-    '</head><body style="background:#0e0e0c;padding:20px 28px;color:#f0ede6">' +
+    '</head><body style="background:#0e0e0c;padding:20px 28px;color:#f0ede6;margin:0">' +
     innerHTML + footer +
     '<scr'+'ipt>window.onload=function(){window.print();};<\/scr'+'ipt>' +
     '</body></html>');
