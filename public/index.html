@@ -801,6 +801,7 @@
         <div class="mode-tabs">
           <button class="mode-tab active" onclick="setMode('email', this)">Initial Email</button>
           <button class="mode-tab" onclick="setMode('pitch', this)">Pitch Brief</button>
+          <button class="mode-tab" onclick="setBriefUploadMode(this)">Upload Brief</button>
           <button class="mode-tab" onclick="setMode('persona', this)">Audience Persona</button>
           <button class="mode-tab" onclick="setMode('compare', this)">Audience Comparison</button>
           <button class="mode-tab" onclick="setMode('calendar', this)">Seasonal Calendar</button>
@@ -1396,6 +1397,17 @@ const MODES = {
       'PlayStation',
       'Spotify'
     ]
+  },
+  brief_upload: {
+    label: 'Upload Brief',
+    placeholder: "Upload a brief above, then hit send — or describe what you need",
+    pills: [
+      'What territories fit our audience?',
+      'Which data points are most relevant?',
+      'What content formats suit this brief?',
+      'Where are the gaps in this brief?',
+      'Summarise the brief and our angle'
+    ]
   }
 };
 
@@ -1878,6 +1890,28 @@ The argument for the client meeting. Confident prose, 3–5 sentences.
 ## DATA CONFIDENCE
 One line: STRONG / MODERATE / GAP and why.`,
 
+  brief_upload: `You have been given a client brief to analyse. Your job is to interrogate it against Rising Ballers' first-party data and identify:
+
+## BRIEF SUMMARY
+2–3 sentences capturing what the client wants, who they're trying to reach, and the core ask.
+
+## AUDIENCE FIT
+How well does the RB/SAB audience match what this brief is looking for? Be direct. Cite relevant stats from the data corpus — demographics, attitudes, interests, purchase behaviour. Flag any gaps.
+
+## DATA-BACKED TERRITORIES
+3–4 content/campaign territories grounded in RB/SAB first-party data. For each:
+**[Territory Name]**
+The idea in one sentence. Then 2–3 data points that make this territory credible for RB/SAB. Keep it sharp.
+
+## BRAND ETHOS ALIGNMENT
+How does the brief's brand or brief positioning align with RB/SAB culture? Reference relevant brand attitudes, cultural behaviours, or audience values from the data. Be honest about tensions too.
+
+## STRONGEST ANGLE
+One paragraph. If you had to walk into the room with one killer argument for why RB/SAB is the answer to this brief, what is it?
+
+## WATCH-OUTS
+1–2 things that could complicate the pitch. Data gaps, audience mismatches, competitive tensions.`,
+
   persona: `Build a detailed, named audience persona from the data. Structure:
 
 ## MEET [NAME]
@@ -2217,6 +2251,17 @@ function setMode(mode, btn) {
   ).join('');
 }
 
+function setBriefUploadMode(btn) {
+  setMode('brief_upload', btn);
+  // Auto-trigger file upload picker
+  const fi = document.getElementById('fileInput');
+  if (fi) {
+    // Change accept to also include .docx
+    fi.accept = '.pdf,.doc,.docx,.txt';
+    fi.click();
+  }
+}
+
 function detectSources(text) {
   const found = [];
   const sourceMap = {
@@ -2264,14 +2309,30 @@ function handleFile(event) {
   chip.classList.add('visible');
   document.getElementById('uploadBtn').classList.add('has-file');
   const reader = new FileReader();
-  reader.onload = e => { attachedFileContent = e.target.result; };
+  reader.onload = e => {
+    attachedFileContent = e.target.result;
+    // Auto-send analysis if in brief_upload mode
+    if (currentMode === 'brief_upload') {
+      const inputBox = document.getElementById('inputBox');
+      inputBox.value = 'Analyse this brief against our first-party data and identify the strongest territories and audience fit.';
+      autoResize(inputBox);
+      setTimeout(() => sendMessage(), 100);
+    }
+  };
   if (file.type === 'application/pdf') {
     attachedFileContent = `[PDF uploaded: ${file.name}]`;
+    // Auto-send for PDFs immediately since we can't read content
+    if (currentMode === 'brief_upload') {
+      const inputBox = document.getElementById('inputBox');
+      inputBox.value = 'Analyse this brief against our first-party data and identify the strongest territories and audience fit.';
+      autoResize(inputBox);
+      setTimeout(() => sendMessage(), 100);
+    }
   } else {
     reader.readAsText(file);
   }
   const inputBox = document.getElementById('inputBox');
-  if (!inputBox.value.trim()) {
+  if (currentMode !== 'brief_upload' && !inputBox.value.trim()) {
     inputBox.value = 'Build a pitch brief based on the uploaded brief';
     autoResize(inputBox);
   }
