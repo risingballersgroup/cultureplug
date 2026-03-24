@@ -2309,33 +2309,19 @@ function handleFile(event) {
   chip.classList.add('visible');
   document.getElementById('uploadBtn').classList.add('has-file');
   const reader = new FileReader();
-  reader.onload = e => {
-    attachedFileContent = e.target.result;
-    // Auto-send analysis if in brief_upload mode
-    if (currentMode === 'brief_upload') {
-      const inputBox = document.getElementById('inputBox');
-      inputBox.value = 'Analyse this brief against our first-party data and identify the strongest territories and audience fit.';
-      autoResize(inputBox);
-      setTimeout(() => sendMessage(), 100);
-    }
-  };
+  reader.onload = e => { attachedFileContent = e.target.result; };
   if (file.type === 'application/pdf') {
     attachedFileContent = `[PDF uploaded: ${file.name}]`;
-    // Auto-send for PDFs immediately since we can't read content
-    if (currentMode === 'brief_upload') {
-      const inputBox = document.getElementById('inputBox');
-      inputBox.value = 'Analyse this brief against our first-party data and identify the strongest territories and audience fit.';
-      autoResize(inputBox);
-      setTimeout(() => sendMessage(), 100);
-    }
   } else {
     reader.readAsText(file);
   }
   const inputBox = document.getElementById('inputBox');
-  if (currentMode !== 'brief_upload' && !inputBox.value.trim()) {
+  if (currentMode === 'brief_upload') {
+    inputBox.value = 'Analyse this brief against our first-party data and identify the strongest territories and audience fit.';
+  } else if (!inputBox.value.trim()) {
     inputBox.value = 'Build a pitch brief based on the uploaded brief';
-    autoResize(inputBox);
   }
+  autoResize(inputBox);
   inputBox.focus();
   event.target.value = '';
 }
