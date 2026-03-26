@@ -799,7 +799,8 @@
       <div class="mode-selector">
         <div class="mode-selector-label">Mode</div>
         <div class="mode-tabs">
-          <button class="mode-tab active" onclick="setMode('email', this)">Initial Email</button>
+          <button class="mode-tab active" onclick="setMode('general', this)">General Chat</button>
+          <button class="mode-tab" onclick="setMode('email', this)">Initial Email</button>
           <button class="mode-tab" onclick="setMode('pitch', this)">Pitch Brief</button>
           <button class="mode-tab" onclick="setBriefUploadMode(this)">Upload Brief</button>
           <button class="mode-tab" onclick="setMode('persona', this)">Audience Persona</button>
@@ -857,7 +858,7 @@
         <textarea
           class="input-box"
           id="inputBox"
-          placeholder="Name a brand or category — e.g. 'Pitch to Beats by Dre'"
+          placeholder="Ask anything — or upload an image or file to get started"
           rows="1"
           onkeydown="handleKey(event)"
           oninput="autoResize(this)"
@@ -1318,11 +1319,22 @@ let conversationHistory = [];
 let attachedFile = null;
 let attachedFileContent = '';
 let imageCompressing = null; // Promise that resolves when image is ready
-let currentMode = 'pitch';
+let currentMode = 'general';
 let activeBrief = null; // { brand, context } — persists across messages
 let currentUser = null; // { name, fullName, email } — set after O365 sign-in
 
 const MODES = {
+  general: {
+    label: 'General Chat',
+    placeholder: "Ask anything — data, strategy, culture, or upload an image or file",
+    pills: [
+      'What makes our audience unique?',
+      'World Cup 2026 opportunity overview',
+      'How do RB and SAB audiences differ?',
+      'What brands should we be targeting?',
+      'Summarise our key data points'
+    ]
+  },
   pitch: {
     label: 'Pitch Brief',
     placeholder: "Name a brand or category — e.g. 'Pitch to Beats by Dre'",
@@ -2022,6 +2034,17 @@ Use these quotes to add human texture to pitch briefs, personas, and exec summar
 `;
 
 const MODE_PROMPTS = {
+  general: `You are Culture Plug — the internal intelligence engine for Rising Ballers and She's A Baller. You have access to our full first-party data corpus.
+
+In this mode, respond naturally and conversationally to whatever the user asks. You can:
+- Answer questions about our audience, data, culture, performance or strategy
+- Analyse images or files the user uploads and give informed responses grounded in our data
+- Brainstorm, ideate, and think creatively alongside the user
+- Connect dots between our data and the wider culture/sports/brand landscape
+
+Style: Confident, direct, and sharp. You're a smart colleague who knows the data inside out — not a formal report generator. Use bullet points or structure only when it genuinely helps. Otherwise, just talk.
+
+Always ground your thinking in the data corpus where relevant, but don't force it — if the question is more conceptual or creative, lean into that. If an image or file is attached, lead with what you observe before layering in data context.`,
   pitch: `Generate a sharp, data-backed pitch brief using this structure:
 
 ## AUDIENCE SNAPSHOT
@@ -2823,7 +2846,7 @@ async function sendMessage() {
 }
 
 // Initialise pills on load
-setMode('email', document.querySelector('.mode-tab.active'));
+setMode('general', document.querySelector('.mode-tab.active'));
 
 // ── AUTH INIT ──
 (async () => {
