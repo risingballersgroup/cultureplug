@@ -1317,6 +1317,7 @@ let isLoading = false;
 let conversationHistory = [];
 let attachedFile = null;
 let attachedFileContent = '';
+let imageCompressing = null; // Promise that resolves when image is ready
 let currentMode = 'pitch';
 let activeBrief = null; // { brand, context } — persists across messages
 let currentUser = null; // { name, fullName, email } — set after O365 sign-in
@@ -2462,24 +2463,27 @@ function handleFile(event) {
   const reader = new FileReader();
 
   if (isImage) {
-    // Compress image via canvas before encoding to avoid 413
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const MAX = 1200;
-        let w = img.width, h = img.height;
-        if (w > MAX || h > MAX) {
-          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
-          else { w = Math.round(w * MAX / h); h = MAX; }
-        }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        attachedFileContent = canvas.toDataURL('image/jpeg', 0.75);
+    // Compress image via canvas — track as promise so sendMessage can wait
+    imageCompressing = new Promise(resolve => {
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX = 1200;
+          let w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+            else { w = Math.round(w * MAX / h); h = MAX; }
+          }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          attachedFileContent = canvas.toDataURL('image/jpeg', 0.75);
+          resolve();
+        };
+        img.src = e.target.result;
       };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    });
   } else if (isPDF || isWord) {
     attachedFileContent = `[${isPDF ? 'PDF' : 'Word doc'} uploaded: ${file.name}]`;
   } else {
@@ -2502,6 +2506,7 @@ function handleFile(event) {
 function removeFile() {
   attachedFile = null;
   attachedFileContent = '';
+  imageCompressing = null;
   document.getElementById('fileChip').classList.remove('visible');
   document.getElementById('fileChipName').textContent = '';
   document.getElementById('uploadBtn').classList.remove('has-file');
@@ -2711,6 +2716,12 @@ async function sendMessage() {
   const sendBtn = document.getElementById('sendBtn');
   const userText = inputBox.value.trim();
   if ((!userText && !attachedFile) || isLoading) return;
+
+  // Wait for image compression to finish before sending
+  if (imageCompressing) {
+    await imageCompressing;
+    imageCompressing = null;
+  }
 
   isLoading = true;
   sendBtn.disabled = true;
