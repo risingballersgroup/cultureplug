@@ -848,8 +848,8 @@
         </button>
       </div>
       <div style="position:relative">
-        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="handleFile(event)">
-        <button class="upload-btn" id="uploadBtn" onclick="document.getElementById('fileInput').click()" title="Upload a brief">
+        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp,.gif" style="display:none" onchange="handleFile(event)">
+        <button class="upload-btn" id="uploadBtn" onclick="document.getElementById('fileInput').click()" title="Upload a file — PDF, Word doc, or image">
           <svg viewBox="0 0 16 16" fill="none">
             <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3M8 2v8M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -2401,11 +2401,9 @@ function setMode(mode, btn) {
 
 function setBriefUploadMode(btn) {
   setMode('brief_upload', btn);
-  // Auto-trigger file upload picker
   const fi = document.getElementById('fileInput');
   if (fi) {
-    // Change accept to also include .docx
-    fi.accept = '.pdf,.doc,.docx,.txt';
+    fi.accept = '.pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp';
     fi.click();
   }
 }
@@ -2457,18 +2455,31 @@ function handleFile(event) {
   document.getElementById('fileChipName').textContent = file.name;
   chip.classList.add('visible');
   document.getElementById('uploadBtn').classList.add('has-file');
+
+  const isImage = file.type.startsWith('image/');
+  const isWord = file.name.match(/\.(doc|docx)$/i);
+  const isPDF = file.type === 'application/pdf';
   const reader = new FileReader();
-  reader.onload = e => { attachedFileContent = e.target.result; };
-  if (file.type === 'application/pdf') {
-    attachedFileContent = `[PDF uploaded: ${file.name}]`;
+
+  if (isImage) {
+    // Read as base64 data URL for vision
+    reader.onload = e => { attachedFileContent = e.target.result; };
+    reader.readAsDataURL(file);
+  } else if (isPDF || isWord) {
+    // Can't extract text client-side — send as label for context
+    attachedFileContent = `[${isPDF ? 'PDF' : 'Word doc'} uploaded: ${file.name}]`;
   } else {
+    // Plain text
+    reader.onload = e => { attachedFileContent = e.target.result; };
     reader.readAsText(file);
   }
+
   const inputBox = document.getElementById('inputBox');
   if (currentMode === 'brief_upload') {
     inputBox.value = 'Analyse this brief against our first-party data and identify the strongest territories and audience fit.';
   } else if (!inputBox.value.trim()) {
-    inputBox.value = 'Build a pitch brief based on the uploaded brief';
+    if (isImage) inputBox.value = 'What can you see in this image?';
+    else inputBox.value = 'Build a pitch brief based on the uploaded brief';
   }
   autoResize(inputBox);
   inputBox.focus();
@@ -2698,9 +2709,11 @@ async function sendMessage() {
   inputBox.value = '';
   inputBox.style.height = 'auto';
 
-  const fileCtx = attachedFile
-    ? `Attached brief: "${attachedFile.name}"${attachedFileContent ? '\n\n' + attachedFileContent.slice(0, 3000) : ''}`
+  const isImageFile = attachedFile && attachedFile.type.startsWith('image/');
+  const fileCtx = attachedFile && !isImageFile
+    ? `Attached file: "${attachedFile.name}"${attachedFileContent && !attachedFileContent.startsWith('[') ? '\n\n' + attachedFileContent.slice(0, 3000) : ''}`
     : '';
+  const imageData = isImageFile ? attachedFileContent : null;
   const modeAtSend = currentMode;
   removeFile();
 
@@ -2714,9 +2727,23 @@ async function sendMessage() {
   }
 
   try {
+    // Build user message content — image gets vision block, text gets plain string
+    let userMsgContent;
+    const userTextFull = (userText || 'Describe what you see') + (fileCtx ? '\n\n[ATTACHED FILE]\n' + fileCtx : '');
+    if (imageData) {
+      const mimeType = attachedFile ? attachedFile.type : 'image/jpeg';
+      const base64 = imageData.split(',')[1];
+      userMsgContent = [
+        { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
+        { type: 'text', text: userText || 'What can you see in this image?' }
+      ];
+    } else {
+      userMsgContent = userTextFull;
+    }
+
     const messages = [
       ...conversationHistory,
-      { role: 'user', content: (userText || 'Build a pitch brief based on the attached file') + (fileCtx ? '\n\n[ATTACHED BRIEF]\n' + fileCtx : '') }
+      { role: 'user', content: userMsgContent }
     ];
 
     const response = await fetch('/api/chat', {
