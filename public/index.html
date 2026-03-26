@@ -2462,14 +2462,27 @@ function handleFile(event) {
   const reader = new FileReader();
 
   if (isImage) {
-    // Read as base64 data URL for vision
-    reader.onload = e => { attachedFileContent = e.target.result; };
+    // Compress image via canvas before encoding to avoid 413
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX = 1200;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+          else { w = Math.round(w * MAX / h); h = MAX; }
+        }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        attachedFileContent = canvas.toDataURL('image/jpeg', 0.75);
+      };
+      img.src = e.target.result;
+    };
     reader.readAsDataURL(file);
   } else if (isPDF || isWord) {
-    // Can't extract text client-side — send as label for context
     attachedFileContent = `[${isPDF ? 'PDF' : 'Word doc'} uploaded: ${file.name}]`;
   } else {
-    // Plain text
     reader.onload = e => { attachedFileContent = e.target.result; };
     reader.readAsText(file);
   }
