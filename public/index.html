@@ -1167,7 +1167,7 @@
         <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;">
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL POSTS</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumPosts">0</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">MEDIA VALUE</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--accent);" id="mpSumValue">£0</div></div>
-          <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">ADDED VALUE</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--accent);" id="mpSumAdded">£0</div></div>
+          <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">ADDED VALUE</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--accent);" id="mpSumAdded">0%</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL REACH</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumReach">0</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL IMPRESSIONS</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumImps">0</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL VIEWS</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumViews">0</div></div>
@@ -3379,10 +3379,12 @@ function mpRecalc() {
     totalPosts += bPosts; totalCost += bCost; totalReach += bReach; totalImps += bImps; totalViews += bViews; totalEngs += bEngs;
   });
 
-  const addedValue = totalCost - budget;
+  const orgBudget = budget * orgPct / 100;
+  const addedValue = totalCost - orgBudget;
+  const addedPctLive = orgBudget > 0 ? Math.round((addedValue / orgBudget) * 100) : 0;
   document.getElementById('mpSumPosts').textContent = fmt(totalPosts);
   document.getElementById('mpSumValue').textContent = fmtGBP(totalCost);
-  document.getElementById('mpSumAdded').textContent = fmtGBP(addedValue);
+  document.getElementById('mpSumAdded').textContent = addedPctLive + '%';
   document.getElementById('mpSumReach').textContent = fmt(totalReach);
   const impEl = document.getElementById('mpSumImps');
   if (impEl) impEl.textContent = fmt(totalImps);
@@ -3436,9 +3438,10 @@ function mpRecalc() {
     const viewsSumEl = document.getElementById('mpSumViews');
     if (viewsSumEl) viewsSumEl.textContent = fmt(totalViews);
     const totalCostWithPaid = totalCost + pBudget;
-    const addedValueWithPaid = totalCostWithPaid - budget;
+    const addedValueWithPaid = totalCostWithPaid - orgBudget;
+    const addedPctWithPaid = orgBudget > 0 ? Math.round((addedValueWithPaid / orgBudget) * 100) : 0;
     document.getElementById('mpSumValue').textContent = fmtGBP(totalCostWithPaid);
-    document.getElementById('mpSumAdded').textContent = fmtGBP(addedValueWithPaid);
+    document.getElementById('mpSumAdded').textContent = addedPctWithPaid + '%';
     document.getElementById('mpSumReach').textContent = fmt(totalReach + pReach);
     const impEl2 = document.getElementById('mpSumImps');
     if (impEl2) impEl2.textContent = fmt(totalImps + pImps);
@@ -3507,8 +3510,9 @@ function mpGenerateClientView() {
   if(MP_PAID_RATECARD['SAB']){MP_PAID_RATECARD['SAB'].forEach((row,i)=>{const el=document.getElementById('paid_SAB_'+i);const spend=el?(parseFloat(el.value)||0):0;if(spend>0){const ratio=spend/(row.budget||1000);const rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rV=Math.round((row.views||row.imps)*ratio),rE=Math.round(row.engs*ratio);paidBudget+=spend;paidReach+=rR;paidImps+=rI;paidViews+=rV;paidEngs+=rE;paidRows.push({type:row.type,spend,reach:rR,imps:rI,views:rV,engs:rE});}});}
   const paidTotals={SAB:{budget:paidBudget,reach:paidReach,imps:paidImps,engs:paidEngs,rows:paidRows}};
   const totalMediaValue=brandTotals.RB.cost+brandTotals.SAB.cost+brandTotals.RBUSA.cost+paidBudget;
-  const addedValue=totalMediaValue-budget;
-  const addedPct = budget > 0 ? Math.round((addedValue / budget) * 100) : 0;
+  const orgBudgetCV = budget * (parseFloat(document.getElementById('mpOrgPct').value)||0) / 100;
+  const addedValue = totalMediaValue - orgBudgetCV;
+  const addedPct = orgBudgetCV > 0 ? Math.round((addedValue / orgBudgetCV) * 100) : 0;
 
   const campaignName = document.getElementById('mpCampaignName') ? document.getElementById('mpCampaignName').value : '';
   document.getElementById('mpClientNameDisplay').textContent = clientName + (campaignName ? ' — ' + campaignName : '');
@@ -3519,8 +3523,8 @@ function mpGenerateClientView() {
   document.getElementById('cv_budget').textContent=fmtGBP(budget);
   document.getElementById('cv_mediaValue').textContent=fmtGBP(totalMediaValue);
   document.getElementById('cv_prod').textContent=fmtGBP(prodBudget);
-  document.getElementById('cv_addedValue').textContent=fmtGBP(addedValue);
-  document.getElementById('cv_addedPct').textContent=addedPct+'% Added Value';
+  document.getElementById('cv_addedValue').textContent=addedPct+'%';
+  document.getElementById('cv_addedPct').textContent=fmtGBP(addedValue)+' Added Value';
   const platforms=['Instagram','TikTok','YouTube'];
   let postTableHTML='';
   const getCount=(brand,plt,t)=>{let n=0;mpRates[brand].forEach((r,i)=>{const qty=parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;if(r.platform!==plt)return;const fl=r.format.toLowerCase();if(t==='Feed'){if(plt==='YouTube'){n+=qty;}else if(fl.includes('feed')||fl.includes('reel')||fl.includes('film')||fl.includes('short')){n+=qty;}}else if(t==='Story'){if(plt!=='YouTube'&&fl.includes('story'))n+=qty;}else if(t==='TOTAL')n+=qty;});return n;};
@@ -3719,8 +3723,9 @@ async function mpExportXLS() {
   const totalReach = brandData.RB.reach + brandData.RBUSA.reach + brandData.SAB.reach;
   const totalImps  = brandData.RB.imps  + brandData.RBUSA.imps  + brandData.SAB.imps;
   const totalEngs  = brandData.RB.engs  + brandData.RBUSA.engs  + brandData.SAB.engs;
-  const addedValue = totalCost - budget;
-  const addedPct   = budget > 0 ? Math.round((addedValue/budget)*100) : 0;
+  const orgBudgetPDF = budget * (parseFloat(document.getElementById('mpOrgPct').value)||0) / 100;
+  const addedValue = totalCost - orgBudgetPDF;
+  const addedPct   = orgBudgetPDF > 0 ? Math.round((addedValue/orgBudgetPDF)*100) : 0;
 
   if (!window.XLSX) {
     await new Promise((res,rej) => {
