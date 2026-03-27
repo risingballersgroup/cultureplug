@@ -16,7 +16,7 @@ const pool = new Pool({
     : { rejectUnauthorized: false }
 });
 
-// Create table if it doesn't exist
+// Create tables if they don't exist
 pool.query(`
   CREATE TABLE IF NOT EXISTS media_plans (
     id          SERIAL PRIMARY KEY,
@@ -25,27 +25,43 @@ pool.query(`
     data        JSONB NOT NULL,
     created_at  TIMESTAMPTZ DEFAULT NOW(),
     updated_at  TIMESTAMPTZ DEFAULT NOW()
-  )
+  );
+  CREATE TABLE IF NOT EXISTS sessions (
+    token       TEXT PRIMARY KEY,
+    data        JSONB NOT NULL,
+    created_at  TIMESTAMPTZ DEFAULT NOW()
+  );
 `).catch(err => console.error('DB init error:', err));
 
-// ── SESSION STORE (in-memory, sufficient for small team) ──
-const sessions = new Map();
-
-function createSession(userData) {
+// ── SESSION STORE (Postgres-backed) ──
+async function createSession(userData) {
   const token = crypto.randomBytes(32).toString('hex');
-  sessions.set(token, { ...userData, createdAt: Date.now() });
+  await pool.query(
+    'INSERT INTO sessions (token, data) VALUES ($1, $2)',
+    [token, JSON.stringify({ ...userData, createdAt: Date.now() })]
+  );
   return token;
 }
 
-function getSession(token) {
+async function getSession(token) {
   if (!token) return null;
-  const session = sessions.get(token);
-  if (!session) return null;
-  if (Date.now() - session.createdAt > 8 * 60 * 60 * 1000) {
-    sessions.delete(token);
+  try {
+    const result = await pool.query('SELECT data FROM sessions WHERE token = $1', [token]);
+    if (!result.rows.length) return null;
+    const session = result.rows[0].data;
+    // Expire after 8 hours
+    if (Date.now() - session.createdAt > 8 * 60 * 60 * 1000) {
+      await pool.query('DELETE FROM sessions WHERE token = $1', [token]);
+      return null;
+    }
+    return session;
+  } catch (err) {
     return null;
   }
-  return session;
+}
+
+async function deleteSession(token) {
+  await pool.query('DELETE FROM sessions WHERE token = $1', [token]);
 }
 
 function getSessionToken(req) {
@@ -55,8 +71,8 @@ function getSessionToken(req) {
 }
 
 // ── AUTH MIDDLEWARE ──
-function requireAuth(req, res, next) {
-  const session = getSession(getSessionToken(req));
+async function requireAuth(req, res, next) {
+  const session = await getSession(getSessionToken(req));
   if (!session) return res.status(401).json({ error: 'Unauthorised' });
   req.user = session;
   next();
@@ -113,7 +129,7 @@ app.get('/auth/callback', async (req, res) => {
     if (!email.endsWith(`@${ALLOWED_DOMAIN}`)) return res.redirect('/?error=unauthorised_domain');
 
     const firstName = profile.givenName || profile.displayName.split(' ')[0] || 'Team';
-    const sessionToken = createSession({ name: firstName, fullName: profile.displayName, email });
+    const sessionToken = await createSession({ name: firstName, fullName: profile.displayName, email });
 
     res.setHeader('Set-Cookie', `cp_session=${sessionToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=28800`);
     res.redirect('/');
@@ -123,16 +139,16 @@ app.get('/auth/callback', async (req, res) => {
   }
 });
 
-app.get('/auth/logout', (req, res) => {
+app.get('/auth/logout', async (req, res) => {
   const token = getSessionToken(req);
-  if (token) sessions.delete(token);
+  if (token) await deleteSession(token);
   res.setHeader('Set-Cookie', 'cp_session=; Path=/; HttpOnly; Max-Age=0');
   res.redirect('/');
 });
 
 // ── USER ENDPOINT ──
-app.get('/api/me', (req, res) => {
-  const session = getSession(getSessionToken(req));
+app.get('/api/me', async (req, res) => {
+  const session = await getSession(getSessionToken(req));
   if (!session) return res.json({ authenticated: false });
   res.json({ authenticated: true, name: session.name, fullName: session.fullName, email: session.email });
 });
@@ -175,7 +191,6 @@ app.post('/api/plans', requireAuth, async (req, res) => {
   if (!name || !data) return res.status(400).json({ error: 'name and data required' });
   try {
     if (id) {
-      // Update existing plan — only if owned by this user
       const result = await pool.query(
         'UPDATE media_plans SET name = $1, data = $2, updated_at = NOW() WHERE id = $3 AND user_email = $4 RETURNING id, name, updated_at',
         [name, JSON.stringify(data), id, req.user.email]
@@ -183,7 +198,6 @@ app.post('/api/plans', requireAuth, async (req, res) => {
       if (result.rows.length === 0) return res.status(404).json({ error: 'Plan not found' });
       res.json(result.rows[0]);
     } else {
-      // Create new plan
       const result = await pool.query(
         'INSERT INTO media_plans (user_email, name, data) VALUES ($1, $2, $3) RETURNING id, name, created_at',
         [req.user.email, name, JSON.stringify(data)]
