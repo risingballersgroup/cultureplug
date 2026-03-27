@@ -2,10 +2,31 @@ const express = require('express');
 const fetch = require('node-fetch');
 const path = require('path');
 const crypto = require('crypto');
+const { Pool } = require('pg');
 
 const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// ── POSTGRES ──
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes('railway.internal')
+    ? false
+    : { rejectUnauthorized: false }
+});
+
+// Create table if it doesn't exist
+pool.query(`
+  CREATE TABLE IF NOT EXISTS media_plans (
+    id          SERIAL PRIMARY KEY,
+    user_email  TEXT NOT NULL,
+    name        TEXT NOT NULL,
+    data        JSONB NOT NULL,
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ DEFAULT NOW()
+  )
+`).catch(err => console.error('DB init error:', err));
 
 // ── SESSION STORE (in-memory, sufficient for small team) ──
 const sessions = new Map();
@@ -20,7 +41,6 @@ function getSession(token) {
   if (!token) return null;
   const session = sessions.get(token);
   if (!session) return null;
-  // Expire after 8 hours
   if (Date.now() - session.createdAt > 8 * 60 * 60 * 1000) {
     sessions.delete(token);
     return null;
@@ -43,10 +63,10 @@ function requireAuth(req, res, next) {
 }
 
 // ── MICROSOFT OAUTH CONFIG ──
-const TENANT_ID     = process.env.MS_TENANT_ID;
-const CLIENT_ID     = process.env.MS_CLIENT_ID;
-const CLIENT_SECRET = process.env.MS_CLIENT_SECRET;
-const REDIRECT_URI  = process.env.REDIRECT_URI || 'https://cultureplug-production.up.railway.app/auth/callback';
+const TENANT_ID      = process.env.MS_TENANT_ID;
+const CLIENT_ID      = process.env.MS_CLIENT_ID;
+const CLIENT_SECRET  = process.env.MS_CLIENT_SECRET;
+const REDIRECT_URI   = process.env.REDIRECT_URI || 'https://cultureplug-production.up.railway.app/auth/callback';
 const ALLOWED_DOMAIN = process.env.ALLOWED_DOMAIN || 'risingballers.co.uk';
 
 // ── AUTH ROUTES ──
@@ -133,6 +153,72 @@ app.post('/api/chat', requireAuth, async (req, res) => {
     res.status(response.status).json(data);
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
+  }
+});
+
+// ── MEDIA PLANS: LIST ──
+app.get('/api/plans', requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, name, created_at, updated_at FROM media_plans WHERE user_email = $1 ORDER BY updated_at DESC',
+      [req.user.email]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── MEDIA PLANS: SAVE (create or update) ──
+app.post('/api/plans', requireAuth, async (req, res) => {
+  const { name, data, id } = req.body;
+  if (!name || !data) return res.status(400).json({ error: 'name and data required' });
+  try {
+    if (id) {
+      // Update existing plan — only if owned by this user
+      const result = await pool.query(
+        'UPDATE media_plans SET name = $1, data = $2, updated_at = NOW() WHERE id = $3 AND user_email = $4 RETURNING id, name, updated_at',
+        [name, JSON.stringify(data), id, req.user.email]
+      );
+      if (result.rows.length === 0) return res.status(404).json({ error: 'Plan not found' });
+      res.json(result.rows[0]);
+    } else {
+      // Create new plan
+      const result = await pool.query(
+        'INSERT INTO media_plans (user_email, name, data) VALUES ($1, $2, $3) RETURNING id, name, created_at',
+        [req.user.email, name, JSON.stringify(data)]
+      );
+      res.json(result.rows[0]);
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── MEDIA PLANS: LOAD ──
+app.get('/api/plans/:id', requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM media_plans WHERE id = $1 AND user_email = $2',
+      [req.params.id, req.user.email]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Plan not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── MEDIA PLANS: DELETE ──
+app.delete('/api/plans/:id', requireAuth, async (req, res) => {
+  try {
+    await pool.query(
+      'DELETE FROM media_plans WHERE id = $1 AND user_email = $2',
+      [req.params.id, req.user.email]
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 
