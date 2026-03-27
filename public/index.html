@@ -1033,6 +1033,19 @@
       <div class="mp-step-pill" id="mpPill2" onclick="mpGoStep(2)">2 Build Plan</div>
       <div style="width:24px;height:1px;background:var(--border);"></div>
       <div class="mp-step-pill" id="mpPill3" onclick="mpGoStep(3)">3 Client View</div>
+      <div style="margin-left:auto;display:flex;gap:8px;">
+        <button onclick="mpShowPlans()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:6px;cursor:pointer;">My Plans</button>
+        <button onclick="mpSavePlan()" style="background:none;border:1px solid var(--accent);color:var(--accent);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:6px;cursor:pointer;" id="mpSaveBtn">Save Plan</button>
+      </div>
+    </div>
+
+    <!-- MY PLANS PANEL -->
+    <div id="mpPlansPanel" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);">Saved Plans</div>
+        <button onclick="mpHidePlans()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;">✕</button>
+      </div>
+      <div id="mpPlansList" style="font-family:'DM Sans',sans-serif;font-size:13px;color:var(--muted);">Loading...</div>
     </div>
 
     <!-- ═══ STEP 1: RATECARD ═══ -->
@@ -4236,6 +4249,170 @@ function copyCalcResult() {
 
 // Init country dropdown on load
 document.addEventListener('DOMContentLoaded', updateCalcCountries);
+
+// ── MEDIA PLAN SAVE / LOAD ──
+let mpCurrentPlanId = null;
+
+function mpGetPlanData() {
+  // Snapshot all current plan state into a plain object
+  const data = {
+    clientName: document.getElementById('mpClientName')?.value || '',
+    campaignName: document.getElementById('mpCampaignName')?.value || '',
+    budget: document.getElementById('mpBudget')?.value || '',
+    orgPct: document.getElementById('mpOrgPct')?.value || '100',
+    ampPct: document.getElementById('mpAmpPct')?.value || '0',
+    prodPct: document.getElementById('mpProdPct')?.value || '0',
+    channels: {
+      RB:   document.getElementById('mpChkRB')?.checked,
+      SAB:  document.getElementById('mpChkSAB')?.checked,
+      RBUSA:document.getElementById('mpChkRBUSA')?.checked,
+      Paid: document.getElementById('mpChkPaid')?.checked,
+    },
+    qty: {}, paidSpend: {},
+    logoB64: mpClientLogoB64 || null,
+    notes: document.getElementById('cv_notes')?.innerHTML || '',
+    boilerplate: document.getElementById('cv_boilerplate')?.innerHTML || '',
+  };
+  ['RB','RBUSA','SAB'].forEach(brand => {
+    mpRates[brand].forEach((_, i) => {
+      const el = document.getElementById('qty_'+brand+'_'+i);
+      if (el) data.qty[brand+'_'+i] = el.value;
+    });
+  });
+  if (MP_PAID_RATECARD['SAB']) {
+    MP_PAID_RATECARD['SAB'].forEach((_, i) => {
+      const el = document.getElementById('paid_SAB_'+i);
+      if (el) data.paidSpend['SAB_'+i] = el.value;
+    });
+  }
+  return data;
+}
+
+function mpApplyPlanData(data) {
+  if (!data) return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('mpClientName',   data.clientName);
+  set('mpCampaignName', data.campaignName);
+  set('mpBudget',       data.budget);
+  set('mpOrgPct',       data.orgPct);
+  set('mpAmpPct',       data.ampPct);
+  set('mpProdPct',      data.prodPct);
+  if (data.channels) {
+    const chk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
+    chk('mpChkRB',    data.channels.RB);
+    chk('mpChkSAB',   data.channels.SAB);
+    chk('mpChkRBUSA', data.channels.RBUSA);
+    chk('mpChkPaid',  data.channels.Paid);
+  }
+  if (data.logoB64) {
+    mpClientLogoB64 = data.logoB64;
+    const img = document.getElementById('mpClientLogoImg');
+    if (img) img.src = mpClientLogoB64;
+    const prev = document.getElementById('mpClientLogoPreview');
+    if (prev) prev.style.display = 'flex';
+    const none = document.getElementById('mpClientLogoNone');
+    if (none) none.style.display = 'none';
+  }
+  if (data.qty) {
+    Object.entries(data.qty).forEach(([key, val]) => {
+      const el = document.getElementById('qty_'+key); if (el) el.value = val;
+    });
+  }
+  if (data.paidSpend) {
+    Object.entries(data.paidSpend).forEach(([key, val]) => {
+      const el = document.getElementById('paid_'+key); if (el) el.value = val;
+    });
+  }
+  mpRecalc();
+}
+
+async function mpSavePlan() {
+  const data = mpGetPlanData();
+  const defaultName = data.clientName && data.campaignName
+    ? data.clientName + (data.campaignName ? ' — ' + data.campaignName : '')
+    : data.clientName || 'Untitled Plan';
+  const name = prompt('Save plan as:', mpCurrentPlanId ? defaultName : defaultName);
+  if (!name) return;
+  const btn = document.getElementById('mpSaveBtn');
+  if (btn) btn.textContent = 'Saving...';
+  try {
+    const res = await fetch('/api/plans', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, data, id: mpCurrentPlanId })
+    });
+    const json = await res.json();
+    if (json.id) {
+      mpCurrentPlanId = json.id;
+      if (btn) btn.textContent = 'Saved ✓';
+      setTimeout(() => { if (btn) btn.textContent = 'Save Plan'; }, 2000);
+    }
+  } catch (err) {
+    alert('Save failed: ' + err.message);
+    if (btn) btn.textContent = 'Save Plan';
+  }
+}
+
+async function mpShowPlans() {
+  const panel = document.getElementById('mpPlansPanel');
+  const list  = document.getElementById('mpPlansList');
+  panel.style.display = 'block';
+  list.innerHTML = '<span style="color:var(--muted)">Loading...</span>';
+  try {
+    const res = await fetch('/api/plans');
+    const plans = await res.json();
+    if (!plans.length) {
+      list.innerHTML = '<span style="color:var(--muted)">No saved plans yet.</span>';
+      return;
+    }
+    list.innerHTML = plans.map(p => {
+      const date = new Date(p.updated_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div>
+          <div style="color:var(--white);font-weight:500;">${p.name}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Saved ${date}</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="mpLoadPlan(${p.id})" style="background:var(--accent);color:var(--bg);border:none;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:5px;cursor:pointer;">Load</button>
+          <button onclick="mpDeletePlan(${p.id},this)" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:5px;cursor:pointer;">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (err) {
+    list.innerHTML = '<span style="color:red">Failed to load plans.</span>';
+  }
+}
+
+function mpHidePlans() {
+  document.getElementById('mpPlansPanel').style.display = 'none';
+}
+
+async function mpLoadPlan(id) {
+  try {
+    const res = await fetch('/api/plans/'+id);
+    const plan = await res.json();
+    if (plan.data) {
+      mpCurrentPlanId = plan.id;
+      mpApplyPlanData(plan.data);
+      mpHidePlans();
+      mpGoStep(2);
+      const btn = document.getElementById('mpSaveBtn');
+      if (btn) btn.textContent = 'Save Plan';
+    }
+  } catch (err) {
+    alert('Load failed: ' + err.message);
+  }
+}
+
+async function mpDeletePlan(id, btn) {
+  if (!confirm('Delete this plan?')) return;
+  try {
+    await fetch('/api/plans/'+id, { method: 'DELETE' });
+    mpShowPlans(); // refresh list
+  } catch (err) {
+    alert('Delete failed: ' + err.message);
+  }
+}
 </script>
 </body>
 </html>
