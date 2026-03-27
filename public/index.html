@@ -1209,7 +1209,7 @@
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">Paid Benchmarking <span style="color:var(--muted);font-size:8px;text-transform:none;letter-spacing:0;">(enter spend per placement)</span></div>
           <table class="mp-table rc-compact">
             <colgroup><col class="col-format"><col class="col-plt"><col style="width:62px"><col style="width:56px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:60px"></colgroup>
-            <thead><tr><th>Type</th><th style="text-align:center;">Plt</th><th>Rate</th><th>Qty</th><th>Est. Reach</th><th>Est. Imps</th><th>Est. Views</th><th>Est. Engs</th><th>Spend</th></tr></thead>
+            <thead><tr><th>Type</th><th style="text-align:center;">Plt</th><th>Rate</th><th>Qty</th><th>Reach</th><th>Imps</th><th>Views</th><th>Engs</th><th>Spend</th></tr></thead>
             <tbody id="mpPaidBodySAB"></tbody>
             <tfoot><tr style="background:rgba(0,255,170,0.05);">
               <td colspan="3" style="font-weight:700;color:var(--accent);">TOTALS</td>
@@ -3584,7 +3584,7 @@ function mpGenerateClientView() {
   });
   if(paidRows.length>0){
     detailHTML+=`<div style="margin-bottom:24px;"><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Paid Benchmarking</div>
-    <table class="mp-table"><thead><tr><th>Type</th><th>Spend</th><th>Est. Reach</th><th>Est. Impressions</th><th>Est. Views</th><th>Est. Engagements</th></tr></thead><tbody>`;
+    <table class="mp-table"><thead><tr><th>Type</th><th>Spend</th><th>Reach</th><th>Impressions</th><th>Views</th><th>Engagements</th></tr></thead><tbody>`;
     paidRows.forEach(r=>{detailHTML+=`<tr><td>${r.type}</td><td style="font-family:'DM Mono',monospace;">${fmtGBP(r.spend)}</td><td style="font-family:'DM Mono',monospace;">${fmt(r.reach)}</td><td style="font-family:'DM Mono',monospace;">${fmt(r.imps)}</td><td style="font-family:'DM Mono',monospace;">${fmt(r.views||0)}</td><td style="font-family:'DM Mono',monospace;">${fmt(r.engs)}</td></tr>`;});
     detailHTML+=`<tr style="background:rgba(255,255,255,0.03);font-weight:700;"><td style="color:var(--accent);">PAID TOTALS</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmtGBP(paidBudget)}</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(paidReach)}</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(paidImps)}</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(paidViews)}</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(paidEngs)}</td></tr></tbody></table></div>`;
   }
