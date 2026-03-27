@@ -1164,12 +1164,13 @@
       <!-- LIVE SUMMARY BAR — shown first -->
       <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:8px 14px;margin-bottom:8px;">
         <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Live Summary</div>
-        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;">
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL POSTS</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumPosts">0</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">MEDIA VALUE</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--accent);" id="mpSumValue">£0</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">ADDED VALUE</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--accent);" id="mpSumAdded">£0</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL REACH</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumReach">0</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL IMPRESSIONS</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumImps">0</div></div>
+          <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL VIEWS</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumViews">0</div></div>
           <div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:2px;">TOTAL ENGAGEMENTS</div><div style="font-family:'Playfair Display',serif;font-size:15px;color:var(--white);" id="mpSumEngs">0</div></div>
         </div>
       </div>
@@ -1180,17 +1181,17 @@
         <div id="mpPanelRB">
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Rising Ballers</div>
           <table class="mp-table rc-compact">
-            <colgroup><col class="col-format"><col class="col-plt"><col style="width:62px"><col style="width:56px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:60px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th>Rate</th><th>Qty</th><th>Cost</th><th>Reach</th><th>Imps</th><th>Engs</th></tr></thead>
+            <colgroup><col class="col-format"><col class="col-plt"><col style="width:62px"><col style="width:56px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:60px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th>Rate</th><th>Qty</th><th>Cost</th><th>Reach</th><th>Imps</th><th>Views</th><th>Engs</th></tr></thead>
             <tbody id="mpBodyRB"></tbody>
-            <tfoot><tr style="background:rgba(201,168,76,0.08);"><td colspan="2" style="font-weight:700;color:var(--gold);">TOTALS</td><td></td><td id="mpRBTotalPosts" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalCost" style="font-weight:700;color:var(--gold);">£0</td><td id="mpRBTotalReach" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalImps" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalEngs" style="font-weight:700;color:var(--gold);">0</td></tr></tfoot>
+            <tfoot><tr style="background:rgba(201,168,76,0.08);"><td colspan="2" style="font-weight:700;color:var(--gold);">TOTALS</td><td></td><td id="mpRBTotalPosts" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalCost" style="font-weight:700;color:var(--gold);">£0</td><td id="mpRBTotalReach" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalImps" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalViews" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBTotalEngs" style="font-weight:700;color:var(--gold);">0</td></tr></tfoot>
           </table>
         </div>
         <div id="mpPanelSAB">
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:4px;">She's A Baller</div>
           <table class="mp-table rc-compact">
-            <colgroup><col class="col-format"><col class="col-plt"><col style="width:62px"><col style="width:56px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:60px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th>Rate</th><th>Qty</th><th>Cost</th><th>Reach</th><th>Imps</th><th>Engs</th></tr></thead>
+            <colgroup><col class="col-format"><col class="col-plt"><col style="width:62px"><col style="width:56px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:60px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th>Rate</th><th>Qty</th><th>Cost</th><th>Reach</th><th>Imps</th><th>Views</th><th>Engs</th></tr></thead>
             <tbody id="mpBodySAB"></tbody>
-            <tfoot><tr style="background:rgba(255,179,198,0.06);"><td colspan="2" style="font-weight:700;color:var(--pink);">TOTALS</td><td></td><td id="mpSABTotalPosts" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalCost" style="font-weight:700;color:var(--pink);">£0</td><td id="mpSABTotalReach" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalImps" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalEngs" style="font-weight:700;color:var(--pink);">0</td></tr></tfoot>
+            <tfoot><tr style="background:rgba(255,179,198,0.06);"><td colspan="2" style="font-weight:700;color:var(--pink);">TOTALS</td><td></td><td id="mpSABTotalPosts" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalCost" style="font-weight:700;color:var(--pink);">£0</td><td id="mpSABTotalReach" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalImps" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalViews" style="font-weight:700;color:var(--pink);">0</td><td id="mpSABTotalEngs" style="font-weight:700;color:var(--pink);">0</td></tr></tfoot>
           </table>
         </div>
       </div>
@@ -1199,22 +1200,23 @@
         <div id="mpPanelRBUSA">
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Rising Ballers USA</div>
           <table class="mp-table rc-compact">
-            <colgroup><col class="col-format"><col class="col-plt"><col style="width:62px"><col style="width:56px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:60px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th>Rate</th><th>Qty</th><th>Cost</th><th>Reach</th><th>Imps</th><th>Engs</th></tr></thead>
+            <colgroup><col class="col-format"><col class="col-plt"><col style="width:62px"><col style="width:56px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:60px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th>Rate</th><th>Qty</th><th>Cost</th><th>Reach</th><th>Imps</th><th>Views</th><th>Engs</th></tr></thead>
             <tbody id="mpBodyRBUSA"></tbody>
-            <tfoot><tr style="background:rgba(201,168,76,0.08);"><td colspan="2" style="font-weight:700;color:var(--gold);">TOTALS</td><td></td><td id="mpRBUSATotalPosts" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalCost" style="font-weight:700;color:var(--gold);">£0</td><td id="mpRBUSATotalReach" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalImps" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalEngs" style="font-weight:700;color:var(--gold);">0</td></tr></tfoot>
+            <tfoot><tr style="background:rgba(201,168,76,0.08);"><td colspan="2" style="font-weight:700;color:var(--gold);">TOTALS</td><td></td><td id="mpRBUSATotalPosts" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalCost" style="font-weight:700;color:var(--gold);">£0</td><td id="mpRBUSATotalReach" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalImps" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalViews" style="font-weight:700;color:var(--gold);">0</td><td id="mpRBUSATotalEngs" style="font-weight:700;color:var(--gold);">0</td></tr></tfoot>
           </table>
         </div>
         <div id="mpPanelPaid">
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:4px;">Paid Benchmarking <span style="color:var(--muted);font-size:8px;text-transform:none;letter-spacing:0;">(enter spend per placement)</span></div>
           <table class="mp-table rc-compact">
             <colgroup><col class="col-format"><col class="col-plt"><col style="width:62px"><col style="width:56px"><col style="width:68px"><col style="width:68px"><col style="width:68px"><col style="width:60px"></colgroup>
-            <thead><tr><th>Type</th><th style="text-align:center;">Plt</th><th>Rate</th><th>Qty</th><th>Est. Reach</th><th>Est. Imps</th><th>Est. Engs</th><th>Spend</th></tr></thead>
+            <thead><tr><th>Type</th><th style="text-align:center;">Plt</th><th>Rate</th><th>Qty</th><th>Est. Reach</th><th>Est. Imps</th><th>Est. Views</th><th>Est. Engs</th><th>Spend</th></tr></thead>
             <tbody id="mpPaidBodySAB"></tbody>
             <tfoot><tr style="background:rgba(0,255,170,0.05);">
               <td colspan="3" style="font-weight:700;color:var(--accent);">TOTALS</td>
               <td id="mpPaidTotalBudgetSAB" style="font-weight:700;color:var(--accent);">£0</td>
               <td id="mpPaidTotalReachSAB"  style="font-weight:700;color:var(--accent);">—</td>
               <td id="mpPaidTotalImpsSAB"   style="font-weight:700;color:var(--accent);">—</td>
+              <td id="mpPaidTotalViewsSAB"  style="font-weight:700;color:var(--accent);">—</td>
               <td id="mpPaidTotalEngsSAB"   style="font-weight:700;color:var(--accent);">—</td>
               <td></td>
             </tr></tfoot>
@@ -1275,7 +1277,7 @@
           <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Media Breakdown</div>
           <div style="overflow-x:auto;">
             <table class="mp-table" style="width:100%;">
-              <colgroup><col style="width:90px"><col style="width:145px"><col style="width:80px"><col style="width:65px"><col style="width:145px"><col style="width:85px"><col style="width:85px"><col style="width:75px"><col style="width:60px"><col style="width:85px"></colgroup><thead><tr><th>Media Type</th><th>Channels</th><th>Platforms</th><th>Formats</th><th>Asset Types</th><th>Total Reach</th><th>Total Imps</th><th>Total Engs</th><th>Eng Rate</th><th>Media Value</th></tr></thead>
+              <colgroup><col style="width:90px"><col style="width:140px"><col style="width:75px"><col style="width:60px"><col style="width:140px"><col style="width:80px"><col style="width:80px"><col style="width:80px"><col style="width:70px"><col style="width:55px"><col style="width:80px"></colgroup><thead><tr><th>Media Type</th><th>Channels</th><th>Platforms</th><th>Formats</th><th>Asset Types</th><th>Total Reach</th><th>Total Imps</th><th>Total Views</th><th>Total Engs</th><th>Eng Rate</th><th>Media Value</th></tr></thead>
               <tbody id="cv_breakdownTable"></tbody>
             </table>
           </div>
@@ -3276,10 +3278,11 @@ function mpRenderPaidPlanInputs() {
       <td style="text-align:center;">${pltBadge(platform)}</td>
       <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">£${fmtN(row.budget)}</td>
       <td style="text-align:center;"><input class="mp-qty-input" type="text" inputmode="numeric" value="" id="paid_SAB_${i}" oninput="mpRecalc()" style="width:56px;" placeholder="0"></td>
-      <td id="paidReach_SAB_${i}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
-      <td id="paidImps_SAB_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
-      <td id="paidEngs_SAB_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
-      <td id="paidSpend_SAB_${i}" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>`;
+      <td id="paidReach_SAB_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
+      <td id="paidImps_SAB_${i}"   style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
+      <td id="paidViews_SAB_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
+      <td id="paidEngs_SAB_${i}"   style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
+      <td id="paidSpend_SAB_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -3320,6 +3323,7 @@ function mpRenderPlanInputs() {
         <td id="rowCost_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;">£0</td>
         <td id="rowReach_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
         <td id="rowImps_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
+        <td id="rowViews_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
         <td id="rowEngs_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>`;
       tbody.appendChild(tr);
     });
@@ -3345,10 +3349,10 @@ function mpRecalc() {
   document.getElementById('mpAmpBudgetDisplay').textContent  = fmtGBP(budget * ampPct / 100);
   document.getElementById('mpProdBudgetDisplay').textContent = fmtGBP(budget * prodPct / 100);
 
-  let totalPosts=0, totalTiles=0, totalCost=0, totalReach=0, totalImps=0, totalEngs=0;
+  let totalPosts=0, totalTiles=0, totalCost=0, totalReach=0, totalImps=0, totalViews=0, totalEngs=0;
 
   ['RB','RBUSA','SAB'].forEach(brand => {
-    let bPosts=0, bTiles=0, bCost=0, bReach=0, bImps=0, bEngs=0;
+    let bPosts=0, bTiles=0, bCost=0, bReach=0, bImps=0, bViews=0, bEngs=0;
     mpRates[brand].forEach((row, i) => {
       const qty = parseInt(document.getElementById('qty_'+brand+'_'+i)?.value) || 0;
       const tilesPerPost = row.tiles || 1;
@@ -3356,19 +3360,22 @@ function mpRecalc() {
       const rCost  = qty * row.cost;
       const rReach = qty * row.reach;
       const rImps  = qty * row.imps;
+      const rViews = qty * (row.views || 0);
       const rEngs  = qty * row.engs;
       document.getElementById('rowCost_'+brand+'_'+i).textContent  = fmtGBP(rCost);
       document.getElementById('rowReach_'+brand+'_'+i).textContent = fmt(rReach);
       document.getElementById('rowImps_'+brand+'_'+i).textContent  = fmt(rImps);
+      document.getElementById('rowViews_'+brand+'_'+i).textContent = fmt(rViews);
       document.getElementById('rowEngs_'+brand+'_'+i).textContent  = fmt(rEngs);
-      bPosts += qty; bTiles += tiles; bCost += rCost; bReach += rReach; bImps += rImps; bEngs += rEngs;
+      bPosts += qty; bTiles += tiles; bCost += rCost; bReach += rReach; bImps += rImps; bViews += rViews; bEngs += rEngs;
     });
     document.getElementById('mp'+brand+'TotalPosts').textContent = fmt(bPosts);
     document.getElementById('mp'+brand+'TotalCost').textContent  = fmtGBP(bCost);
     document.getElementById('mp'+brand+'TotalReach').textContent = fmt(bReach);
     document.getElementById('mp'+brand+'TotalImps').textContent  = fmt(bImps);
+    const vEl = document.getElementById('mp'+brand+'TotalViews'); if (vEl) vEl.textContent = fmt(bViews);
     document.getElementById('mp'+brand+'TotalEngs').textContent  = fmt(bEngs);
-    totalPosts += bPosts; totalCost += bCost; totalReach += bReach; totalImps += bImps; totalEngs += bEngs;
+    totalPosts += bPosts; totalCost += bCost; totalReach += bReach; totalImps += bImps; totalViews += bViews; totalEngs += bEngs;
   });
 
   const addedValue = totalCost - budget;
@@ -3378,6 +3385,8 @@ function mpRecalc() {
   document.getElementById('mpSumReach').textContent = fmt(totalReach);
   const impEl = document.getElementById('mpSumImps');
   if (impEl) impEl.textContent = fmt(totalImps);
+  const viewsEl = document.getElementById('mpSumViews');
+  if (viewsEl) viewsEl.textContent = fmt(totalViews);
   document.getElementById('mpSumEngs').textContent  = fmt(totalEngs);
 
   // Update paid estimates — SAB only (single benchmarking source)
@@ -3389,33 +3398,42 @@ function mpRecalc() {
       const ratio = spend / (row.budget || 1000);
       const rEl = document.getElementById('paidReach_SAB_'+i);
       const iEl = document.getElementById('paidImps_SAB_'+i);
+      const vEl = document.getElementById('paidViews_SAB_'+i);
       const eEl = document.getElementById('paidEngs_SAB_'+i);
       const sEl = document.getElementById('paidSpend_SAB_'+i);
       if (rEl) rEl.textContent = spend > 0 ? fmt(Math.round(row.reach * ratio)) : '—';
       if (iEl) iEl.textContent = spend > 0 ? fmt(Math.round(row.imps  * ratio)) : '—';
+      if (vEl) vEl.textContent = spend > 0 ? fmt(Math.round((row.views||row.imps) * ratio)) : '—';
       if (eEl) eEl.textContent = spend > 0 ? fmt(Math.round(row.engs  * ratio)) : '—';
       if (sEl) sEl.textContent = spend > 0 ? fmtGBP(spend) : '—';
     });
-    let pBudget=0, pReach=0, pImps=0, pEngs=0, anySpend=false;
+    let pBudget=0, pReach=0, pImps=0, pViews=0, pEngs=0, anySpend=false;
     MP_PAID_RATECARD['SAB'].forEach((row, i) => {
       const el = document.getElementById('paid_SAB_'+i);
       const spend = el ? (parseFloat(el.value)||0) : 0;
       if (spend > 0) {
         const ratio = spend / (row.budget || 1000);
         pBudget += spend; pReach += Math.round(row.reach * ratio);
-        pImps += Math.round(row.imps * ratio); pEngs += Math.round(row.engs * ratio);
+        pImps += Math.round(row.imps * ratio);
+        pViews += Math.round((row.views||row.imps) * ratio);
+        pEngs += Math.round(row.engs * ratio);
         anySpend = true;
       }
     });
     const bEl = document.getElementById('mpPaidTotalBudgetSAB');
     const rEl2 = document.getElementById('mpPaidTotalReachSAB');
     const iEl2 = document.getElementById('mpPaidTotalImpsSAB');
+    const vEl2 = document.getElementById('mpPaidTotalViewsSAB');
     const eEl2 = document.getElementById('mpPaidTotalEngsSAB');
     if (bEl) bEl.textContent = anySpend ? fmtGBP(pBudget) : '£0';
     if (rEl2) rEl2.textContent = anySpend ? fmt(pReach) : '—';
     if (iEl2) iEl2.textContent = anySpend ? fmt(pImps)  : '—';
+    if (vEl2) vEl2.textContent = anySpend ? fmt(pViews) : '—';
     if (eEl2) eEl2.textContent = anySpend ? fmt(pEngs)  : '—';
     // Roll paid into live summary
+    totalViews += pViews;
+    const viewsSumEl = document.getElementById('mpSumViews');
+    if (viewsSumEl) viewsSumEl.textContent = fmt(totalViews);
     const totalCostWithPaid = totalCost + pBudget;
     const addedValueWithPaid = totalCostWithPaid - budget;
     document.getElementById('mpSumValue').textContent = fmtGBP(totalCostWithPaid);
@@ -3479,13 +3497,13 @@ function mpGenerateClientView() {
 
   const brandTotals={};
   ['RB','SAB','RBUSA'].forEach(brand=>{
-    let posts=0,cost=0,reach=0,imps=0,engs=0;const platformMap={};
-    mpRates[brand].forEach((row,i)=>{const qty=parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;posts+=qty;cost+=qty*row.cost;reach+=qty*row.reach;imps+=qty*row.imps;engs+=qty*row.engs;if(!platformMap[row.platform])platformMap[row.platform]={posts:0,cost:0,reach:0,imps:0,engs:0};platformMap[row.platform].posts+=qty;platformMap[row.platform].cost+=qty*row.cost;platformMap[row.platform].reach+=qty*row.reach;platformMap[row.platform].imps+=qty*row.imps;platformMap[row.platform].engs+=qty*row.engs;});
-    brandTotals[brand]={posts,cost,reach,imps,engs,platformMap};
+    let posts=0,cost=0,reach=0,imps=0,views=0,engs=0;const platformMap={};
+    mpRates[brand].forEach((row,i)=>{const qty=parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;posts+=qty;cost+=qty*row.cost;reach+=qty*row.reach;imps+=qty*row.imps;views+=qty*(row.views||0);engs+=qty*row.engs;if(!platformMap[row.platform])platformMap[row.platform]={posts:0,cost:0,reach:0,imps:0,engs:0};platformMap[row.platform].posts+=qty;platformMap[row.platform].cost+=qty*row.cost;platformMap[row.platform].reach+=qty*row.reach;platformMap[row.platform].imps+=qty*row.imps;platformMap[row.platform].engs+=qty*row.engs;});
+    brandTotals[brand]={posts,cost,reach,imps,views,engs,platformMap};
   });
   // Paid — SAB rates only, single benchmarking source
-  let paidBudget=0,paidReach=0,paidImps=0,paidEngs=0;const paidRows=[];
-  if(MP_PAID_RATECARD['SAB']){MP_PAID_RATECARD['SAB'].forEach((row,i)=>{const el=document.getElementById('paid_SAB_'+i);const spend=el?(parseFloat(el.value)||0):0;if(spend>0){const ratio=spend/(row.budget||1000);const rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rE=Math.round(row.engs*ratio);paidBudget+=spend;paidReach+=rR;paidImps+=rI;paidEngs+=rE;paidRows.push({type:row.type,spend,reach:rR,imps:rI,engs:rE});}});}
+  let paidBudget=0,paidReach=0,paidImps=0,paidViews=0,paidEngs=0;const paidRows=[];
+  if(MP_PAID_RATECARD['SAB']){MP_PAID_RATECARD['SAB'].forEach((row,i)=>{const el=document.getElementById('paid_SAB_'+i);const spend=el?(parseFloat(el.value)||0):0;if(spend>0){const ratio=spend/(row.budget||1000);const rR=Math.round(row.reach*ratio),rI=Math.round(row.imps*ratio),rV=Math.round((row.views||row.imps)*ratio),rE=Math.round(row.engs*ratio);paidBudget+=spend;paidReach+=rR;paidImps+=rI;paidViews+=rV;paidEngs+=rE;paidRows.push({type:row.type,spend,reach:rR,imps:rI,views:rV,engs:rE});}});}
   const paidTotals={SAB:{budget:paidBudget,reach:paidReach,imps:paidImps,engs:paidEngs,rows:paidRows}};
   const totalMediaValue=brandTotals.RB.cost+brandTotals.SAB.cost+brandTotals.RBUSA.cost+paidBudget;
   const addedValue=totalMediaValue-budget;
@@ -3520,13 +3538,14 @@ function mpGenerateClientView() {
   const dynPlatforms=activePlatforms.length?activePlatforms.join(' + '):'IG + TT + YT';
   const allOrgReach=brandTotals.RB.reach+brandTotals.SAB.reach+brandTotals.RBUSA.reach;
   const allOrgImps=brandTotals.RB.imps+brandTotals.SAB.imps+brandTotals.RBUSA.imps;
+  const allOrgViews=brandTotals.RB.views+brandTotals.SAB.views+brandTotals.RBUSA.views;
   const allOrgEngs=brandTotals.RB.engs+brandTotals.SAB.engs+brandTotals.RBUSA.engs;
   const bkRows=[
-    {type:'ORGANIC',channels:dynChannels,platforms:dynPlatforms,formats:'Mixed',assets:'Launch asset & cutdowns',reach:allOrgReach,imps:allOrgImps,engs:allOrgEngs,value:totalMediaValue},
-    {type:'PAID',channels:dynChannels,platforms:dynPlatforms,formats:'Amplification',assets:'Dark posts + paid boosts',reach:paidReach,imps:paidImps,engs:paidEngs,value:paidBudget},
-    {type:'ADDED VALUE',channels:dynChannels,platforms:dynPlatforms,formats:'Mixed',assets:'Same as above',reach:Math.round(allOrgReach*1.97),imps:Math.round(allOrgImps*1.97),engs:Math.round(allOrgEngs*1.97),value:addedValue>0?addedValue:0},
+    {type:'ORGANIC',channels:dynChannels,platforms:dynPlatforms,formats:'Mixed',assets:'Launch asset & cutdowns',reach:allOrgReach,imps:allOrgImps,views:allOrgViews,engs:allOrgEngs,value:totalMediaValue},
+    {type:'PAID',channels:dynChannels,platforms:dynPlatforms,formats:'Amplification',assets:'Dark posts + paid boosts',reach:paidReach,imps:paidImps,views:paidViews,engs:paidEngs,value:paidBudget},
+    {type:'ADDED VALUE',channels:dynChannels,platforms:dynPlatforms,formats:'Mixed',assets:'Same as above',reach:Math.round(allOrgReach*1.97),imps:Math.round(allOrgImps*1.97),views:Math.round(allOrgViews*1.97),engs:Math.round(allOrgEngs*1.97),value:addedValue>0?addedValue:0},
   ];
-  const totalRow={reach:allOrgReach,imps:allOrgImps,engs:allOrgEngs,value:totalMediaValue};
+  const totalRow={reach:allOrgReach,imps:allOrgImps,views:allOrgViews,engs:allOrgEngs,value:totalMediaValue};
 
   let bkHTML = bkRows.map(r => `<tr>
     <td style="font-weight:600;color:var(--white);">${r.type}</td>
@@ -3536,6 +3555,7 @@ function mpGenerateClientView() {
     <td style="color:var(--muted);white-space:normal;word-break:break-word;">${r.assets}</td>
     <td style="font-family:'DM Mono',monospace;">${r.reach>0?fmt(r.reach):'-'}</td>
     <td style="font-family:'DM Mono',monospace;">${r.imps>0?fmt(r.imps):'-'}</td>
+    <td style="font-family:'DM Mono',monospace;">${r.views>0?fmt(r.views):'-'}</td>
     <td style="font-family:'DM Mono',monospace;">${r.engs>0?fmt(r.engs):'-'}</td>
     <td style="font-family:'DM Mono',monospace;color:var(--accent);">1% Min</td>
     <td style="font-family:'DM Mono',monospace;color:var(--accent);">${r.value>0?fmtGBP(r.value):'-'}</td>
@@ -3544,6 +3564,7 @@ function mpGenerateClientView() {
     <td colspan="5" style="color:var(--accent);">OVERALL TOTALS</td>
     <td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(totalRow.reach)}</td>
     <td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(totalRow.imps)}</td>
+    <td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(totalRow.views)}</td>
     <td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(totalRow.engs)}</td>
     <td style="font-family:'DM Mono',monospace;color:var(--accent);">1% Min</td>
     <td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmtGBP(totalRow.value)}</td>
@@ -3557,15 +3578,15 @@ function mpGenerateClientView() {
     const bt=brandTotals[brand];if(bt.posts===0)return;
     const col=brandLabels[brand].color;
     detailHTML+=`<div style="margin-bottom:24px;"><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:${col};margin-bottom:8px;">${brandLabels[brand].label} — Organic</div>
-    <table class="mp-table" style="margin-bottom:4px;"><thead><tr><th>Format</th><th>Platform</th><th>Posts</th><th>Cost</th><th>Reach</th><th>Impressions</th><th>Engagements</th></tr></thead><tbody>`;
-    mpRates[brand].forEach((row,i)=>{const qty=parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;if(!qty)return;detailHTML+=`<tr><td>${row.format}</td><td><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform.replace("Instagram","IG").replace("YouTube","YT").replace("TikTok","TT")}</span></td><td style="font-family:'DM Mono',monospace;">${qty}</td><td style="font-family:'DM Mono',monospace;">${fmtGBP(qty*row.cost)}</td><td style="font-family:'DM Mono',monospace;">${fmt(qty*row.reach)}</td><td style="font-family:'DM Mono',monospace;">${fmt(qty*row.imps)}</td><td style="font-family:'DM Mono',monospace;">${fmt(qty*row.engs)}</td></tr>`;});
-    detailHTML+=`<tr style="background:rgba(255,255,255,0.03);font-weight:700;"><td colspan="2" style="color:${col};">TOTALS</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.posts)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmtGBP(bt.cost)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.reach)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.imps)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.engs)}</td></tr></tbody></table></div>`;
+    <table class="mp-table" style="margin-bottom:4px;"><thead><tr><th>Format</th><th>Platform</th><th>Posts</th><th>Cost</th><th>Reach</th><th>Impressions</th><th>Views</th><th>Engagements</th></tr></thead><tbody>`;
+    mpRates[brand].forEach((row,i)=>{const qty=parseInt(document.getElementById('qty_'+brand+'_'+i)?.value)||0;if(!qty)return;detailHTML+=`<tr><td>${row.format}</td><td><span style="font-family:'DM Mono',monospace;font-size:8px;padding:1px 5px;border-radius:3px;background:rgba(255,255,255,0.06);color:var(--muted);">${row.platform.replace("Instagram","IG").replace("YouTube","YT").replace("TikTok","TT")}</span></td><td style="font-family:'DM Mono',monospace;">${qty}</td><td style="font-family:'DM Mono',monospace;">${fmtGBP(qty*row.cost)}</td><td style="font-family:'DM Mono',monospace;">${fmt(qty*row.reach)}</td><td style="font-family:'DM Mono',monospace;">${fmt(qty*row.imps)}</td><td style="font-family:'DM Mono',monospace;">${fmt(qty*(row.views||0))}</td><td style="font-family:'DM Mono',monospace;">${fmt(qty*row.engs)}</td></tr>`;});
+    detailHTML+=`<tr style="background:rgba(255,255,255,0.03);font-weight:700;"><td colspan="2" style="color:${col};">TOTALS</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.posts)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmtGBP(bt.cost)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.reach)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.imps)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.views||0)}</td><td style="font-family:'DM Mono',monospace;color:${col};">${fmt(bt.engs)}</td></tr></tbody></table></div>`;
   });
   if(paidRows.length>0){
     detailHTML+=`<div style="margin-bottom:24px;"><div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;">Paid Benchmarking</div>
-    <table class="mp-table"><thead><tr><th>Type</th><th>Spend</th><th>Est. Reach</th><th>Est. Impressions</th><th>Est. Engagements</th></tr></thead><tbody>`;
-    paidRows.forEach(r=>{detailHTML+=`<tr><td>${r.type}</td><td style="font-family:'DM Mono',monospace;">${fmtGBP(r.spend)}</td><td style="font-family:'DM Mono',monospace;">${fmt(r.reach)}</td><td style="font-family:'DM Mono',monospace;">${fmt(r.imps)}</td><td style="font-family:'DM Mono',monospace;">${fmt(r.engs)}</td></tr>`;});
-    detailHTML+=`<tr style="background:rgba(255,255,255,0.03);font-weight:700;"><td style="color:var(--accent);">PAID TOTALS</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmtGBP(paidBudget)}</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(paidReach)}</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(paidImps)}</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(paidEngs)}</td></tr></tbody></table></div>`;
+    <table class="mp-table"><thead><tr><th>Type</th><th>Spend</th><th>Est. Reach</th><th>Est. Impressions</th><th>Est. Views</th><th>Est. Engagements</th></tr></thead><tbody>`;
+    paidRows.forEach(r=>{detailHTML+=`<tr><td>${r.type}</td><td style="font-family:'DM Mono',monospace;">${fmtGBP(r.spend)}</td><td style="font-family:'DM Mono',monospace;">${fmt(r.reach)}</td><td style="font-family:'DM Mono',monospace;">${fmt(r.imps)}</td><td style="font-family:'DM Mono',monospace;">${fmt(r.views||0)}</td><td style="font-family:'DM Mono',monospace;">${fmt(r.engs)}</td></tr>`;});
+    detailHTML+=`<tr style="background:rgba(255,255,255,0.03);font-weight:700;"><td style="color:var(--accent);">PAID TOTALS</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmtGBP(paidBudget)}</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(paidReach)}</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(paidImps)}</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(paidViews)}</td><td style="font-family:'DM Mono',monospace;color:var(--accent);">${fmt(paidEngs)}</td></tr></tbody></table></div>`;
   }
   const detailEl=document.getElementById('cv_channelDetail');
   detailEl.innerHTML=detailHTML;detailEl.style.display='none';
