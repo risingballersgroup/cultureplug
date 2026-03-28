@@ -3223,11 +3223,11 @@ function mpRenderPaidRatecard() {
     tr.innerHTML = `
       <td style="font-size:10px;">${typeLabel}</td>
       <td style="text-align:center;">${pltBadge(platform)}</td>
-      <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--white);">£${fmtN(row.budget)}</td>
-      <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.reach)}</td>
-      <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.imps)}</td>
-      <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.views||0)}</td>
-      <td style="text-align:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">${fmtN(row.engs)}</td>
+      <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.budget)}" onchange="MP_PAID_RATECARD['SAB'][${i}].budget=parseFloat(this.value.replace(/,/g,''));" style="width:68px;text-align:center;font-size:10px;"></td>
+      <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" onchange="MP_PAID_RATECARD['SAB'][${i}].reach=parseFloat(this.value.replace(/,/g,''));" style="width:72px;text-align:center;font-size:10px;"></td>
+      <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" onchange="MP_PAID_RATECARD['SAB'][${i}].imps=parseFloat(this.value.replace(/,/g,''));" style="width:72px;text-align:center;font-size:10px;"></td>
+      <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.views||0)}" onchange="MP_PAID_RATECARD['SAB'][${i}].views=parseFloat(this.value.replace(/,/g,''));" style="width:72px;text-align:center;font-size:10px;"></td>
+      <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.engs)}" onchange="MP_PAID_RATECARD['SAB'][${i}].engs=parseFloat(this.value.replace(/,/g,''));" style="width:68px;text-align:center;font-size:10px;"></td>
       <td></td>`;
     tbody.appendChild(tr);
   });
