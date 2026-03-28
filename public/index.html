@@ -4266,10 +4266,10 @@ function mpGetPlanData() {
     ampPct: document.getElementById('mpAmpPct')?.value || '0',
     prodPct: document.getElementById('mpProdPct')?.value || '0',
     channels: {
-      RB:   document.getElementById('mpChkRB')?.checked,
-      SAB:  document.getElementById('mpChkSAB')?.checked,
-      RBUSA:document.getElementById('mpChkRBUSA')?.checked,
-      Paid: document.getElementById('mpChkPaid')?.checked,
+      RB:   document.getElementById('toggleRB')?.checked,
+      SAB:  document.getElementById('toggleSAB')?.checked,
+      RBUSA:document.getElementById('toggleRBUSA')?.checked,
+      Paid: document.getElementById('togglePaid')?.checked,
     },
     qty: {}, paidSpend: {},
     logoB64: mpClientLogoB64 || null,
@@ -4302,10 +4302,29 @@ function mpApplyPlanData(data) {
   set('mpProdPct',      data.prodPct);
   if (data.channels) {
     const chk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = !!val; };
-    chk('mpChkRB',    data.channels.RB);
-    chk('mpChkSAB',   data.channels.SAB);
-    chk('mpChkRBUSA', data.channels.RBUSA);
-    chk('mpChkPaid',  data.channels.Paid);
+    chk('toggleRB',    data.channels.RB);
+    chk('toggleSAB',   data.channels.SAB);
+    chk('toggleRBUSA', data.channels.RBUSA);
+    chk('togglePaid',  data.channels.Paid);
+    // Show/hide panels to match
+    mpTogglePanel('RB',    !!data.channels.RB);
+    mpTogglePanel('SAB',   !!data.channels.SAB);
+    mpTogglePanel('RBUSA', !!data.channels.RBUSA);
+    mpTogglePanel('Paid',  !!data.channels.Paid);
+  } else {
+    // No saved channel state — infer from qty data
+    const hasRB    = Object.keys(data.qty||{}).some(k => k.startsWith('RB_')    && !k.startsWith('RBUSA_') && parseInt(data.qty[k]) > 0);
+    const hasRBUSA = Object.keys(data.qty||{}).some(k => k.startsWith('RBUSA_') && parseInt(data.qty[k]) > 0);
+    const hasSAB   = Object.keys(data.qty||{}).some(k => k.startsWith('SAB_')   && parseInt(data.qty[k]) > 0);
+    const hasPaid  = Object.values(data.paidSpend||{}).some(v => parseFloat(v) > 0);
+    ['toggleRB','toggleSAB','toggleRBUSA','togglePaid'].forEach((id, i) => {
+      const val = [hasRB, hasSAB, hasRBUSA, hasPaid][i];
+      const el = document.getElementById(id); if (el) el.checked = val;
+    });
+    mpTogglePanel('RB',    hasRB);
+    mpTogglePanel('SAB',   hasSAB);
+    mpTogglePanel('RBUSA', hasRBUSA);
+    mpTogglePanel('Paid',  hasPaid);
   }
   if (data.logoB64) {
     mpClientLogoB64 = data.logoB64;
