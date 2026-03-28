@@ -3294,7 +3294,7 @@ function mpRenderPaidPlanInputs() {
       <td style="font-size:10px;">${typeLabel(row.type)}</td>
       <td style="text-align:center;">${pltBadge(platform)}</td>
       <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">£${fmtN(row.budget)}</td>
-      <td style="text-align:center;"><input class="mp-qty-input" type="text" inputmode="numeric" value="" id="paid_SAB_${i}" oninput="mpRecalc()" style="width:56px;" placeholder="0"></td>
+      <td style="text-align:center;"><input class="mp-qty-input" type="text" inputmode="numeric" value="" id="paid_SAB_${i}" oninput="mpRecalc()" style="width:34px;" placeholder="0"></td>
       <td id="paidReach_SAB_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
       <td id="paidImps_SAB_${i}"   style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
       <td id="paidViews_SAB_${i}"  style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);">—</td>
@@ -3336,7 +3336,7 @@ function mpRenderPlanInputs() {
         <td style="font-size:11px;">${abbreviateFormat(row.format)}</td>
         <td style="text-align:center;">${pltBadge(row.platform)}</td>
         <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">${fmtGBP(row.cost)}</td>
-        <td><input class="mp-qty-input" type="number" value="0" min="0" id="qty_${brand}_${i}" oninput="mpRecalc()" style="width:48px;"></td>
+        <td><input class="mp-qty-input" type="number" value="0" min="0" id="qty_${brand}_${i}" oninput="mpRecalc()" style="width:34px;"></td>
         <td id="rowCost_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;">£0</td>
         <td id="rowReach_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
         <td id="rowImps_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
