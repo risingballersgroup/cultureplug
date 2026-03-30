@@ -3695,28 +3695,33 @@ function mpExportPDF() {
     'html{background:#0e0e0c!important;margin:0;padding:0}' +
     'body{margin:0!important;background:#0e0e0c!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;overflow:visible!important}' +
     '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}' +
-    /* Tighten spacing for print to fit one page */
-    '#cv_logoBar{padding-bottom:8px!important;margin-bottom:8px!important}' +
-    '#mpStep3 h2{font-size:20px!important;margin-bottom:8px!important}' +
-    '#mpStep3 .mp-card, #mpStep3 [style*="border:1px solid"]{margin-bottom:8px!important}' +
-    '#cv_boilerplate{line-height:1.4!important;font-size:11px!important}' +
+    '#cv_logoBar{padding-bottom:4px!important;margin-bottom:4px!important}' +
+    '#mpStep3 h2{font-size:18px!important;margin-bottom:4px!important}' +
+    '#mpStep3 .mp-card, #mpStep3 [style*="border:1px solid"]{margin-bottom:4px!important}' +
+    '#cv_boilerplate{line-height:1.3!important;font-size:10px!important}' +
     '#cv_boilerplate br{display:none!important}' +
-    /* Remove gaps between Audience/Engagement/Added Value paragraphs */
+    '#cv_boilerplate p{margin-bottom:2px!important}' +
     '#cv_boilerplate strong{display:inline!important}' +
-    '[id*="cv_"] [style*="margin-bottom:24px"]{margin-bottom:8px!important}' +
-    '[id*="cv_"] [style*="margin-bottom:16px"]{margin-bottom:6px!important}' +
-    '[id*="cv_"] [style*="margin-bottom:20px"]{margin-bottom:8px!important}' +
-    '[style*="padding-top:14px"]{padding-top:8px!important}' +
-    '[style*="margin-bottom:24px"]{margin-bottom:8px!important}' +
-    '[style*="margin-bottom:20px"]{margin-bottom:6px!important}' +
-    '[style*="margin-bottom:16px"]{margin-bottom:6px!important}';
+    '[id*="cv_"] [style*="margin-bottom:24px"]{margin-bottom:4px!important}' +
+    '[id*="cv_"] [style*="margin-bottom:16px"]{margin-bottom:4px!important}' +
+    '[id*="cv_"] [style*="margin-bottom:20px"]{margin-bottom:4px!important}' +
+    '[id*="cv_"] [style*="margin-bottom:10px"]{margin-bottom:3px!important}' +
+    '[style*="padding-top:14px"]{padding-top:4px!important}' +
+    '[style*="margin-bottom:24px"]{margin-bottom:4px!important}' +
+    '[style*="margin-bottom:20px"]{margin-bottom:4px!important}' +
+    '[style*="margin-bottom:16px"]{margin-bottom:4px!important}' +
+    '[style*="margin-bottom:12px"]{margin-bottom:3px!important}' +
+    'td{padding-top:2px!important;padding-bottom:2px!important}' +
+    'tr td[style*="padding:5px"]{padding:2px 0!important}' +
+    'tr td[style*="padding:8px"]{padding:3px 0!important}' +
+    'tr td[style*="padding:4px"]{padding:2px 0!important}';
 
   var w = window.open('','_blank');
   w.document.write('<!DOCTYPE html><html style="background:#0e0e0c;margin:0;padding:0"><head><meta charset="utf-8"><title>'+pdfFileName+'</title>' +
     '<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">' +
     '<style>'+styles+'</style>' +
     '<style>'+printCSS+'</style>' +
-    '</head><body style="background:#0e0e0c;padding:16px 24px;color:#f0ede6;margin:0;overflow:visible">' +
+    '</head><body style="background:#0e0e0c;padding:8px 14px;color:#f0ede6;margin:0;overflow:visible">' +
     innerHTML + footer +
     '<scr'+'ipt>window.onload=function(){window.print();};<\/scr'+'ipt>' +
     '</body></html>');
