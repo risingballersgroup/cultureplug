@@ -1290,7 +1290,7 @@
         </div>
 
         <!-- MEDIA BREAKDOWN TABLE -->
-        <div style="margin-bottom:24px;">
+        <div id="cv_breakdownWrap" style="margin-bottom:24px;">
           <div style="font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">Media Breakdown</div>
           <div style="overflow-x:auto;">
             <table class="mp-table" style="width:100%;">
@@ -3696,6 +3696,10 @@ function mpExportPDF() {
     'body{margin:0!important;background:#0e0e0c!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;overflow:visible!important}' +
     '*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}' +
     '#cv_logoBar{padding-bottom:6px!important;margin-bottom:12px!important}' +
+    '#cv_breakdownTable{margin-bottom:0!important}' +
+    '#cv_breakdownTable+div,#cv_breakdownTable~div{margin-top:20px!important}' +
+    '.mp-table tr:last-child td{padding-bottom:4px!important}' +
+    '#cv_breakdownTable tr:last-child + tr,#cv_breakdownTable tr:last-child{padding-bottom:16px!important}' +
     '#mpStep3 h2{font-size:18px!important;margin-bottom:4px!important}' +
     '#mpStep3 .mp-card, #mpStep3 [style*="border:1px solid"]{margin-bottom:4px!important}' +
     '#cv_boilerplate{line-height:1.3!important;font-size:10px!important}' +
@@ -3711,6 +3715,7 @@ function mpExportPDF() {
     '[style*="margin-bottom:20px"]{margin-bottom:4px!important}' +
     '[style*="margin-bottom:16px"]{margin-bottom:4px!important}' +
     '[style*="margin-bottom:12px"]{margin-bottom:3px!important}' +
+    '#cv_breakdownWrap{margin-bottom:10px!important}' +
     'td{padding-top:2px!important;padding-bottom:2px!important}' +
     'tr td[style*="padding:5px"]{padding:2px 0!important}' +
     'tr td[style*="padding:8px"]{padding:3px 0!important}' +
