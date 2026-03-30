@@ -141,12 +141,25 @@ app.get('/auth/callback', async (req, res) => {
     const sessionToken = await createSession({ name: firstName, fullName: profile.displayName, email });
     console.log('STEP 6: Session created OK, sending response...');
 
-    res.setHeader('Set-Cookie', `cp_session=${sessionToken}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=28800`);
-    res.send(`<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/"></head><body><script>document.cookie='cp_session=${sessionToken};path=/;max-age=28800';window.location.replace('/');</script></body></html>`);
+    // Redirect to a success page that sets the cookie via JS (handles proxy cookie-stripping)
+    res.redirect(`/auth/success?t=${sessionToken}`);
   } catch (err) {
     console.error('Auth error:', err.message);
     res.redirect('/?error=auth_error');
   }
+});
+
+// ── AUTH SUCCESS PAGE ──
+app.get('/auth/success', (req, res) => {
+  const t = req.query.t;
+  if (!t || !/^[a-f0-9]{64}$/.test(t)) return res.redirect('/?error=auth_error');
+  res.send(`<!DOCTYPE html><html><head><title>Signing in...</title></head><body>
+<script>
+  document.cookie = 'cp_session=${t}; path=/; max-age=28800; samesite=lax';
+  window.location.replace('/');
+</script>
+<noscript><meta http-equiv="refresh" content="0;url=/"></noscript>
+</body></html>`);
 });
 
 app.get('/auth/logout', async (req, res) => {
