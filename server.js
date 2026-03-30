@@ -130,8 +130,9 @@ app.get('/auth/callback', async (req, res) => {
 
     const firstName = profile.givenName || profile.displayName.split(' ')[0] || 'Team';
     const sessionToken = await createSession({ name: firstName, fullName: profile.displayName, email });
+    console.log(`Session created for ${email}, token: ${sessionToken.substring(0, 8)}...`);
 
-    res.setHeader('Set-Cookie', `cp_session=${sessionToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=28800`);
+    res.setHeader('Set-Cookie', `cp_session=${sessionToken}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=28800`);
     res.redirect('/');
   } catch (err) {
     console.error('Auth error:', err);
