@@ -148,6 +148,7 @@ app.get('/auth/logout', async (req, res) => {
 
 // ── USER ENDPOINT ──
 app.get('/api/me', async (req, res) => {
+  res.set('Cache-Control', 'no-store');
   const session = await getSession(getSessionToken(req));
   if (!session) return res.json({ authenticated: false });
   res.json({ authenticated: true, name: session.name, fullName: session.fullName, email: session.email });
