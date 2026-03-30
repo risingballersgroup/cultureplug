@@ -11,9 +11,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // ── POSTGRES ──
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes('railway.internal')
-    ? false
-    : { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
+  connectionTimeoutMillis: 5000,
+  idleTimeoutMillis: 30000,
+  max: 10
 });
 
 pool.query(`
@@ -30,15 +31,18 @@ pool.query(`
     data        JSONB NOT NULL,
     created_at  TIMESTAMPTZ DEFAULT NOW()
   );
-`).catch(err => console.error('DB init error:', err));
+`).then(() => console.log('DB tables ready'))
+  .catch(err => console.error('DB init error:', err.message));
 
 // ── SESSION STORE ──
 async function createSession(userData) {
   const token = crypto.randomBytes(32).toString('hex');
+  console.log('DB: inserting session...');
   await pool.query(
     'INSERT INTO sessions (token, data) VALUES ($1, $2)',
     [token, JSON.stringify({ ...userData, createdAt: Date.now() })]
   );
+  console.log('DB: session inserted OK');
   return token;
 }
 
@@ -54,6 +58,7 @@ async function getSession(token) {
     }
     return session;
   } catch (err) {
+    console.error('getSession error:', err.message);
     return null;
   }
 }
@@ -118,7 +123,7 @@ app.get('/auth/callback', async (req, res) => {
     });
 
     const tokenData = await tokenRes.json();
-    console.log('STEP 2: Token status:', tokenRes.status, 'has_token:', !!tokenData.access_token, 'error:', tokenData.error, tokenData.error_description);
+    console.log('STEP 2: Token status:', tokenRes.status, 'has_token:', !!tokenData.access_token, 'error:', tokenData.error);
     if (!tokenData.access_token) throw new Error(`No access token: ${tokenData.error} - ${tokenData.error_description}`);
 
     console.log('STEP 3: Fetching profile...');
@@ -134,7 +139,7 @@ app.get('/auth/callback', async (req, res) => {
     const firstName = profile.givenName || (profile.displayName || 'Team').split(' ')[0];
     console.log('STEP 5: Creating session for', firstName);
     const sessionToken = await createSession({ name: firstName, fullName: profile.displayName, email });
-    console.log('STEP 6: Session created OK, redirecting...');
+    console.log('STEP 6: Session created OK, sending response...');
 
     res.setHeader('Set-Cookie', `cp_session=${sessionToken}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=28800`);
     res.send(`<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/"></head><body><script>document.cookie='cp_session=${sessionToken};path=/;max-age=28800';window.location.replace('/');</script></body></html>`);
@@ -157,6 +162,16 @@ app.get('/api/me', async (req, res) => {
   const session = await getSession(getSessionToken(req));
   if (!session) return res.json({ authenticated: false });
   res.json({ authenticated: true, name: session.name, fullName: session.fullName, email: session.email });
+});
+
+// ── DB HEALTH CHECK ──
+app.get('/api/dbcheck', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT NOW() as time, count(*) as session_count FROM sessions');
+    res.json({ ok: true, time: result.rows[0].time, sessions: result.rows[0].session_count });
+  } catch (err) {
+    res.json({ ok: false, error: err.message });
+  }
 });
 
 // ── CHAT ──
