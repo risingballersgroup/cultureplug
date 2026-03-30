@@ -3566,7 +3566,7 @@ function mpGenerateClientView() {
     {type:'PAID',channels:dynChannels,platforms:dynPlatforms,formats:'Amplification',assets:'Dark posts + paid boosts',reach:paidReach,imps:paidImps,views:paidViews,engs:paidEngs,value:paidBudget},
     {type:'ADDED VALUE',channels:dynChannels,platforms:dynPlatforms,formats:'Mixed',assets:'Same as above',reach:Math.round(allOrgReach*1.97),imps:Math.round(allOrgImps*1.97),views:Math.round(allOrgViews*1.97),engs:Math.round(allOrgEngs*1.97),value:addedValue>0?addedValue:0},
   ];
-  const totalRow={reach:allOrgReach,imps:allOrgImps,views:allOrgViews,engs:allOrgEngs,value:totalMediaValue};
+  const totalRow={reach:allOrgReach+paidReach,imps:allOrgImps+paidImps,views:allOrgViews+paidViews,engs:allOrgEngs+paidEngs,value:totalMediaValue};
 
   let bkHTML = bkRows.map(r => `<tr>
     <td style="font-weight:600;color:var(--white);">${r.type}</td>
