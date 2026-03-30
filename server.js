@@ -132,8 +132,8 @@ app.get('/auth/callback', async (req, res) => {
     const sessionToken = await createSession({ name: firstName, fullName: profile.displayName, email });
     console.log(`Session created for ${email}, token: ${sessionToken.substring(0, 8)}...`);
 
-    res.setHeader('Set-Cookie', `cp_session=${sessionToken}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=28800`);
-    res.redirect('/');
+    res.setHeader('Set-Cookie', `cp_session=${sessionToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`);
+    res.send(`<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/"></head><body><script>window.location.replace('/')</script></body></html>`);
   } catch (err) {
     console.error('Auth error:', err);
     res.redirect('/?error=auth_error');
