@@ -16,7 +16,6 @@ const pool = new Pool({
     : { rejectUnauthorized: false }
 });
 
-// Create tables if they don't exist
 pool.query(`
   CREATE TABLE IF NOT EXISTS media_plans (
     id          SERIAL PRIMARY KEY,
@@ -33,7 +32,7 @@ pool.query(`
   );
 `).catch(err => console.error('DB init error:', err));
 
-// ── SESSION STORE (Postgres-backed) ──
+// ── SESSION STORE ──
 async function createSession(userData) {
   const token = crypto.randomBytes(32).toString('hex');
   await pool.query(
@@ -49,7 +48,6 @@ async function getSession(token) {
     const result = await pool.query('SELECT data FROM sessions WHERE token = $1', [token]);
     if (!result.rows.length) return null;
     const session = result.rows[0].data;
-    // Expire after 8 hours
     if (Date.now() - session.createdAt > 8 * 60 * 60 * 1000) {
       await pool.query('DELETE FROM sessions WHERE token = $1', [token]);
       return null;
@@ -101,9 +99,11 @@ app.get('/auth/login', (req, res) => {
 
 app.get('/auth/callback', async (req, res) => {
   const { code, error } = req.query;
+  console.log('CALLBACK HIT - code:', !!code, 'error:', error);
   if (error || !code) return res.redirect('/?error=auth_failed');
 
   try {
+    console.log('STEP 1: Exchanging code for token...');
     const tokenRes = await fetch(`https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0/token`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -118,24 +118,28 @@ app.get('/auth/callback', async (req, res) => {
     });
 
     const tokenData = await tokenRes.json();
-    if (!tokenData.access_token) throw new Error('No access token');
+    console.log('STEP 2: Token status:', tokenRes.status, 'has_token:', !!tokenData.access_token, 'error:', tokenData.error, tokenData.error_description);
+    if (!tokenData.access_token) throw new Error(`No access token: ${tokenData.error} - ${tokenData.error_description}`);
 
+    console.log('STEP 3: Fetching profile...');
     const profileRes = await fetch('https://graph.microsoft.com/v1.0/me', {
       headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
     const profile = await profileRes.json();
 
     const email = (profile.mail || profile.userPrincipalName || '').toLowerCase();
+    console.log('STEP 4: Email:', email, 'allowed:', email.endsWith(`@${ALLOWED_DOMAIN}`));
     if (!email.endsWith(`@${ALLOWED_DOMAIN}`)) return res.redirect('/?error=unauthorised_domain');
 
-    const firstName = profile.givenName || profile.displayName.split(' ')[0] || 'Team';
+    const firstName = profile.givenName || (profile.displayName || 'Team').split(' ')[0];
+    console.log('STEP 5: Creating session for', firstName);
     const sessionToken = await createSession({ name: firstName, fullName: profile.displayName, email });
-    console.log(`Session created for ${email}, token: ${sessionToken.substring(0, 8)}...`);
+    console.log('STEP 6: Session created OK, redirecting...');
 
-    res.setHeader('Set-Cookie', `cp_session=${sessionToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=28800`);
-    res.send(`<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/"></head><body><script>window.location.replace('/')</script></body></html>`);
+    res.setHeader('Set-Cookie', `cp_session=${sessionToken}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=28800`);
+    res.send(`<!DOCTYPE html><html><head><meta http-equiv="refresh" content="0;url=/"></head><body><script>document.cookie='cp_session=${sessionToken};path=/;max-age=28800';window.location.replace('/');</script></body></html>`);
   } catch (err) {
-    console.error('Auth error:', err);
+    console.error('Auth error:', err.message);
     res.redirect('/?error=auth_error');
   }
 });
@@ -155,7 +159,7 @@ app.get('/api/me', async (req, res) => {
   res.json({ authenticated: true, name: session.name, fullName: session.fullName, email: session.email });
 });
 
-// ── CHAT (requires auth) ──
+// ── CHAT ──
 app.post('/api/chat', requireAuth, async (req, res) => {
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -174,7 +178,7 @@ app.post('/api/chat', requireAuth, async (req, res) => {
   }
 });
 
-// ── MEDIA PLANS: LIST ──
+// ── MEDIA PLANS ──
 app.get('/api/plans', requireAuth, async (req, res) => {
   try {
     const result = await pool.query(
@@ -187,7 +191,6 @@ app.get('/api/plans', requireAuth, async (req, res) => {
   }
 });
 
-// ── MEDIA PLANS: SAVE (create or update) ──
 app.post('/api/plans', requireAuth, async (req, res) => {
   const { name, data, id } = req.body;
   if (!name || !data) return res.status(400).json({ error: 'name and data required' });
@@ -211,7 +214,6 @@ app.post('/api/plans', requireAuth, async (req, res) => {
   }
 });
 
-// ── MEDIA PLANS: LOAD ──
 app.get('/api/plans/:id', requireAuth, async (req, res) => {
   try {
     const result = await pool.query(
@@ -225,7 +227,6 @@ app.get('/api/plans/:id', requireAuth, async (req, res) => {
   }
 });
 
-// ── MEDIA PLANS: DELETE ──
 app.delete('/api/plans/:id', requireAuth, async (req, res) => {
   try {
     await pool.query(
