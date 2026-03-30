@@ -3572,7 +3572,6 @@ function mpGenerateClientView() {
   const bkRows=[
     {type:'ORGANIC',channels:dynChannels,platforms:dynPlatforms,formats:'Mixed',assets:'Launch asset & cutdowns',reach:allOrgReach,imps:allOrgImps,views:allOrgViews,engs:allOrgEngs,value:totalMediaValue},
     {type:'PAID',channels:dynChannels,platforms:dynPlatforms,formats:'Amplification',assets:'Dark posts + paid boosts',reach:paidReach,imps:paidImps,views:paidViews,engs:paidEngs,value:paidBudget},
-    {type:'ADDED VALUE',channels:dynChannels,platforms:dynPlatforms,formats:'Mixed',assets:'Same as above',reach:Math.round(allOrgReach*1.97),imps:Math.round(allOrgImps*1.97),views:Math.round(allOrgViews*1.97),engs:Math.round(allOrgEngs*1.97),value:addedValue>0?addedValue:0},
   ];
   const totalRow={reach:allOrgReach+paidReach,imps:allOrgImps+paidImps,views:allOrgViews+paidViews,engs:allOrgEngs+paidEngs,value:totalMediaValue};
 
@@ -3773,7 +3772,6 @@ async function mpExportXLS() {
     ['','MEDIA TYPE','MEDIA CHANNELS','PLATFORMS','FORMATS','ASSET TYPES','','TOTAL REACH','','TOTAL IMPS','TOTAL ENGS','ENG RATE','MEDIA VALUE'],
     ['','ORGANIC','RB + PARTNER','IG + TT + YT','Mixed','Launch asset & cutdowns','',totalReach,'',totalImps,totalEngs,'1% Min',budget],
     ['','PAID','RB + PARTNER','IG + TT + YT','Amplification','Dark posts + paid boosts'],
-    ['','ADDED VALUE','RB + PARTNER','IG + TT + YT','Mixed','Same as above','',Math.round(totalReach*1.97),'',Math.round(totalImps*1.97),Math.round(totalEngs*1.97),'1% Min',addedValue>0?addedValue:0],
     ['','OVERALL TOTALS','','','','','',totalReach,'',totalImps,totalEngs,'1% Min',totalCost],
     [],
     ['','NOTES'],
