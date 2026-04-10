@@ -3169,6 +3169,18 @@ function mpGoStep(n) {
   });
   // Re-apply panel visibility based on current checkbox state when entering step 2
   if (n === 2) {
+    // Save existing qty values before re-render
+    const savedQtys = {};
+    document.querySelectorAll('[id^="qty_"]').forEach(el => { savedQtys[el.id] = el.value; });
+    // Re-render so overridden rates from step 1 flow through
+    mpRenderPlanInputs();
+    mpRenderPaidPlanInputs();
+    // Restore qty values
+    Object.entries(savedQtys).forEach(([id, val]) => {
+      const el = document.getElementById(id);
+      if (el) el.value = val;
+    });
+    mpRecalc();
     ['RB','SAB','RBUSA','Paid'].forEach(p => {
       const cb = document.getElementById('toggle' + p);
       mpTogglePanel(p, cb ? cb.checked : false);
