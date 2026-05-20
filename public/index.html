@@ -755,6 +755,8 @@
       <span class="logo-sub">Culture Plug</span>
     </a>
     <div class="header-right">
+      <button onclick="showMediaPlan()" style="background:none;border:1px solid var(--border);color:var(--white);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:7px 14px;border-radius:6px;cursor:pointer;transition:border-color 0.15s,color 0.15s;white-space:nowrap;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--white)'">Media Plan</button>
+      <div style="width:1px;height:24px;background:var(--border);margin:0 4px;"></div>
       <div class="header-stat">
         <div class="header-stat-n">50K+</div>
         <div class="header-stat-l">Respondents</div>
@@ -813,7 +815,6 @@
           <button class="mode-tab" onclick="setMode('objection', this)">Objection Handler</button>
           <button class="mode-tab" onclick="showBulkMode(this)">Bulk Email</button>
           <button class="mode-tab" onclick="showReachCalculator(this)">Reach Calculator</button>
-          <button class="mode-tab" onclick="showMediaPlan(this)">Media Plan Builder</button>
         </div>
       </div>
       <div class="pill-group">
@@ -3362,7 +3363,7 @@ let mpCurrentStep = 1;
 
 function showMediaPlan(btn) {
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn && btn.classList && btn.classList.contains('mode-tab')) btn.classList.add('active');
   mpRates = { RB: MP_RATECARD.RB.map(r => ({...r})), RBUSA: MP_RATECARD.RBUSA.map(r => ({...r})), SAB: MP_RATECARD.SAB.map(r => ({...r})) };
   mpRenderRatecard();
   mpRenderPaidRatecard();
