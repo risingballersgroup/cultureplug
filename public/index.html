@@ -2488,6 +2488,18 @@ Exactly 3 ideas. Specific to this brand's category, current moment, and what you
 
 **[Title]** — One sentence concept. One sentence why it works for this brand right now.
 
+### 5. UPCOMING MOMENTS
+Identify 4–6 upcoming cultural or sporting moments in the next 12 months that are relevant to this brand and create a natural hook for RB/SAB activation. Draw from both football and wider culture.
+
+Football calendar to consider: pre-season (July/Aug 2026), WSL season start (Sept 2026), UEFA Champions League group stage (Sept 2026), Women's World Cup 2027 (Brazil, July–Aug 2027), FIFA Club World Cup (June–July 2025), international breaks, domestic cup finals.
+
+Wider cultural moments: Black History Month (Oct UK, Feb US), Ramadan (approx Feb–Mar 2027), Chinese New Year, Pride Month (June), back-to-school (Aug/Sept), Christmas/gifting season (Nov–Dec).
+
+For each moment:
+**[Moment — Month/Year]** — One sentence on the opportunity for this brand specifically with RB/SAB. Must be concrete, not generic.
+
+Only include moments that genuinely make sense for this brand. Skip ones that are a stretch.
+
 ---
 
 TONE: Sharp, confident, internal. Every line earns its place.`,
@@ -4135,8 +4147,8 @@ function exportPreMeetingPDF() {
     .section-body em { color:#c9a84c; font-style:normal; }
     .section-body ul { padding-left:10px; margin:3px 0 6px; list-style:none; }
     .section-body li { position:relative; padding-left:10px; margin-bottom:3px; line-height:1.55; }
-    .section-body li::before { content:'—'; position:absolute; left:-2px; color:#2a2a28; font-size:8px; }
-    .subhead { font-family:'DM Mono',monospace; font-size:7.5px; letter-spacing:1px; text-transform:uppercase; color:#666; margin:7px 0 3px; font-weight:500; }
+    .section-body li::before { content:'—'; position:absolute; left:-2px; color:#444; font-size:8px; }
+    .subhead { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:700; color:#f0ede6 !important; margin:8px 0 3px; letter-spacing:0; text-transform:none; }
     .subhead:first-child { margin-top:0; }
 
     /* Footer */
@@ -4155,6 +4167,24 @@ function exportPreMeetingPDF() {
     @media print {
       .page-break { page-break-before: always; }
     }
+
+    /* Section 5 — full width below the grid */
+    .section-full {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #1a1a18;
+    }
+    /* Section 5 body renders as 2-col grid of moments */
+    .section-body-grid ul {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 10mm;
+      padding-left: 0;
+      margin: 0;
+    }
+    .section-body-grid ul li { padding-left: 0; }
+    .section-body-grid ul li::before { display: none; }
+    .section-body-grid p { column-span: all; }
   `;
 
   // Put sections 1+2 on page 1, sections 3+4 on page 2
@@ -4171,17 +4201,35 @@ function exportPreMeetingPDF() {
     </div>`;
   }).join('');
 
-  const page2Sections = s.slice(2, 4).map((sec, i) => {
-    const accent = accentColors[i + 2];
-    return `<div class="section">
-      <div class="section-header">
-        <span class="section-num" style="color:${accent}">0${i+3}</span>
-        <span class="section-label" style="color:${accent}">${sec.title}</span>
-      </div>
-      <div class="section-rule" style="border-color:${accent}44"></div>
-      <div class="section-body">${renderBody(sec.body)}</div>
-    </div>`;
-  }).join('');
+  const page2Sections = (() => {
+    const p2 = s.slice(2); // sections 3, 4, 5
+    const top = p2.slice(0, 2).map((sec, i) => {
+      const accent = accentColors[i + 2] || '#c9a84c';
+      return `<div class="section">
+        <div class="section-header">
+          <span class="section-num" style="color:${accent}">0${i+3}</span>
+          <span class="section-label" style="color:${accent}">${sec.title}</span>
+        </div>
+        <div class="section-rule" style="border-color:${accent}44"></div>
+        <div class="section-body">${renderBody(sec.body)}</div>
+      </div>`;
+    }).join('');
+
+    const sec5 = p2[2];
+    const full = sec5 ? (() => {
+      const accent = '#e879f9';
+      return `<div class="section section-full">
+        <div class="section-header">
+          <span class="section-num" style="color:${accent}">05</span>
+          <span class="section-label" style="color:${accent}">${sec5.title}</span>
+        </div>
+        <div class="section-rule" style="border-color:${accent}44"></div>
+        <div class="section-body section-body-grid">${renderBody(sec5.body)}</div>
+      </div>`;
+    })() : '';
+
+    return `<div class="sections-grid">${top}</div>${full}`;
+  })();
 
   const debugInfo = sections.length < 4
     ? `<div style="position:fixed;top:0;left:0;right:0;background:#ff6b6b;color:#fff;font-family:monospace;font-size:11px;padding:8px;z-index:9999;">
@@ -4198,7 +4246,7 @@ function exportPreMeetingPDF() {
     </div>
     <div class="wrapper" style="page-break-before:always;">
       ${header}
-      <div class="sections-grid">${page2Sections}</div>
+      ${page2Sections}
       ${footer}
     </div>
     <script>window.onload=function(){window.print();}<\/script>
