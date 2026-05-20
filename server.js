@@ -194,33 +194,42 @@ app.get('/api/dbcheck', async (req, res) => {
 app.post('/api/chat', requireAuth, async (req, res) => {
   try {
     const body = { ...req.body };
+    const isPreMeeting = body.mode === 'pre_meeting';
+    delete body.mode;
 
-    // Inject web search tool for pre_meeting mode so "What's Happening Now" is live
-    if (body.mode === 'pre_meeting') {
+    if (isPreMeeting) {
       body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
-      // web search requires a newer API version
-      delete body.mode;
-    } else {
-      delete body.mode;
+    }
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+    };
+    if (isPreMeeting) {
+      headers['anthropic-beta'] = 'web-search-2025-03-05';
     }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'web-search-2025-03-05'
-      },
+      headers,
       body: JSON.stringify(body)
     });
+
     const data = await response.json();
 
-    // Flatten web search results — extract only text content blocks for the frontend
+    // Log for debugging
+    if (isPreMeeting) {
+      const types = (data.content || []).map(b => b.type);
+      console.log('Pre-meeting response block types:', types);
+    }
+
+    // Flatten — combine all text blocks, web search results inject into text naturally
     if (data.content && Array.isArray(data.content)) {
       const textBlocks = data.content.filter(b => b.type === 'text');
       if (textBlocks.length > 0) {
-        data.content = textBlocks;
+        // Merge all text blocks into one so frontend gets complete response
+        data.content = [{ type: 'text', text: textBlocks.map(b => b.text).join('\n') }];
       }
     }
 
