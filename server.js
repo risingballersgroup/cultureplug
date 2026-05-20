@@ -270,6 +270,108 @@ app.delete('/api/plans/:id', requireAuth, async (req, res) => {
   }
 });
 
+// ── MONDAY CRM SYNC ──
+
+pool.query(`
+  CREATE TABLE IF NOT EXISTS monday_cache (
+    id        SERIAL PRIMARY KEY,
+    data      JSONB NOT NULL,
+    synced_at TIMESTAMPTZ DEFAULT NOW()
+  );
+`).catch(err => console.error('monday_cache init error:', err.message));
+
+const MONDAY_BOARD_ID = '5089413136';
+
+function parseDealName(raw) {
+  const match = raw.match(/^(\d+)\.\s+(.+)$/);
+  if (!match) return { dealNumber: null, brand: raw, campaign: '' };
+  const rest = match[2];
+  const words = rest.split(' ');
+  let brandWords = [words[0]];
+  if (words[1] && /^[A-Z]/.test(words[1]) && !['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Q1','Q2','Q3','Q4'].includes(words[1])) {
+    brandWords.push(words[1]);
+  }
+  return { dealNumber: match[1], brand: brandWords.join(' '), campaign: words.slice(brandWords.length).join(' ') };
+}
+
+function getMondayCol(item, colId) {
+  const col = item.column_values.find(c => c.id === colId);
+  return col ? (col.text || '') : '';
+}
+
+function bucketValue(v) {
+  const n = parseFloat(v) || 0;
+  if (n === 0)   return null;
+  if (n < 5000)  return '< £5K';
+  if (n < 15000) return '£5K–15K';
+  if (n < 30000) return '£15K–30K';
+  if (n < 75000) return '£30K–75K';
+  return '£75K+';
+}
+
+app.post('/api/monday/sync', requireAuth, async (req, res) => {
+  const apiKey = process.env.MONDAY_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'MONDAY_API_KEY not set in Railway env vars' });
+
+  try {
+    let allItems = [], cursor = null;
+    do {
+      const gql = `{ boards(ids: ${MONDAY_BOARD_ID}) { items_page(limit: 500${cursor ? `, cursor: "${cursor}"` : ''}) { cursor items { name column_values(ids: ["stage_mkkpc6ys","owner_mkkpavhq","originals_value_mkkpy6hv","dup__of_originals_value_mkkptkzq","q1_value_mkkp2qp3","q2_value_mkkpcpmv","q3_value_mkkpecds","q4_value_mkkppnm7","close_date_mkkpvkwv","date_mkz215e1","color_mkz2bhee"]) { id text } } } } }`;
+      const r = await fetch('https://api.monday.com/v2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': apiKey, 'API-Version': '2024-01' },
+        body: JSON.stringify({ query: gql })
+      });
+      const d = await r.json();
+      if (d.errors) throw new Error(d.errors[0].message);
+      const page = d.data.boards[0].items_page;
+      allItems = allItems.concat(page.items);
+      cursor = page.cursor || null;
+    } while (cursor);
+
+    const deals = allItems.map(item => {
+      const { dealNumber, brand, campaign } = parseDealName(item.name);
+      const dealValue = parseFloat(getMondayCol(item, 'originals_value_mkkpy6hv')) || 0;
+      const sabValue  = parseFloat(getMondayCol(item, 'dup__of_originals_value_mkkptkzq')) || 0;
+      const q1 = parseFloat(getMondayCol(item, 'q1_value_mkkp2qp3')) || 0;
+      const q2 = parseFloat(getMondayCol(item, 'q2_value_mkkpcpmv')) || 0;
+      const q3 = parseFloat(getMondayCol(item, 'q3_value_mkkpecds')) || 0;
+      const q4 = parseFloat(getMondayCol(item, 'q4_value_mkkppnm7')) || 0;
+      const activeQuarters = ['Q1','Q2','Q3','Q4'].filter((_,i) => [q1,q2,q3,q4][i] > 0);
+      return {
+        dealNumber, brand, campaign,
+        stage:         getMondayCol(item, 'stage_mkkpc6ys') || 'Unknown',
+        owner:         getMondayCol(item, 'owner_mkkpavhq') || '',
+        spendTier:     bucketValue(dealValue),
+        includesSAB:   sabValue > 0,
+        sabTier:       sabValue > 0 ? bucketValue(sabValue) : null,
+        activeQuarters,
+        signOffDate:   getMondayCol(item, 'date_mkz215e1') || null,
+        closeDate:     getMondayCol(item, 'close_date_mkkpvkwv') || null,
+        newOrExisting: getMondayCol(item, 'color_mkz2bhee') || '',
+      };
+    }).filter(d => d.brand && d.stage);
+
+    await pool.query('DELETE FROM monday_cache');
+    await pool.query('INSERT INTO monday_cache (data) VALUES ($1)', [JSON.stringify({ deals, syncedAt: new Date().toISOString() })]);
+    console.log(`Monday sync: ${deals.length} deals cached`);
+    res.json({ ok: true, count: deals.length, syncedAt: new Date().toISOString() });
+  } catch (err) {
+    console.error('Monday sync error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/monday/data', requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT data, synced_at FROM monday_cache ORDER BY synced_at DESC LIMIT 1');
+    if (!result.rows.length) return res.json({ deals: [], syncedAt: null });
+    res.json({ ...result.rows[0].data, syncedAt: result.rows[0].synced_at });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 3000;
