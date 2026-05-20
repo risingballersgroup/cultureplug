@@ -393,5 +393,40 @@ app.get('/api/monday/data', requireAuth, async (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ── MONDAY BACKGROUND SYNC ──
+async function backgroundMondaySync() {
+  const apiKey = process.env.MONDAY_API_KEY;
+  if (!apiKey) return; // silently skip if not configured
+
+  try {
+    // Check when we last synced — skip if within the last 7 days
+    const result = await pool.query('SELECT synced_at FROM monday_cache ORDER BY synced_at DESC LIMIT 1');
+    if (result.rows.length) {
+      const lastSync = new Date(result.rows[0].synced_at);
+      const daysSince = (Date.now() - lastSync.getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSince < 7) {
+        console.log(`Monday background sync skipped — last synced ${daysSince.toFixed(1)} days ago`);
+        return;
+      }
+    }
+
+    console.log('Monday background sync starting...');
+    const boardResults = await Promise.all(
+      MONDAY_BOARDS.map(b => fetchBoardItems(apiKey, b.id).then(items => mapDeals(items, b.label)))
+    );
+    const deals = boardResults.flat();
+    await pool.query('DELETE FROM monday_cache');
+    await pool.query('INSERT INTO monday_cache (data) VALUES ($1)', [JSON.stringify({ deals, syncedAt: new Date().toISOString() })]);
+    console.log(`Monday background sync complete: ${deals.length} deals cached`);
+  } catch (err) {
+    console.error('Monday background sync error:', err.message);
+  }
+}
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => console.log(`Culture Plug running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Culture Plug running on port ${PORT}`);
+  // Run once on startup (after a short delay to let DB settle), then every 7 days
+  setTimeout(backgroundMondaySync, 10000);
+  setInterval(backgroundMondaySync, 7 * 24 * 60 * 60 * 1000);
+});
