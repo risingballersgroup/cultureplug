@@ -303,14 +303,10 @@ function getMondayCol(item, colId) {
   return col ? (col.text || '') : '';
 }
 
-function bucketValue(v) {
+function formatValue(v) {
   const n = parseFloat(v) || 0;
-  if (n === 0)   return null;
-  if (n < 5000)  return '< £5K';
-  if (n < 15000) return '£5K–15K';
-  if (n < 30000) return '£15K–30K';
-  if (n < 75000) return '£30K–75K';
-  return '£75K+';
+  if (n === 0) return null;
+  return '£' + n.toLocaleString('en-GB', { maximumFractionDigits: 0 });
 }
 
 async function fetchBoardItems(apiKey, boardId) {
@@ -346,9 +342,9 @@ function mapDeals(items, pipelineLabel) {
       pipeline:      pipelineLabel,
       stage:         getMondayCol(item, 'stage_mkkpc6ys') || 'Unknown',
       owner:         getMondayCol(item, 'owner_mkkpavhq') || '',
-      spendTier:     bucketValue(dealValue),
+      spendTier:     formatValue(dealValue),
       includesSAB:   sabValue > 0,
-      sabTier:       sabValue > 0 ? bucketValue(sabValue) : null,
+      sabTier:       sabValue > 0 ? formatValue(sabValue) : null,
       activeQuarters,
       signOffDate:   getMondayCol(item, 'date_mkz215e1') || null,
       closeDate:     getMondayCol(item, 'close_date_mkkpvkwv') || null,
