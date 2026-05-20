@@ -228,9 +228,21 @@ app.post('/api/chat', requireAuth, async (req, res) => {
     if (data.content && Array.isArray(data.content)) {
       const textBlocks = data.content.filter(b => b.type === 'text');
       if (textBlocks.length > 0) {
-        // Merge all text blocks into one so frontend gets complete response
-        data.content = [{ type: 'text', text: textBlocks.map(b => b.text).join('\n') }];
-      }
+        // Join with space — web search splits mid-sentence across blocks
+        // Use smart join: if block starts with newline keep it, otherwise join with space
+        let merged = '';
+        for (const block of textBlocks) {
+          const t = block.text;
+          if (!merged) { merged = t; continue; }
+          // If the new block starts a new line/section, keep newline; otherwise join inline
+          if (t.startsWith('\n') || t.startsWith('#') || merged.endsWith('\n')) {
+            merged += t;
+          } else {
+            merged += ' ' + t;
+          }
+        }
+        data.content = [{ type: 'text', text: merged }];
+      }      }
     }
 
     res.status(response.status).json(data);
