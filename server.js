@@ -280,7 +280,11 @@ pool.query(`
   );
 `).catch(err => console.error('monday_cache init error:', err.message));
 
-const MONDAY_BOARD_ID = '5089413136';
+const MONDAY_BOARDS = [
+  { id: '1353139719', label: '2026 Pipeline (Live)' },
+  { id: '5089413136', label: '2025 Pipeline (Closed)' },
+  { id: '1756615690', label: '2024 Pipeline (Closed)' },
+];
 
 function parseDealName(raw) {
   const match = raw.match(/^(\d+)\.\s+(.+)$/);
@@ -309,53 +313,68 @@ function bucketValue(v) {
   return '£75K+';
 }
 
+async function fetchBoardItems(apiKey, boardId) {
+  let allItems = [], cursor = null;
+  do {
+    const gql = `{ boards(ids: ${boardId}) { items_page(limit: 500${cursor ? `, cursor: "${cursor}"` : ''}) { cursor items { name column_values(ids: ["stage_mkkpc6ys","owner_mkkpavhq","originals_value_mkkpy6hv","dup__of_originals_value_mkkptkzq","q1_value_mkkp2qp3","q2_value_mkkpcpmv","q3_value_mkkpecds","q4_value_mkkppnm7","close_date_mkkpvkwv","date_mkz215e1","color_mkz2bhee"]) { id text } } } } }`;
+    const r = await fetch('https://api.monday.com/v2', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': apiKey, 'API-Version': '2024-01' },
+      body: JSON.stringify({ query: gql })
+    });
+    const d = await r.json();
+    if (d.errors) throw new Error(`Board ${boardId}: ${d.errors[0].message}`);
+    const page = d.data.boards[0].items_page;
+    allItems = allItems.concat(page.items);
+    cursor = page.cursor || null;
+  } while (cursor);
+  return allItems;
+}
+
+function mapDeals(items, pipelineLabel) {
+  return items.map(item => {
+    const { dealNumber, brand, campaign } = parseDealName(item.name);
+    const dealValue = parseFloat(getMondayCol(item, 'originals_value_mkkpy6hv')) || 0;
+    const sabValue  = parseFloat(getMondayCol(item, 'dup__of_originals_value_mkkptkzq')) || 0;
+    const q1 = parseFloat(getMondayCol(item, 'q1_value_mkkp2qp3')) || 0;
+    const q2 = parseFloat(getMondayCol(item, 'q2_value_mkkpcpmv')) || 0;
+    const q3 = parseFloat(getMondayCol(item, 'q3_value_mkkpecds')) || 0;
+    const q4 = parseFloat(getMondayCol(item, 'q4_value_mkkppnm7')) || 0;
+    const activeQuarters = ['Q1','Q2','Q3','Q4'].filter((_,i) => [q1,q2,q3,q4][i] > 0);
+    return {
+      dealNumber, brand, campaign,
+      pipeline:      pipelineLabel,
+      stage:         getMondayCol(item, 'stage_mkkpc6ys') || 'Unknown',
+      owner:         getMondayCol(item, 'owner_mkkpavhq') || '',
+      spendTier:     bucketValue(dealValue),
+      includesSAB:   sabValue > 0,
+      sabTier:       sabValue > 0 ? bucketValue(sabValue) : null,
+      activeQuarters,
+      signOffDate:   getMondayCol(item, 'date_mkz215e1') || null,
+      closeDate:     getMondayCol(item, 'close_date_mkkpvkwv') || null,
+      newOrExisting: getMondayCol(item, 'color_mkz2bhee') || '',
+    };
+  }).filter(d => d.brand);
+}
+
 app.post('/api/monday/sync', requireAuth, async (req, res) => {
   const apiKey = process.env.MONDAY_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'MONDAY_API_KEY not set in Railway env vars' });
 
   try {
-    let allItems = [], cursor = null;
-    do {
-      const gql = `{ boards(ids: ${MONDAY_BOARD_ID}) { items_page(limit: 500${cursor ? `, cursor: "${cursor}"` : ''}) { cursor items { name column_values(ids: ["stage_mkkpc6ys","owner_mkkpavhq","originals_value_mkkpy6hv","dup__of_originals_value_mkkptkzq","q1_value_mkkp2qp3","q2_value_mkkpcpmv","q3_value_mkkpecds","q4_value_mkkppnm7","close_date_mkkpvkwv","date_mkz215e1","color_mkz2bhee"]) { id text } } } } }`;
-      const r = await fetch('https://api.monday.com/v2', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': apiKey, 'API-Version': '2024-01' },
-        body: JSON.stringify({ query: gql })
-      });
-      const d = await r.json();
-      if (d.errors) throw new Error(d.errors[0].message);
-      const page = d.data.boards[0].items_page;
-      allItems = allItems.concat(page.items);
-      cursor = page.cursor || null;
-    } while (cursor);
+    // Fetch all three boards in parallel
+    const boardResults = await Promise.all(
+      MONDAY_BOARDS.map(b => fetchBoardItems(apiKey, b.id).then(items => mapDeals(items, b.label)))
+    );
 
-    const deals = allItems.map(item => {
-      const { dealNumber, brand, campaign } = parseDealName(item.name);
-      const dealValue = parseFloat(getMondayCol(item, 'originals_value_mkkpy6hv')) || 0;
-      const sabValue  = parseFloat(getMondayCol(item, 'dup__of_originals_value_mkkptkzq')) || 0;
-      const q1 = parseFloat(getMondayCol(item, 'q1_value_mkkp2qp3')) || 0;
-      const q2 = parseFloat(getMondayCol(item, 'q2_value_mkkpcpmv')) || 0;
-      const q3 = parseFloat(getMondayCol(item, 'q3_value_mkkpecds')) || 0;
-      const q4 = parseFloat(getMondayCol(item, 'q4_value_mkkppnm7')) || 0;
-      const activeQuarters = ['Q1','Q2','Q3','Q4'].filter((_,i) => [q1,q2,q3,q4][i] > 0);
-      return {
-        dealNumber, brand, campaign,
-        stage:         getMondayCol(item, 'stage_mkkpc6ys') || 'Unknown',
-        owner:         getMondayCol(item, 'owner_mkkpavhq') || '',
-        spendTier:     bucketValue(dealValue),
-        includesSAB:   sabValue > 0,
-        sabTier:       sabValue > 0 ? bucketValue(sabValue) : null,
-        activeQuarters,
-        signOffDate:   getMondayCol(item, 'date_mkz215e1') || null,
-        closeDate:     getMondayCol(item, 'close_date_mkkpvkwv') || null,
-        newOrExisting: getMondayCol(item, 'color_mkz2bhee') || '',
-      };
-    }).filter(d => d.brand && d.stage);
+    const deals = boardResults.flat();
+    const counts = MONDAY_BOARDS.map((b, i) => `${b.label}: ${boardResults[i].length}`);
+    console.log(`Monday sync: ${deals.length} total deals — ${counts.join(' | ')}`);
 
     await pool.query('DELETE FROM monday_cache');
     await pool.query('INSERT INTO monday_cache (data) VALUES ($1)', [JSON.stringify({ deals, syncedAt: new Date().toISOString() })]);
-    console.log(`Monday sync: ${deals.length} deals cached`);
-    res.json({ ok: true, count: deals.length, syncedAt: new Date().toISOString() });
+
+    res.json({ ok: true, count: deals.length, breakdown: counts, syncedAt: new Date().toISOString() });
   } catch (err) {
     console.error('Monday sync error:', err.message);
     res.status(500).json({ error: err.message });
