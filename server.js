@@ -242,7 +242,7 @@ app.post('/api/chat', requireAuth, async (req, res) => {
           }
         }
         data.content = [{ type: 'text', text: merged }];
-      }      }
+      }
     }
 
     res.status(response.status).json(data);
