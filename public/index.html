@@ -791,6 +791,16 @@
           <button onclick="toggleBookingPanel()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:9px 12px;border-radius:6px;cursor:pointer;">Cancel</button>
         </div>
         <div id="bookingUrlStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--accent);margin-top:8px;display:none;"></div>
+
+        <!-- Monday CRM Sync -->
+        <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:14px;">
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#6366f1;margin-bottom:6px;">Monday CRM</div>
+          <p style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);margin:0 0 10px;line-height:1.5;">Sync your 2025 Pipeline so the AI knows your active clients, deal stages, and spend tiers.</p>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button onclick="syncMondayData()" id="mondaySyncBtn" style="flex:1;background:#6366f1;color:#fff;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;border:none;padding:9px;border-radius:6px;cursor:pointer;font-weight:700;">Sync Now</button>
+          </div>
+          <div id="mondaySyncStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;display:none;"></div>
+        </div>
       </div>
     </div>
   </header>
@@ -2594,10 +2604,13 @@ function getSystemPrompt(mode, fileCtx) {
     ? `SENDER: The person writing this email is ${currentUser.name}. Use their first name in the sign-off instead of [SENDER_NAME]. Do NOT include any booking link or URL in your output — this is handled separately.\n`
     : '';
 
+  const mondayCtx = buildMondayContext();
+
   return `You are Culture Plug — the internal commercial intelligence engine for Rising Ballers, a football media and production company. You have access to Rising Ballers' proprietary first-party data corpus below.
 
 ${DATA_CORPUS}
 
+${mondayCtx ? mondayCtx + '\n' : ''}
 ${briefCtx}${socialProofCtx}${senderCtx}${fileCtx ? `The user has uploaded a brand brief for context:\n${fileCtx}\n` : ''}
 
 ${MODE_PROMPTS[mode] || MODE_PROMPTS.pitch}
@@ -3100,6 +3113,7 @@ setMode('general', document.querySelector('.mode-tab.active'));
       document.getElementById('userName').textContent = user.name;
       document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
       restoreBookingBtnState();
+      loadMondayData();
     } else {
       document.getElementById('loginGate').style.display = 'block';
       if (errorParam) {
@@ -3231,7 +3245,7 @@ async function startBulkGeneration() {
     document.getElementById('bulkCurrentBrand').textContent = 'Writing email for: ' + company;
     try {
       const spCtx = getSocialProof(company);
-      const sys = 'You are Culture Plug, the internal commercial intelligence engine for Rising Ballers, a global football media and production company.\n\n' + DATA_CORPUS + '\n\n' + (spCtx ? spCtx + '\n' : '') + 'SENDER: The person writing this email is ' + senderName + '. Use their first name only in the sign-off. Do NOT add Rising Ballers after the name. Do NOT include any booking link or URL.\n\n' + MODE_PROMPTS.email + '\n\nUNIVERSAL RULES:\n- Only use data from the corpus. Never invent stats.\n- Sharp and specific beats long and vague.';
+      const sys = 'You are Culture Plug, the internal commercial intelligence engine for Rising Ballers, a global football media and production company.\n\n' + DATA_CORPUS + '\n\n' + (buildMondayContext() ? buildMondayContext() + '\n\n' : '') + (spCtx ? spCtx + '\n' : '') + 'SENDER: The person writing this email is ' + senderName + '. Use their first name only in the sign-off. Do NOT add Rising Ballers after the name. Do NOT include any booking link or URL.\n\n' + MODE_PROMPTS.email + '\n\nUNIVERSAL RULES:\n- Only use data from the corpus. Never invent stats.\n- Sharp and specific beats long and vague.';
       const greetingInstruction = firstName
         ? 'Open with "Hey ' + firstName + '," on its own line — NOT "Hey team,".'
         : 'Open with "Hey," on its own line.';
@@ -4214,6 +4228,98 @@ document.addEventListener('click', (e) => {
     document.getElementById('bookingPanel').style.display = 'none';
   }
 });
+
+// ── MONDAY CRM ──
+let mondayDeals = [];
+let mondaySyncedAt = null;
+
+async function loadMondayData() {
+  try {
+    const res = await fetch('/api/monday/data');
+    if (!res.ok) return;
+    const d = await res.json();
+    if (d.deals && d.deals.length) {
+      mondayDeals = d.deals;
+      mondaySyncedAt = d.syncedAt;
+      console.log(`Monday: loaded ${mondayDeals.length} deals from cache (synced ${mondaySyncedAt})`);
+    }
+  } catch (e) {
+    console.warn('Monday load failed:', e.message);
+  }
+}
+
+async function syncMondayData() {
+  const btn = document.getElementById('mondaySyncBtn');
+  const status = document.getElementById('mondaySyncStatus');
+  btn.textContent = 'Syncing...';
+  btn.disabled = true;
+  status.style.display = 'block';
+  status.style.color = 'var(--muted)';
+  status.textContent = 'Connecting to Monday...';
+  try {
+    const res = await fetch('/api/monday/sync', { method: 'POST' });
+    const d = await res.json();
+    if (!res.ok) throw new Error(d.error || 'Sync failed');
+    mondaySyncedAt = d.syncedAt;
+    await loadMondayData();
+    status.style.color = '#6366f1';
+    status.textContent = `✓ ${d.count} deals synced`;
+    btn.textContent = 'Sync Now';
+    btn.disabled = false;
+  } catch (e) {
+    status.style.color = '#ff6b6b';
+    status.textContent = '✗ ' + e.message;
+    btn.textContent = 'Sync Now';
+    btn.disabled = false;
+  }
+}
+
+function buildMondayContext() {
+  if (!mondayDeals.length) return '';
+
+  const syncDate = mondaySyncedAt ? new Date(mondaySyncedAt).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : 'recent';
+
+  // Group by stage
+  const byStage = {};
+  mondayDeals.forEach(d => {
+    if (!byStage[d.stage]) byStage[d.stage] = [];
+    byStage[d.stage].push(d);
+  });
+
+  let lines = [`=== MONDAY CRM — 2025 PIPELINE (synced ${syncDate}) ===`];
+  lines.push(`Total deals in board: ${mondayDeals.length}`);
+  lines.push('');
+
+  // Live clients first — most important for pitch context
+  const stageOrder = ['Live', 'Signed', 'Closed Won', 'Proposal', 'Negotiating', 'Prospecting', 'Lost', 'Closed Lost'];
+  const orderedStages = [...stageOrder.filter(s => byStage[s]), ...Object.keys(byStage).filter(s => !stageOrder.includes(s))];
+
+  orderedStages.forEach(stage => {
+    const deals = byStage[stage];
+    lines.push(`${stage.toUpperCase()} (${deals.length}):`);
+    deals.forEach(d => {
+      const parts = [`  - ${d.brand}`];
+      if (d.campaign) parts.push(`"${d.campaign}"`);
+      if (d.spendTier) parts.push(`| ${d.spendTier}`);
+      if (d.includesSAB) parts.push('| incl. SAB');
+      if (d.activeQuarters.length) parts.push(`| ${d.activeQuarters.join('+')}`);
+      if (d.owner) parts.push(`| ${d.owner}`);
+      if (d.newOrExisting) parts.push(`| ${d.newOrExisting}`);
+      lines.push(parts.join(' '));
+    });
+    lines.push('');
+  });
+
+  lines.push(`USAGE NOTES FOR AI:
+- Use this data to identify returning clients (Existing) vs new logos
+- When pitching a brand in the same vertical as a Live client, treat that as social proof
+- Never reveal exact deal values — use tiers only (e.g. "£15K–30K range")
+- If a brand appears as Live/Signed, flag upsell opportunities (e.g. adding SAB, additional channels, Q4 spend)
+- If a brand appears as Lost, do not reference them as a client`);
+
+  return lines.join('\n');
+}
+
 
 // On load — restore booking btn colour if URL already saved
 function restoreBookingBtnState() {
