@@ -825,6 +825,7 @@
           <button class="mode-tab" onclick="setMode('objection', this)">Objection Handler</button>
           <button class="mode-tab" onclick="showBulkMode(this)">Bulk Email</button>
           <button class="mode-tab" onclick="showReachCalculator(this)">Reach Calculator</button>
+          <button class="mode-tab" onclick="setMode('pre_meeting', this)">Pre-Meeting Intel</button>
         </div>
       </div>
       <div class="pill-group">
@@ -1451,6 +1452,17 @@ const MODES = {
       'What content formats suit this brief?',
       'Where are the gaps in this brief?',
       'Summarise the brief and our angle'
+    ]
+  },
+  pre_meeting: {
+    label: 'Pre-Meeting Intel',
+    placeholder: "Name a brand — e.g. 'Nike' or 'Red Bull'",
+    pills: [
+      'Nike',
+      'Adidas',
+      'Red Bull',
+      'EA Sports',
+      'Beats by Dre'
     ]
   }
 };
@@ -2425,7 +2437,54 @@ One sentence that flips the objection into an opportunity — ending the rebutta
 ## IF THEY PUSH BACK AGAIN
 One pre-emptive response to the most likely follow-up objection.`,
 
-  email: `Write a short cold outreach email from Rising Ballers to the brand the user names. It should read like a real person wrote it — casual, confident, no waffle.
+  pre_meeting: `You are generating a Pre-Meeting Intelligence Brief for the Rising Ballers commercial team. They are about to meet with or pitch to the brand the user names. Produce a tight, scannable one-pager they can read in 2 minutes before walking into the room.
+
+Use ALL available context: the first-party data corpus, the Monday CRM pipeline data (if present), and your broader knowledge of the brand's recent activity.
+
+Structure your response exactly as follows — no deviations:
+
+## PRE-MEETING INTEL — [BRAND NAME IN CAPS]
+
+---
+
+### 1. HAVE WE WORKED WITH THEM BEFORE?
+Search the Monday CRM data for any history with this brand across 2024, 2025, and 2026 pipelines.
+
+If YES: State clearly — when, what campaign, which pipeline (2024/2025/2026), spend tier, which channels (RB/SAB), owner, and whether it was a new or existing client at that point. If multiple deals exist, list each one. Close with one sentence on relationship status: warm return, lapsed, or currently active.
+
+If NO: State clearly — "No previous deal history found in the CRM." Then note whether they appear in the EXISTING_CLIENTS list as a known name. Keep this section to 3 lines max if no history.
+
+---
+
+### 2. WHAT'S HAPPENING WITH THEM RIGHT NOW?
+Draw on your knowledge of this brand's recent activity — campaigns, partnerships, cultural moments, product launches, signings, controversies. Be specific. No vague generalities.
+
+Flag anything commercially relevant: Are they in a growth phase? Rebranding? Expanding into new markets? Recently activated with a competitor? This section should feel like something a well-briefed colleague told you in the corridor — sharp and current.
+
+3–5 bullet points. Each one a concrete, specific observation. If you genuinely have no recent knowledge of this brand, say so clearly rather than inventing.
+
+---
+
+### 3. RELEVANT INSIGHTS FROM OUR DATA
+Pull the 4–6 most commercially relevant data points from the corpus for this brand's likely target audience, vertical, or campaign objective. Think about what would make them lean forward in the meeting.
+
+Format each as:
+- **[Stat or finding]** — [one sentence on why this matters for this specific brand] [Source]
+
+Prioritise: purchase behaviour, brand affinity data, platform engagement rates, attitude statements that map to their category. Avoid generic demographic stats unless they're genuinely striking for this brand.
+
+---
+
+### 4. THOUGHT-STARTERS
+2–3 concrete activation ideas tailored specifically to this brand — their category, their audience, their current moment. Not generic partnership angles. Ideas that show you've thought about their specific business.
+
+For each:
+**[Idea Title]**
+One sentence on the concept. One sentence on why it works for this brand specifically, grounded in data or cultural context.
+
+---
+
+TONE: Confident, direct, and brief. This is an internal document — no fluff, no throat-clearing. Every line should earn its place. The team member reading this should feel more prepared, not more overwhelmed.`, It should read like a real person wrote it — casual, confident, no waffle.
 
 RULES:
 - Do NOT use subject lines, headers, bullet points, or bold text — plain prose only
