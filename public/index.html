@@ -2437,67 +2437,60 @@ One sentence that flips the objection into an opportunity — ending the rebutta
 ## IF THEY PUSH BACK AGAIN
 One pre-emptive response to the most likely follow-up objection.`,
 
-  pre_meeting: `You are generating a Pre-Meeting Intelligence Brief for the Rising Ballers commercial team. They are about to meet with or pitch to the brand the user names. Produce a tight, scannable one-pager they can read in 2 minutes before walking into the room.
+  pre_meeting: `You are generating a Pre-Meeting Intelligence Brief for the Rising Ballers commercial team. They are about to meet with or pitch to the brand the user names.
 
-Use ALL available context: the first-party data corpus, the Monday CRM pipeline data (if present), and your broader knowledge of the brand's recent activity.
+CRITICAL FORMATTING RULES — NON-NEGOTIABLE:
+- Section 1 (CRM history): MAXIMUM 12 bullet points total across all years. If there are more deals, summarise the rest in one line: "Plus X further deals across [years]." DO NOT list every single deal — prioritise the highest value and most recent ones only.
+- Section 2 (What's Happening Now): MINIMUM 4 sub-sections, each with 2–3 sentences. This must be substantive. Run multiple web searches.
+- Sections 3 and 4 are MANDATORY — never omit them regardless of how much you wrote in sections 1 and 2.
+- The entire output must fit a 2-page document. Be ruthlessly concise in section 1 to leave room for all four sections.
 
-Structure your response exactly as follows — no deviations:
+Structure your response exactly as follows:
 
 ## PRE-MEETING INTEL — [BRAND NAME IN CAPS]
 
 ---
 
 ### 1. HAVE WE WORKED WITH THEM BEFORE?
-Search the Monday CRM data for any history with this brand across 2024, 2025, and 2026 pipelines.
+Check Monday CRM data. If YES: Group by year (2024 / 2025 / 2026). List MAX 4 deals per year — highest value first. Show: deal name, value, channel, owner. If there are more, add "Plus X further deals this year." Close with ONE sentence on relationship status.
 
-If YES: State clearly — when, what campaign, which pipeline (2024/2025/2026), the exact deal value as shown in the CRM data, which channels (RB/SAB), owner, and whether it was a new or existing client at that point. If multiple deals exist, list each one with its value. Close with one sentence on relationship status: warm return, lapsed, or currently active.
-
-If NO: State clearly — "No previous deal history found in the CRM." Then note whether they appear in the EXISTING_CLIENTS list as a known name. Keep this section to 3 lines max if no history.
+If NO: "No CRM history found." Note if they appear in EXISTING_CLIENTS. Max 2 lines.
 
 ---
 
 ### 2. WHAT'S HAPPENING WITH THEM RIGHT NOW?
-You have access to web search. Use it. Run targeted searches before writing this section. Search specifically for:
-- "[Brand] football sponsorship partnership 2025 2026"
-- "[Brand] earnings results quarterly 2025 2026"
-- "[Brand] stock share price performance 2025 2026"
-- "[Brand] football signing ambassador deal 2025 2026"
-- "[Brand] campaign launch football 2026"
+You have web search. Run ALL FOUR of these searches before writing — do not skip any:
+1. "[Brand] football sponsorship partnership signing 2025 2026"
+2. "[Brand] quarterly earnings revenue results 2025 2026"
+3. "[Brand] stock share price 2026"
+4. "[Brand] campaign launch football culture 2026"
 
-Then synthesise what you find into 4–6 sharp, specific bullets covering:
+Write exactly FOUR sub-sections. Each must have 2–3 sentences minimum. Do not collapse them into bullets:
 
-**Football & Sports Partnerships:** Any new kit deals, athlete signings, tournament sponsorships, or ambassador announcements relevant to football. Be specific — name the player, the deal, the campaign.
+**Football & Partnerships:** New kit deals, athlete signings, tournament sponsorships in football. Name specific players, competitions, agencies. If nothing found via search, say so and note the last known partnership.
 
-**Financial Health:** Latest quarterly earnings, revenue trend, stock performance. Is the share price up or down significantly vs 12 months ago? Any profit warnings or beats? Keep it to 2–3 sentences, no jargon.
+**Financial Health:** Latest quarterly earnings or annual results. Revenue trend, profit/loss, stock performance vs 12 months ago — up, down, or flat by roughly what %. Use plain language. If no data found, say so clearly.
 
-**Recent Campaigns & Cultural Moments:** Any major brand campaigns, controversies, rebrands, or cultural activations in the last 6 months that are relevant to the RB/SAB audience.
+**Recent Campaigns & Culture:** Major brand campaigns or cultural moments in the last 6 months relevant to the RB/SAB Gen Z audience. Tone, talent used, reception.
 
-**Strategic Direction:** Where are they heading? Growth markets, new categories, stated priorities from leadership. Anything that creates a commercial hook for RB/SAB.
-
-Cite your sources inline where possible. If search returns nothing useful for a sub-topic, say so — do not invent. Flag clearly if data is limited: "No recent earnings data found."
+**Strategic Direction:** Where is the brand heading? Growth markets, new categories, stated CEO priorities. What does this mean for a partnership with RB/SAB?
 
 ---
 
 ### 3. RELEVANT INSIGHTS FROM OUR DATA
-Pull the 4–6 most commercially relevant data points from the corpus for this brand's likely target audience, vertical, or campaign objective. Think about what would make them lean forward in the meeting.
-
-Format each as:
-- **[Stat or finding]** — [one sentence on why this matters for this specific brand] [Source]
-
-Prioritise: purchase behaviour, brand affinity data, platform engagement rates, attitude statements that map to their category. Avoid generic demographic stats unless they're genuinely striking for this brand.
+Exactly 5 data points from the corpus. Most commercially compelling for this specific brand. Format:
+- **[Stat]** — [why this matters for this brand specifically] [Source]
 
 ---
 
 ### 4. THOUGHT-STARTERS
-2–3 concrete activation ideas tailored specifically to this brand — their category, their audience, their current moment. Not generic partnership angles. Ideas that show you've thought about their specific business.
+Exactly 3 ideas. Specific to this brand's category, current moment, and what you now know from section 2. Not generic.
 
-For each:
-**[Idea Title]**
-One sentence on the concept. One sentence on why it works for this brand specifically, grounded in data or cultural context.
+**[Title]** — One sentence concept. One sentence why it works for this brand right now.
 
 ---
 
-TONE: Confident, direct, and brief. This is an internal document — no fluff, no throat-clearing. Every line should earn its place. The team member reading this should feel more prepared, not more overwhelmed.`,
+TONE: Sharp, confident, internal. Every line earns its place.`,
 
   email: `Write a short cold outreach email from Rising Ballers to the brand the user names. It should read like a real person wrote it — casual, confident, no waffle.
 
@@ -3998,7 +3991,7 @@ function exportPreMeetingPDF() {
   const brandName = brandMatch ? brandMatch[1].trim() : 'Brand';
   const fileName = 'PRE-MEETING INTEL - ' + brandName.toUpperCase() + ' - ' + pdfYYMMDD;
 
-  // Parse sections by ### N. TITLE pattern
+  // Parse sections
   const sections = [];
   const sectionRegex = /###\s+\d+\.\s+(.+?)\n([\s\S]+?)(?=###\s+\d+\.|TONE:|$)/g;
   let m;
@@ -4006,12 +3999,12 @@ function exportPreMeetingPDF() {
     sections.push({ title: m[1].trim(), body: m[2].trim() });
   }
 
+  const accentColors = ['#c9a84c', '#6366f1', '#2dd4bf', '#c9a84c'];
+
   function renderBody(raw) {
-    // Process line by line for consistent output
     const lines = raw.split('\n');
     let html = '';
     let listOpen = false;
-    let pendingSubhead = null;
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
@@ -4019,40 +4012,30 @@ function exportPreMeetingPDF() {
         if (listOpen) { html += '</ul>'; listOpen = false; }
         continue;
       }
-
-      // Sub-headings like "2026 (Active):" — bold label lines ending in :
-      if (/^[A-Z0-9].*:$/.test(line) && line.length < 60) {
+      // Sub-headings: bold lines starting with **X:** pattern or lines ending in :
+      if (/^\*\*(.+)\*\*$/.test(line)) {
+        if (listOpen) { html += '</ul>'; listOpen = false; }
+        html += `<div class="subhead">${line.replace(/\*\*/g,'')}</div>`;
+        continue;
+      }
+      if (/^[A-Z][^a-z]{0,3}.*:$/.test(line) && line.length < 60) {
         if (listOpen) { html += '</ul>'; listOpen = false; }
         html += `<div class="subhead">${line}</div>`;
         continue;
       }
-
-      // Bullet points
+      // Bullets
       if (/^[-–—•]\s+/.test(line)) {
-        const content = line.replace(/^[-–—•]\s+/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+        const content = line.replace(/^[-–—•]\s+/, '').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
         if (!listOpen) { html += '<ul>'; listOpen = true; }
         html += `<li>${content}</li>`;
         continue;
       }
-
-      // Regular paragraph text
       if (listOpen) { html += '</ul>'; listOpen = false; }
-      const para = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+      const para = line.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>');
       html += `<p>${para}</p>`;
     }
     if (listOpen) html += '</ul>';
     return html;
-  }
-
-  const accentColors = ['#c9a84c', '#c9a84c', '#6366f1', '#2dd4bf'];
-
-  function renderSection(s, idx) {
-    const accent = accentColors[idx] || '#c9a84c';
-    return `<div class="section">
-      <div class="section-num" style="color:${accent}">0${idx+1}</div>
-      <div class="section-label" style="color:${accent}">${s.title}</div>
-      <div class="section-body">${renderBody(s.body)}</div>
-    </div>`;
   }
 
   const header = `<div class="doc-header">
@@ -4066,15 +4049,25 @@ function exportPreMeetingPDF() {
     </div>
   </div>`;
 
-  // Pair sections into pages: [0,1] on p1, [2,3] on p2
-  const pages = [];
-  for (let i = 0; i < sections.length; i += 2) {
-    const left = sections[i] ? renderSection(sections[i], i) : '';
-    const right = sections[i+1] ? renderSection(sections[i+1], i+1) : '';
-    pages.push(`<div class="cols">${left ? `<div class="col">${left}</div>` : ''}${right ? `<div class="col">${right}</div>` : ''}</div>`);
-  }
+  const footer = `<div class="doc-footer">
+    <span class="footer-l">Rising Ballers Group</span>
+    <span class="footer-c">Internal Use Only</span>
+    <span class="footer-r">Generated by Culture Plug</span>
+  </div>`;
 
-  const totalPages = pages.length;
+  // Render all sections as a continuous flow — CSS handles page breaks
+  const sectionsHtml = sections.map((s, i) => {
+    const accent = accentColors[i] || '#c9a84c';
+    const breakBefore = i === 2 ? 'style="page-break-before:always;padding-top:10mm;"' : '';
+    return `<div class="section" ${breakBefore}>
+      <div class="section-header">
+        <span class="section-num" style="color:${accent}">0${i+1}</span>
+        <span class="section-label" style="color:${accent}">${s.title}</span>
+      </div>
+      <div class="section-rule" style="border-color:${accent}33"></div>
+      <div class="section-body">${renderBody(s.body)}</div>
+    </div>`;
+  }).join('');
 
   const css = `
     @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
@@ -4082,17 +4075,14 @@ function exportPreMeetingPDF() {
     * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; margin: 0; padding: 0; }
     html, body { background: #0e0e0c; color: #f0ede6; font-family: 'DM Sans', sans-serif; font-size: 10px; }
 
-    .page {
+    .wrapper {
       width: 210mm;
-      height: 297mm;
-      padding: 10mm 12mm 8mm;
+      min-height: 297mm;
+      padding: 10mm 13mm 14mm;
       background: #0e0e0c;
-      page-break-after: always;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
-    .page:last-child { page-break-after: avoid; }
 
     /* Header */
     .doc-header {
@@ -4100,166 +4090,99 @@ function exportPreMeetingPDF() {
       justify-content: space-between;
       align-items: flex-end;
       padding-bottom: 8px;
-      margin-bottom: 12px;
-      border-bottom: 1px solid #c9a84c;
+      margin-bottom: 14px;
+      border-bottom: 1.5px solid #c9a84c;
       flex-shrink: 0;
     }
-    .doc-eyebrow {
-      font-family: 'DM Mono', monospace;
-      font-size: 7px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: #555;
-      margin-bottom: 3px;
-    }
-    .doc-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px;
-      color: #f0ede6;
-      line-height: 1.15;
-    }
-    .doc-brand { color: #c9a84c; font-style: italic; }
-    .header-right { text-align: right; flex-shrink: 0; }
-    .doc-date {
-      font-family: 'DM Mono', monospace;
-      font-size: 8px;
-      color: #777;
-      margin-bottom: 3px;
-    }
-    .doc-confidential {
-      font-family: 'DM Mono', monospace;
-      font-size: 7px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: #3a3a38;
-    }
+    .doc-eyebrow { font-family:'DM Mono',monospace; font-size:7px; letter-spacing:2px; text-transform:uppercase; color:#555; margin-bottom:4px; }
+    .doc-title { font-family:'Playfair Display',serif; font-size:20px; color:#f0ede6; line-height:1.15; }
+    .doc-brand { color:#c9a84c; font-style:italic; }
+    .header-right { text-align:right; }
+    .doc-date { font-family:'DM Mono',monospace; font-size:8px; color:#777; margin-bottom:3px; }
+    .doc-confidential { font-family:'DM Mono',monospace; font-size:7px; letter-spacing:1.5px; text-transform:uppercase; color:#333; }
 
-    /* Two-column layout */
-    .cols {
-      display: flex;
-      gap: 10mm;
+    /* Two-column grid for sections */
+    .sections-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 0 10mm;
       flex: 1;
-      overflow: hidden;
-      min-height: 0;
-    }
-    .col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      min-width: 0;
     }
 
     /* Section */
-    .section {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding-top: 2px;
-    }
-    .section-num {
-      font-family: 'DM Mono', monospace;
-      font-size: 28px;
-      font-weight: 500;
-      line-height: 1;
-      opacity: 0.15;
-      margin-bottom: -4px;
-    }
-    .section-label {
-      font-family: 'DM Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      font-weight: 500;
-      margin-bottom: 10px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid #1e1e1b;
-    }
-    .section-body {
-      font-size: 9.5px;
-      line-height: 1.6;
-      color: #b8b4ac;
-      flex: 1;
-      overflow: hidden;
-    }
-    .section-body p {
-      margin-bottom: 6px;
-    }
-    .section-body p:last-child { margin-bottom: 0; }
-    .section-body strong { color: #f0ede6; font-weight: 600; }
-    .section-body em { color: #c9a84c; font-style: normal; }
-    .section-body ul {
-      padding-left: 12px;
-      margin: 4px 0 8px;
-      list-style: none;
-    }
-    .section-body ul li {
-      position: relative;
-      padding-left: 8px;
-      margin-bottom: 4px;
-      line-height: 1.5;
-    }
-    .section-body ul li::before {
-      content: '—';
-      position: absolute;
-      left: -8px;
-      color: #333;
-    }
-    .subhead {
-      font-family: 'DM Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: #555;
-      margin: 8px 0 4px;
-    }
-    .subhead:first-child { margin-top: 0; }
+    .section { padding-bottom: 12px; overflow: hidden; }
+    .section-header { display:flex; align-items:baseline; gap:6px; margin-bottom:5px; }
+    .section-num { font-family:'DM Mono',monospace; font-size:22px; font-weight:500; opacity:0.2; line-height:1; }
+    .section-label { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:2px; text-transform:uppercase; font-weight:500; }
+    .section-rule { border-top:1px solid; margin-bottom:8px; }
+
+    .section-body { font-size:9px; line-height:1.6; color:#a8a49c; }
+    .section-body p { margin-bottom:5px; }
+    .section-body p:last-child { margin-bottom:0; }
+    .section-body strong { color:#f0ede6; font-weight:600; }
+    .section-body em { color:#c9a84c; font-style:normal; }
+    .section-body ul { padding-left:10px; margin:3px 0 6px; list-style:none; }
+    .section-body li { position:relative; padding-left:10px; margin-bottom:3px; line-height:1.55; }
+    .section-body li::before { content:'—'; position:absolute; left:-2px; color:#2a2a28; font-size:8px; }
+    .subhead { font-family:'DM Mono',monospace; font-size:7.5px; letter-spacing:1px; text-transform:uppercase; color:#666; margin:7px 0 3px; font-weight:500; }
+    .subhead:first-child { margin-top:0; }
 
     /* Footer */
-    .page-footer {
-      flex-shrink: 0;
-      margin-top: 8px;
+    .doc-footer {
+      margin-top: 12px;
       padding-top: 8px;
       border-top: 1px solid #1a1a18;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-shrink: 0;
     }
-    .footer-brand {
-      font-family: 'DM Mono', monospace;
-      font-size: 7.5px;
-      letter-spacing: 1px;
-      color: #333;
-      text-transform: uppercase;
-    }
-    .footer-center {
-      font-family: 'DM Mono', monospace;
-      font-size: 7px;
-      color: #2a2a28;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .footer-page {
-      font-family: 'DM Mono', monospace;
-      font-size: 7.5px;
-      color: #333;
+    .footer-l, .footer-c, .footer-r { font-family:'DM Mono',monospace; font-size:7px; text-transform:uppercase; letter-spacing:1px; color:#2e2e2c; }
+
+    /* Page break handling */
+    @media print {
+      .page-break { page-break-before: always; }
     }
   `;
 
-  const pageHtml = pages.map((content, i) => `
-    <div class="page">
-      ${header}
-      ${content}
-      <div class="page-footer">
-        <span class="footer-brand">Rising Ballers Group</span>
-        <span class="footer-center">Internal Use Only</span>
-        <span class="footer-page">${i+1} / ${totalPages}</span>
+  // Put sections 1+2 on page 1, sections 3+4 on page 2
+  const s = sections;
+  const page1Sections = s.slice(0, 2).map((sec, i) => {
+    const accent = accentColors[i];
+    return `<div class="section">
+      <div class="section-header">
+        <span class="section-num" style="color:${accent}">0${i+1}</span>
+        <span class="section-label" style="color:${accent}">${sec.title}</span>
       </div>
-    </div>
-  `).join('');
+      <div class="section-rule" style="border-color:${accent}44"></div>
+      <div class="section-body">${renderBody(sec.body)}</div>
+    </div>`;
+  }).join('');
+
+  const page2Sections = s.slice(2, 4).map((sec, i) => {
+    const accent = accentColors[i + 2];
+    return `<div class="section">
+      <div class="section-header">
+        <span class="section-num" style="color:${accent}">0${i+3}</span>
+        <span class="section-label" style="color:${accent}">${sec.title}</span>
+      </div>
+      <div class="section-rule" style="border-color:${accent}44"></div>
+      <div class="section-body">${renderBody(sec.body)}</div>
+    </div>`;
+  }).join('');
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${fileName}</title><style>${css}</style></head><body>
-    ${pageHtml}
+    <div class="wrapper">
+      ${header}
+      <div class="sections-grid">${page1Sections}</div>
+      ${footer}
+    </div>
+    <div class="wrapper" style="page-break-before:always;">
+      ${header}
+      <div class="sections-grid">${page2Sections}</div>
+      ${footer}
+    </div>
     <script>window.onload=function(){window.print();}<\/script>
   </body></html>`;
 
@@ -4267,6 +4190,7 @@ function exportPreMeetingPDF() {
   w.document.write(html);
   w.document.close();
 }
+
 
 function emailPreMeetingIntel() {
   if (!lastPreMeetingText) return;
