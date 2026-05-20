@@ -2457,11 +2457,24 @@ If NO: State clearly — "No previous deal history found in the CRM." Then note 
 ---
 
 ### 2. WHAT'S HAPPENING WITH THEM RIGHT NOW?
-Draw on your knowledge of this brand's recent activity — campaigns, partnerships, cultural moments, product launches, signings, controversies. Be specific. No vague generalities.
+You have access to web search. Use it. Run targeted searches before writing this section. Search specifically for:
+- "[Brand] football sponsorship partnership 2025 2026"
+- "[Brand] earnings results quarterly 2025 2026"
+- "[Brand] stock share price performance 2025 2026"
+- "[Brand] football signing ambassador deal 2025 2026"
+- "[Brand] campaign launch football 2026"
 
-Flag anything commercially relevant: Are they in a growth phase? Rebranding? Expanding into new markets? Recently activated with a competitor? This section should feel like something a well-briefed colleague told you in the corridor — sharp and current.
+Then synthesise what you find into 4–6 sharp, specific bullets covering:
 
-3–5 bullet points. Each one a concrete, specific observation. If you genuinely have no recent knowledge of this brand, say so clearly rather than inventing.
+**Football & Sports Partnerships:** Any new kit deals, athlete signings, tournament sponsorships, or ambassador announcements relevant to football. Be specific — name the player, the deal, the campaign.
+
+**Financial Health:** Latest quarterly earnings, revenue trend, stock performance. Is the share price up or down significantly vs 12 months ago? Any profit warnings or beats? Keep it to 2–3 sentences, no jargon.
+
+**Recent Campaigns & Cultural Moments:** Any major brand campaigns, controversies, rebrands, or cultural activations in the last 6 months that are relevant to the RB/SAB audience.
+
+**Strategic Direction:** Where are they heading? Growth markets, new categories, stated priorities from leadership. Anything that creates a commercial hook for RB/SAB.
+
+Cite your sources inline where possible. If search returns nothing useful for a sub-topic, say so — do not invent. Flag clearly if data is limited: "No recent earnings data found."
 
 ---
 
@@ -2878,7 +2891,10 @@ function addUserMsg(text) {
 function addTyping() {
   const el = document.createElement('div');
   el.className = 'msg ai'; el.id = 'typing';
-  el.innerHTML = `<div class="chat-mode-badge">${MODES[currentMode].label}</div><div class="msg-label">Culture Plug</div><div class="typing-wrap"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>`;
+  const searchNote = currentMode === 'pre_meeting'
+    ? `<div style="font-family:'DM Mono',monospace;font-size:9px;color:#6366f1;letter-spacing:1px;margin-top:6px;opacity:0.8;">⟳ Searching the web for latest news...</div>`
+    : '';
+  el.innerHTML = `<div class="chat-mode-badge">${MODES[currentMode].label}</div><div class="msg-label">Culture Plug</div><div class="typing-wrap"><div class="t-dot"></div><div class="t-dot"></div><div class="t-dot"></div></div>${searchNote}`;
   document.getElementById('messages').appendChild(el);
   scrollBottom();
 }
@@ -3121,9 +3137,10 @@ async function sendMessage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
+        max_tokens: modeAtSend === 'pre_meeting' ? 4000 : 2000,
         system: getSystemPrompt(modeAtSend, fileCtx),
-        messages
+        messages,
+        mode: modeAtSend
       })
     });
 
