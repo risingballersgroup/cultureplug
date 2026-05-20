@@ -4367,8 +4367,9 @@ function buildMondayContext() {
       byStage[stage].forEach(d => {
         const parts = [`    - ${d.brand}`];
         if (d.campaign) parts.push(`"${d.campaign}"`);
-        if (d.spendTier) parts.push(`| ${d.spendTier}`);
-        if (d.includesSAB) parts.push('| incl. SAB');
+        if (d.dealValue) parts.push(`| ${d.dealValue}`);
+        if (d.includesSAB && d.sabValue) parts.push(`| SAB: ${d.sabValue}`);
+        else if (d.includesSAB) parts.push('| incl. SAB');
         if (d.activeQuarters.length) parts.push(`| ${d.activeQuarters.join('+')}`);
         if (d.owner) parts.push(`| ${d.owner}`);
         if (d.newOrExisting) parts.push(`| ${d.newOrExisting}`);
