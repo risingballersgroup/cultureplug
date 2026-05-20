@@ -280,25 +280,87 @@ pool.query(`
   );
 `).catch(err => console.error('monday_cache init error:', err.message));
 
+// Per-board column schemas — IDs differ between the 2026 and 2024/2025 boards
 const MONDAY_BOARDS = [
-  { id: '1353139719', label: '2026 Pipeline (Live)' },
-  { id: '5089413136', label: '2025 Pipeline (Closed)' },
-  { id: '1756615690', label: '2024 Pipeline (Closed)' },
+  {
+    id: '1353139719',
+    label: '2026 Pipeline (Live)',
+    cols: {
+      stage:        'deal_stage',
+      owner:        'deal_owner',
+      dealValue:    'deal_value',
+      sabValue:     'deal_actual_value',
+      q1:           'numbers',
+      q2:           'numbers9',
+      q3:           'numbers8',
+      q4:           'numbers93',
+      signOffDate:  'deal_close_date',
+      closeDate:    'deal_close_date',
+      newOrExisting:'color_mkttct2g',
+    }
+  },
+  {
+    id: '5089413136',
+    label: '2025 Pipeline (Closed)',
+    cols: {
+      stage:        'stage_mkkpc6ys',
+      owner:        'owner_mkkpavhq',
+      dealValue:    'originals_value_mkkpy6hv',
+      sabValue:     'dup__of_originals_value_mkkptkzq',
+      q1:           'q1_value_mkkp2qp3',
+      q2:           'q2_value_mkkpcpmv',
+      q3:           'q3_value_mkkpecds',
+      q4:           'q4_value_mkkppnm7',
+      signOffDate:  'date_mkz215e1',
+      closeDate:    'close_date_mkkpvkwv',
+      newOrExisting:'color_mkz2bhee',
+    }
+  },
+  {
+    id: '1756615690',
+    label: '2024 Pipeline (Closed)',
+    cols: {
+      stage:        'stage_mkkpc6ys',
+      owner:        'owner_mkkpavhq',
+      dealValue:    'originals_value_mkkpy6hv',
+      sabValue:     'dup__of_originals_value_mkkptkzq',
+      q1:           'q1_value_mkkp2qp3',
+      q2:           'q2_value_mkkpcpmv',
+      q3:           'q3_value_mkkpecds',
+      q4:           'q4_value_mkkppnm7',
+      signOffDate:  'date_mkz215e1',
+      closeDate:    'close_date_mkkpvkwv',
+      newOrExisting:'color_mkz2bhee',
+    }
+  },
 ];
 
 function parseDealName(raw) {
-  const match = raw.match(/^(\d+)\.\s+(.+)$/);
-  if (!match) return { dealNumber: null, brand: raw, campaign: '' };
-  const rest = match[2];
-  const words = rest.split(' ');
-  let brandWords = [words[0]];
-  if (words[1] && /^[A-Z]/.test(words[1]) && !['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Q1','Q2','Q3','Q4'].includes(words[1])) {
-    brandWords.push(words[1]);
+  // Handle "3001. Nike Campaign" format (2024/2025) and "Nike EMEA | WC27" format (2026)
+  const numbered = raw.match(/^(\d+)\.\s+(.+)$/);
+  if (numbered) {
+    const rest = numbered[2];
+    const words = rest.split(' ');
+    let brandWords = [words[0]];
+    if (words[1] && /^[A-Z]/.test(words[1]) && !['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Q1','Q2','Q3','Q4'].includes(words[1])) {
+      brandWords.push(words[1]);
+    }
+    return { dealNumber: numbered[1], brand: brandWords.join(' '), campaign: words.slice(brandWords.length).join(' ') };
   }
-  return { dealNumber: match[1], brand: brandWords.join(' '), campaign: words.slice(brandWords.length).join(' ') };
+  // 2026 format: no number prefix — first word(s) before | or space are the brand
+  const pipeIdx = raw.indexOf('|');
+  if (pipeIdx > -1) {
+    const brand = raw.substring(0, pipeIdx).trim().split(' ')[0];
+    return { dealNumber: null, brand, campaign: raw.substring(pipeIdx + 1).trim() };
+  }
+  const words = raw.split(' ');
+  let brandWords = [words[0]];
+  if (words[1] && /^[A-Z]/.test(words[1])) brandWords.push(words[1]);
+  return { dealNumber: null, brand: brandWords.join(' '), campaign: words.slice(brandWords.length).join(' ') };
 }
 
 function getMondayCol(item, colId) {
+  if (!colId) return '';
   const col = item.column_values.find(c => c.id === colId);
   return col ? (col.text || '') : '';
 }
@@ -309,17 +371,20 @@ function formatValue(v) {
   return '£' + n.toLocaleString('en-GB', { maximumFractionDigits: 0 });
 }
 
-async function fetchBoardItems(apiKey, boardId) {
+async function fetchBoardItems(apiKey, board) {
+  const c = board.cols;
+  const colIds = [...new Set(Object.values(c))].filter(Boolean);
+  const colList = colIds.map(id => `"${id}"`).join(',');
   let allItems = [], cursor = null;
   do {
-    const gql = `{ boards(ids: ${boardId}) { items_page(limit: 500${cursor ? `, cursor: "${cursor}"` : ''}) { cursor items { name column_values(ids: ["stage_mkkpc6ys","owner_mkkpavhq","originals_value_mkkpy6hv","dup__of_originals_value_mkkptkzq","q1_value_mkkp2qp3","q2_value_mkkpcpmv","q3_value_mkkpecds","q4_value_mkkppnm7","close_date_mkkpvkwv","date_mkz215e1","color_mkz2bhee"]) { id text } } } } }`;
+    const gql = `{ boards(ids: ${board.id}) { items_page(limit: 500${cursor ? `, cursor: "${cursor}"` : ''}) { cursor items { name column_values(ids: [${colList}]) { id text } } } } }`;
     const r = await fetch('https://api.monday.com/v2', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': apiKey, 'API-Version': '2024-01' },
       body: JSON.stringify({ query: gql })
     });
     const d = await r.json();
-    if (d.errors) throw new Error(`Board ${boardId}: ${d.errors[0].message}`);
+    if (d.errors) throw new Error(`Board ${board.id}: ${d.errors[0].message}`);
     const page = d.data.boards[0].items_page;
     allItems = allItems.concat(page.items);
     cursor = page.cursor || null;
@@ -327,28 +392,28 @@ async function fetchBoardItems(apiKey, boardId) {
   return allItems;
 }
 
-function mapDeals(items, pipelineLabel) {
+function mapDeals(items, board) {
+  const c = board.cols;
   return items.map(item => {
     const { dealNumber, brand, campaign } = parseDealName(item.name);
-    const dealValue = parseFloat(getMondayCol(item, 'originals_value_mkkpy6hv')) || 0;
-    const sabValue  = parseFloat(getMondayCol(item, 'dup__of_originals_value_mkkptkzq')) || 0;
-    const q1 = parseFloat(getMondayCol(item, 'q1_value_mkkp2qp3')) || 0;
-    const q2 = parseFloat(getMondayCol(item, 'q2_value_mkkpcpmv')) || 0;
-    const q3 = parseFloat(getMondayCol(item, 'q3_value_mkkpecds')) || 0;
-    const q4 = parseFloat(getMondayCol(item, 'q4_value_mkkppnm7')) || 0;
+    const dealValue = parseFloat(getMondayCol(item, c.dealValue)) || 0;
+    const sabValue  = parseFloat(getMondayCol(item, c.sabValue))  || 0;
+    const q1 = parseFloat(getMondayCol(item, c.q1)) || 0;
+    const q2 = parseFloat(getMondayCol(item, c.q2)) || 0;
+    const q3 = parseFloat(getMondayCol(item, c.q3)) || 0;
+    const q4 = parseFloat(getMondayCol(item, c.q4)) || 0;
     const activeQuarters = ['Q1','Q2','Q3','Q4'].filter((_,i) => [q1,q2,q3,q4][i] > 0);
     return {
       dealNumber, brand, campaign,
-      pipeline:      pipelineLabel,
-      stage:         getMondayCol(item, 'stage_mkkpc6ys') || 'Unknown',
-      owner:         getMondayCol(item, 'owner_mkkpavhq') || '',
-      spendTier:     formatValue(dealValue),
+      pipeline:      board.label,
+      stage:         getMondayCol(item, c.stage)        || 'Unknown',
+      owner:         getMondayCol(item, c.owner)        || '',
+      dealValue:     formatValue(dealValue),
       includesSAB:   sabValue > 0,
-      sabTier:       sabValue > 0 ? formatValue(sabValue) : null,
+      sabValue:      sabValue > 0 ? formatValue(sabValue) : null,
       activeQuarters,
-      signOffDate:   getMondayCol(item, 'date_mkz215e1') || null,
-      closeDate:     getMondayCol(item, 'close_date_mkkpvkwv') || null,
-      newOrExisting: getMondayCol(item, 'color_mkz2bhee') || '',
+      signOffDate:   getMondayCol(item, c.signOffDate)  || null,
+      newOrExisting: getMondayCol(item, c.newOrExisting)|| '',
     };
   }).filter(d => d.brand);
 }
@@ -360,7 +425,7 @@ app.post('/api/monday/sync', requireAuth, async (req, res) => {
   try {
     // Fetch all three boards in parallel
     const boardResults = await Promise.all(
-      MONDAY_BOARDS.map(b => fetchBoardItems(apiKey, b.id).then(items => mapDeals(items, b.label)))
+      MONDAY_BOARDS.map(b => fetchBoardItems(apiKey, b).then(items => mapDeals(items, b)))
     );
 
     const deals = boardResults.flat();
@@ -408,7 +473,7 @@ async function backgroundMondaySync() {
 
     console.log('Monday background sync starting...');
     const boardResults = await Promise.all(
-      MONDAY_BOARDS.map(b => fetchBoardItems(apiKey, b.id).then(items => mapDeals(items, b.label)))
+      MONDAY_BOARDS.map(b => fetchBoardItems(apiKey, b).then(items => mapDeals(items, b)))
     );
     const deals = boardResults.flat();
     await pool.query('DELETE FROM monday_cache');
