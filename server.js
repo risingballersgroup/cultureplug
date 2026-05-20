@@ -193,16 +193,37 @@ app.get('/api/dbcheck', async (req, res) => {
 // ── CHAT ──
 app.post('/api/chat', requireAuth, async (req, res) => {
   try {
+    const body = { ...req.body };
+
+    // Inject web search tool for pre_meeting mode so "What's Happening Now" is live
+    if (body.mode === 'pre_meeting') {
+      body.tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+      // web search requires a newer API version
+      delete body.mode;
+    } else {
+      delete body.mode;
+    }
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01'
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'web-search-2025-03-05'
       },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(body)
     });
     const data = await response.json();
+
+    // Flatten web search results — extract only text content blocks for the frontend
+    if (data.content && Array.isArray(data.content)) {
+      const textBlocks = data.content.filter(b => b.type === 'text');
+      if (textBlocks.length > 0) {
+        data.content = textBlocks;
+      }
+    }
+
     res.status(response.status).json(data);
   } catch (err) {
     res.status(500).json({ error: { message: err.message } });
