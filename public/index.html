@@ -2942,6 +2942,10 @@ function addAIMsg(text, mode) {
   // For pre_meeting mode: action bar sits immediately after the badge, before content
   if (mode === 'pre_meeting') {
     lastPreMeetingText = text;
+    console.log('=== PRE-MEETING RAW TEXT ===\n', text.substring(0, 2000));
+    console.log('=== SECTION HEADERS FOUND ===');
+    const headers = [...text.matchAll(/###\s+\d+\.\s+(.+)/g)];
+    console.log(headers.map(h => h[0]));
     const userEmail = currentUser ? currentUser.email : '';
     const actionBar = `<div style="display:flex;gap:8px;margin:10px 0 14px;padding-bottom:14px;border-bottom:1px solid var(--border);">
       <button onclick="exportPreMeetingPDF()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:8px 14px;border-radius:6px;cursor:pointer;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↓ Export PDF</button>
@@ -3991,13 +3995,20 @@ function exportPreMeetingPDF() {
   const brandName = brandMatch ? brandMatch[1].trim() : 'Brand';
   const fileName = 'PRE-MEETING INTEL - ' + brandName.toUpperCase() + ' - ' + pdfYYMMDD;
 
-  // Parse sections
+  // Parse sections — split on ### N. headers robustly
   const sections = [];
-  const sectionRegex = /###\s+\d+\.\s+(.+?)\n([\s\S]+?)(?=###\s+\d+\.|TONE:|$)/g;
-  let m;
-  while ((m = sectionRegex.exec(text)) !== null) {
-    sections.push({ title: m[1].trim(), body: m[2].trim() });
+  const parts = text.split(/(?=###\s+\d+\.)/);
+  for (const part of parts) {
+    const headerMatch = part.match(/###\s+\d+\.\s+(.+?)\n([\s\S]*)/);
+    if (headerMatch) {
+      const title = headerMatch[1].trim();
+      // Strip trailing TONE: instruction if AI echoes it back
+      let body = headerMatch[2].replace(/\n*TONE:[\s\S]*$/, '').replace(/\n*---\s*$/, '').trim();
+      sections.push({ title, body });
+    }
   }
+
+  console.log('PDF: found', sections.length, 'sections:', sections.map(s => s.title));
 
   const accentColors = ['#c9a84c', '#6366f1', '#2dd4bf', '#c9a84c'];
 
@@ -4172,7 +4183,14 @@ function exportPreMeetingPDF() {
     </div>`;
   }).join('');
 
+  const debugInfo = sections.length < 4
+    ? `<div style="position:fixed;top:0;left:0;right:0;background:#ff6b6b;color:#fff;font-family:monospace;font-size:11px;padding:8px;z-index:9999;">
+        ⚠ Only ${sections.length} section(s) found: ${sections.map(s => s.title).join(' | ')}. Expected 4.
+       </div>`
+    : '';
+
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${fileName}</title><style>${css}</style></head><body>
+    ${debugInfo}
     <div class="wrapper">
       ${header}
       <div class="sections-grid">${page1Sections}</div>
