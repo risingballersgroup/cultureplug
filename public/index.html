@@ -2465,7 +2465,7 @@ You have web search. Run ALL FOUR of these searches before writing — do not sk
 3. "[Brand] stock share price 2026"
 4. "[Brand] campaign launch football culture 2026"
 
-Write exactly FOUR sub-sections. Each must have 2–3 sentences minimum. Do not collapse them into bullets:
+Write exactly FOUR sub-sections. Each must have 2–3 sentences maximum — keep it tight, this must share a page with section 1.
 
 **Football & Partnerships:** New kit deals, athlete signings, tournament sponsorships in football. Name specific players, competitions, agencies. If nothing found via search, say so and note the last known partnership.
 
@@ -4101,12 +4101,14 @@ function exportPreMeetingPDF() {
 
     .page {
       width: 210mm;
-      min-height: 297mm;
+      height: 297mm;
       padding: 11mm 14mm 10mm;
       background: #0e0e0c;
       page-break-after: always;
+      page-break-inside: avoid;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
     .page:last-child { page-break-after: avoid; }
 
@@ -4115,7 +4117,7 @@ function exportPreMeetingPDF() {
       justify-content: space-between;
       align-items: flex-end;
       padding-bottom: 9px;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       border-bottom: 1.5px solid #c9a84c;
       flex-shrink: 0;
     }
@@ -4126,23 +4128,25 @@ function exportPreMeetingPDF() {
     .doc-date { font-family:'DM Mono',monospace; font-size:8px; color:#777; margin-bottom:3px; }
     .doc-confidential { font-family:'DM Mono',monospace; font-size:7px; letter-spacing:1.5px; text-transform:uppercase; color:#333; }
 
-    .section { padding-bottom: 16px; }
-    .section-divider { margin-top: 16px; padding-top: 16px; border-top: 1px solid #1a1a18; }
+    .page-content { flex:1; overflow:hidden; display:flex; flex-direction:column; }
 
-    .section-header { display:flex; align-items:baseline; gap:8px; margin-bottom:6px; }
+    .section { padding-bottom:12px; }
+    .section-divider { margin-top:12px; padding-top:12px; border-top:1px solid #1a1a18; }
+
+    .section-header { display:flex; align-items:baseline; gap:8px; margin-bottom:5px; }
     .section-num { font-family:'DM Mono',monospace; font-size:26px; font-weight:500; opacity:0.15; line-height:1; }
     .section-label { font-family:'DM Mono',monospace; font-size:8.5px; letter-spacing:2px; text-transform:uppercase; font-weight:500; }
-    .section-rule { border-top:1px solid; margin-bottom:10px; }
+    .section-rule { border-top:1px solid; margin-bottom:9px; }
 
-    .section-body { font-size:11px; line-height:1.65; color:#a8a49c; }
-    .section-body p { margin-bottom:7px; }
+    .section-body { font-size:10.5px; line-height:1.6; color:#a8a49c; }
+    .section-body p { margin-bottom:6px; }
     .section-body p:last-child { margin-bottom:0; }
     .section-body strong { color:#f0ede6; font-weight:600; }
     .section-body em { color:#c9a84c; font-style:normal; }
-    .section-body ul { padding-left:0; margin:4px 0 8px; list-style:none; }
-    .section-body li { position:relative; padding-left:14px; margin-bottom:5px; line-height:1.6; }
+    .section-body ul { padding-left:0; margin:3px 0 6px; list-style:none; }
+    .section-body li { position:relative; padding-left:14px; margin-bottom:4px; line-height:1.55; }
     .section-body li::before { content:'—'; position:absolute; left:0; color:#333; }
-    .subhead { font-family:'DM Sans',sans-serif; font-size:11px; font-weight:700; color:#f0ede6; margin:10px 0 4px; }
+    .subhead { font-family:'DM Sans',sans-serif; font-size:10.5px; font-weight:700; color:#f0ede6; margin:9px 0 3px; }
     .subhead:first-child { margin-top:0; }
 
     .moments-body ul.moments-list {
@@ -4154,20 +4158,20 @@ function exportPreMeetingPDF() {
     .moments-body ul.moments-list li { padding-left:14px; }
 
     .doc-footer {
-      margin-top: auto;
-      padding-top: 10px;
-      border-top: 1px solid #1a1a18;
+      flex-shrink: 0;
+      margin-top: 10px;
+      padding-top: 7px;
+      border-top: 1px solid #252523;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-shrink: 0;
     }
-    .doc-footer span { font-family:'DM Mono',monospace; font-size:7.5px; text-transform:uppercase; letter-spacing:1px; color:#2e2e2c; }
+    .doc-footer span { font-family:'DM Mono',monospace; font-size:7.5px; text-transform:uppercase; letter-spacing:1.2px; color:#383836; }
   `;
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${fileName}</title><style>${css}</style></head><body>
-    <div class="page">${header}${page1}${footer(1,2)}</div>
-    <div class="page">${header}${page2}${footer(2,2)}</div>
+    <div class="page">${header}<div class="page-content">${page1}</div>${footer(1,2)}</div>
+    <div class="page">${header}<div class="page-content">${page2}</div>${footer(2,2)}</div>
     <script>window.onload=function(){window.print();}<\/script>
   </body></html>`;
 
