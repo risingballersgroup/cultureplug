@@ -801,6 +801,12 @@
           </div>
           <div id="mondaySyncStatus" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px;display:none;"></div>
         </div>
+
+        <!-- Admin — only visible to eni@risingballers.co.uk -->
+        <div id="adminPanelLink" style="display:none;border-top:1px solid var(--border);margin-top:14px;padding-top:14px;">
+          <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#555;margin-bottom:6px;">Admin</div>
+          <a href="/admin" target="_blank" style="display:block;text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:9px;border-radius:6px;border:1px solid var(--border);color:var(--muted);text-decoration:none;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='#555';this.style.color='#f0ede6'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Usage Analytics →</a>
+        </div>
       </div>
     </div>
   </header>
@@ -3153,16 +3159,7 @@ async function sendMessage() {
       })
     });
 
-    let data;
-    if (modeAtSend === 'pre_meeting') {
-      // Server sends SSE with pings to keep Railway alive, then a data: event with JSON
-      const text = await response.text();
-      const dataLine = text.split('\n').find(l => l.startsWith('data: '));
-      if (!dataLine) throw new Error('No response received — try again.');
-      data = JSON.parse(dataLine.slice(6));
-    } else {
-      data = await response.json();
-    }
+    const data = await response.json();
     removeTyping();
 
     if (data.error) {
@@ -3223,6 +3220,9 @@ setMode('general', document.querySelector('.mode-tab.active'));
       document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
       restoreBookingBtnState();
       loadMondayData();
+      if (user.email === 'eni@risingballers.co.uk') {
+        document.getElementById('adminPanelLink').style.display = 'block';
+      }
     } else {
       document.getElementById('loginGate').style.display = 'block';
       if (errorParam) {
