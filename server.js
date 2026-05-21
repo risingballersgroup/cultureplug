@@ -31,6 +31,13 @@ pool.query(`
     data        JSONB NOT NULL,
     created_at  TIMESTAMPTZ DEFAULT NOW()
   );
+  CREATE TABLE IF NOT EXISTS usage_logs (
+    id          SERIAL PRIMARY KEY,
+    user_email  TEXT NOT NULL,
+    user_name   TEXT,
+    mode        TEXT NOT NULL,
+    logged_at   TIMESTAMPTZ DEFAULT NOW()
+  );
 `).then(() => console.log('DB tables ready'))
   .catch(err => console.error('DB init error:', err.message));
 
@@ -79,6 +86,25 @@ async function requireAuth(req, res, next) {
   if (!session) return res.status(401).json({ error: 'Unauthorised' });
   req.user = session;
   next();
+}
+
+async function requireAdmin(req, res, next) {
+  const session = await getSession(getSessionToken(req));
+  if (!session) return res.redirect('/auth/login');
+  if (session.email !== 'eni@risingballers.co.uk') return res.status(403).send('Forbidden');
+  req.user = session;
+  next();
+}
+
+async function logUsage(email, name, mode) {
+  try {
+    await pool.query(
+      'INSERT INTO usage_logs (user_email, user_name, mode) VALUES ($1, $2, $3)',
+      [email, name || '', mode]
+    );
+  } catch (err) {
+    console.error('Usage log error:', err.message);
+  }
 }
 
 // ── MICROSOFT OAUTH CONFIG ──
@@ -195,6 +221,7 @@ app.post('/api/chat', requireAuth, async (req, res) => {
   try {
     const body = { ...req.body };
     const isPreMeeting = body.mode === 'pre_meeting';
+    const modeLabel = body.mode || 'general';
     delete body.mode;
 
     if (isPreMeeting) {
@@ -210,72 +237,38 @@ app.post('/api/chat', requireAuth, async (req, res) => {
       headers['anthropic-beta'] = 'web-search-2025-03-05';
     }
 
-    // For pre_meeting, keep the Railway connection alive during slow web search
-    // by sending SSE-style pings, then flush the real response at the end
-    if (isPreMeeting) {
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('X-Accel-Buffering', 'no');
-
-      // Ping every 15s so Railway doesn't drop the connection
-      const ping = setInterval(() => {
-        res.write(': ping\n\n');
-      }, 15000);
-
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 90000);
-
-      let data;
-      try {
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST', headers, body: JSON.stringify(body), signal: controller.signal,
-        });
-        data = await response.json();
-      } finally {
-        clearTimeout(timeout);
-        clearInterval(ping);
-      }
-
-      // Flatten text blocks
-      if (data.content && Array.isArray(data.content)) {
-        const textBlocks = data.content.filter(b => b.type === 'text');
-        if (textBlocks.length > 0) {
-          let merged = '';
-          for (const block of textBlocks) {
-            const t = block.text;
-            if (!merged) { merged = t; continue; }
-            if (t.startsWith('\n') || t.startsWith('#') || merged.endsWith('\n')) {
-              merged += t;
-            } else {
-              merged += ' ' + t;
-            }
-          }
-          data.content = [{ type: 'text', text: merged }];
-        }
-      }
-
-      console.log('Pre-meeting block types:', (data.content || []).map(b => b.type));
-
-      // Send the JSON payload as a data event, then close
-      res.write(`data: ${JSON.stringify(data)}\n\n`);
-      res.end();
-      return;
-    }
-
-    // All other modes — normal JSON response
     const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST', headers, body: JSON.stringify(body),
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
     });
-    const data = await response.json();
-    res.status(response.status).json(data);
 
-  } catch (err) {
-    const isTimeout = err.name === 'AbortError';
-    if (!res.headersSent) {
-      res.status(isTimeout ? 504 : 500).json({
-        error: { message: isTimeout ? 'Web search timed out. Please try again.' : err.message }
-      });
+    const data = await response.json();
+
+    // Log usage (fire and forget)
+    if (req.user) logUsage(req.user.email, req.user.name, modeLabel);
+
+    // Flatten — merge all text blocks into one
+    if (data.content && Array.isArray(data.content)) {
+      const textBlocks = data.content.filter(b => b.type === 'text');
+      if (textBlocks.length > 0) {
+        let merged = '';
+        for (const block of textBlocks) {
+          const t = block.text;
+          if (!merged) { merged = t; continue; }
+          if (t.startsWith('\n') || t.startsWith('#') || merged.endsWith('\n')) {
+            merged += t;
+          } else {
+            merged += ' ' + t;
+          }
+        }
+        data.content = [{ type: 'text', text: merged }];
+      }
     }
+
+    res.status(response.status).json(data);
+  } catch (err) {
+    res.status(500).json({ error: { message: err.message } });
   }
 });
 
@@ -520,6 +513,142 @@ app.get('/api/monday/data', requireAuth, async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+// ── ADMIN ──
+app.get('/api/admin/usage', requireAdmin, async (req, res) => {
+  try {
+    const [totals, byMode, byUser, byDay, recent] = await Promise.all([
+      pool.query(`SELECT COUNT(*) as total, COUNT(DISTINCT user_email) as users FROM usage_logs`),
+      pool.query(`SELECT mode, COUNT(*) as count FROM usage_logs GROUP BY mode ORDER BY count DESC`),
+      pool.query(`SELECT user_name, user_email, COUNT(*) as count, MAX(logged_at) as last_seen FROM usage_logs GROUP BY user_name, user_email ORDER BY count DESC`),
+      pool.query(`SELECT DATE(logged_at) as day, COUNT(*) as count FROM usage_logs WHERE logged_at > NOW() - INTERVAL '30 days' GROUP BY day ORDER BY day ASC`),
+      pool.query(`SELECT user_name, user_email, mode, logged_at FROM usage_logs ORDER BY logged_at DESC LIMIT 50`),
+    ]);
+    res.json({
+      totals: totals.rows[0],
+      byMode: byMode.rows,
+      byUser: byUser.rows,
+      byDay: byDay.rows,
+      recent: recent.rows,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/admin', requireAdmin, (req, res) => {
+  res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Culture Plug — Admin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0e0e0c;color:#f0ede6;font-family:'DM Sans',sans-serif;min-height:100vh;padding:32px 40px}
+h1{font-size:13px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:#c9a84c;margin-bottom:4px}
+.subtitle{font-size:12px;color:#555;font-family:'DM Mono',monospace;margin-bottom:32px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:32px}
+.stat{background:#111;border:1px solid #1e1e1b;border-radius:8px;padding:16px}
+.stat-n{font-size:32px;font-weight:700;color:#f0ede6;line-height:1}
+.stat-l{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;color:#555;margin-top:4px}
+.section{margin-bottom:32px}
+.section-title{font-size:10px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:#444;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #1a1a18}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#444;padding:0 12px 8px 0}
+td{padding:8px 12px 8px 0;border-bottom:1px solid #141412;color:#a8a49c}
+td:first-child{color:#f0ede6}
+.badge{display:inline-block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:3px 8px;border-radius:4px;background:#1a1a18;color:#888}
+.bar-wrap{background:#1a1a18;border-radius:3px;height:6px;min-width:60px;flex:1}
+.bar{height:6px;border-radius:3px;background:#c9a84c}
+.bar-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #141412}
+.bar-label{font-size:12px;color:#f0ede6;min-width:140px}
+.bar-count{font-family:'DM Mono',monospace;font-size:11px;color:#555;min-width:30px;text-align:right}
+.loading{color:#444;font-family:'DM Mono',monospace;font-size:11px;padding:40px 0}
+.chart{display:flex;align-items:flex-end;gap:3px;height:80px;margin-bottom:4px}
+.chart-bar{flex:1;background:#c9a84c22;border-radius:2px 2px 0 0;min-width:4px;position:relative;transition:background 0.1s}
+.chart-bar:hover{background:#c9a84c55}
+.chart-bar span{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:9px;font-family:'DM Mono',monospace;color:#888;white-space:nowrap;padding-bottom:2px}
+.chart-bar:hover span{display:block}
+</style></head><body>
+<h1>Culture Plug</h1>
+<div class="subtitle">Usage Analytics — Admin Only</div>
+<div id="root"><div class="loading">Loading...</div></div>
+<script>
+const MODE_LABELS = {
+  general:'General Chat',pitch:'Pitch Brief',email:'Initial Email',brief_upload:'Upload Brief',
+  persona:'Audience Persona',compare:'Audience Comparison',seasonal:'Seasonal Calendar',
+  exec:'Exec Summary',objection:'Objection Handler',bulk_email:'Bulk Email',
+  reach_calc:'Reach Calculator',pre_meeting:'Pre-Meeting Intel',unknown:'Unknown'
+};
+
+async function load() {
+  const r = await fetch('/api/admin/usage');
+  const d = await r.json();
+  if(d.error){document.getElementById('root').innerHTML='<div class="loading">Error: '+d.error+'</div>';return;}
+
+  const maxMode = Math.max(...d.byMode.map(m=>+m.count),1);
+  const maxDay  = Math.max(...d.byDay.map(m=>+m.count),1);
+
+  const chartBars = d.byDay.map(row=>{
+    const h = Math.max(4, Math.round((+row.count/maxDay)*80));
+    const label = new Date(row.day).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    return \`<div class="chart-bar" style="height:\${h}px"><span>\${label}: \${row.count}</span></div>\`;
+  }).join('');
+
+  const modeRows = d.byMode.map(row=>{
+    const pct = Math.round(+row.count/maxMode*100);
+    const label = MODE_LABELS[row.mode]||row.mode;
+    return \`<div class="bar-row">
+      <div class="bar-label">\${label}</div>
+      <div class="bar-wrap"><div class="bar" style="width:\${pct}%"></div></div>
+      <div class="bar-count">\${row.count}</div>
+    </div>\`;
+  }).join('');
+
+  const userRows = d.byUser.map(row=>{
+    const last = new Date(row.last_seen).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+    return \`<tr><td>\${row.user_name||'—'}</td><td style="color:#555">\${row.user_email}</td><td>\${row.count}</td><td style="color:#555">\${last}</td></tr>\`;
+  }).join('');
+
+  const recentRows = d.recent.map(row=>{
+    const when = new Date(row.logged_at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    const label = MODE_LABELS[row.mode]||row.mode;
+    return \`<tr><td>\${row.user_name||'—'}</td><td><span class="badge">\${label}</span></td><td style="color:#555">\${when}</td></tr>\`;
+  }).join('');
+
+  document.getElementById('root').innerHTML = \`
+    <div class="grid">
+      <div class="stat"><div class="stat-n">\${d.totals.total}</div><div class="stat-l">Total Queries</div></div>
+      <div class="stat"><div class="stat-n">\${d.totals.users}</div><div class="stat-l">Active Users</div></div>
+      <div class="stat"><div class="stat-n">\${d.byMode.length}</div><div class="stat-l">Modes Used</div></div>
+      <div class="stat"><div class="stat-n">\${d.byDay.length > 0 ? d.byDay[d.byDay.length-1].count : 0}</div><div class="stat-l">Queries Today</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Activity — Last 30 Days</div>
+      <div class="chart">\${chartBars||'<div style="color:#333;font-size:11px;font-family:DM Mono,monospace">No data yet</div>'}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Usage by Mode</div>
+      \${modeRows||'<div class="loading">No data yet</div>'}
+    </div>
+
+    <div class="section">
+      <div class="section-title">Team Members</div>
+      <table><thead><tr><th>Name</th><th>Email</th><th>Queries</th><th>Last Active</th></tr></thead>
+      <tbody>\${userRows||'<tr><td colspan="4" style="color:#333">No data yet</td></tr>'}</tbody></table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Recent Activity</div>
+      <table><thead><tr><th>User</th><th>Mode</th><th>Time</th></tr></thead>
+      <tbody>\${recentRows||'<tr><td colspan="3" style="color:#333">No data yet</td></tr>'}</tbody></table>
+    </div>
+  \`;
+}
+load();
+</script></body></html>`);
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
