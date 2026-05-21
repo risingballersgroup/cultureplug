@@ -3153,7 +3153,16 @@ async function sendMessage() {
       })
     });
 
-    const data = await response.json();
+    let data;
+    if (modeAtSend === 'pre_meeting') {
+      // Server sends SSE with pings to keep Railway alive, then a data: event with JSON
+      const text = await response.text();
+      const dataLine = text.split('\n').find(l => l.startsWith('data: '));
+      if (!dataLine) throw new Error('No response received — try again.');
+      data = JSON.parse(dataLine.slice(6));
+    } else {
+      data = await response.json();
+    }
     removeTyping();
 
     if (data.error) {
