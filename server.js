@@ -210,44 +210,72 @@ app.post('/api/chat', requireAuth, async (req, res) => {
       headers['anthropic-beta'] = 'web-search-2025-03-05';
     }
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body)
-    });
-
-    const data = await response.json();
-
-    // Log for debugging
+    // For pre_meeting, keep the Railway connection alive during slow web search
+    // by sending SSE-style pings, then flush the real response at the end
     if (isPreMeeting) {
-      const types = (data.content || []).map(b => b.type);
-      console.log('Pre-meeting response block types:', types);
-    }
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('X-Accel-Buffering', 'no');
 
-    // Flatten — combine all text blocks, web search results inject into text naturally
-    if (data.content && Array.isArray(data.content)) {
-      const textBlocks = data.content.filter(b => b.type === 'text');
-      if (textBlocks.length > 0) {
-        // Join with space — web search splits mid-sentence across blocks
-        // Use smart join: if block starts with newline keep it, otherwise join with space
-        let merged = '';
-        for (const block of textBlocks) {
-          const t = block.text;
-          if (!merged) { merged = t; continue; }
-          // If the new block starts a new line/section, keep newline; otherwise join inline
-          if (t.startsWith('\n') || t.startsWith('#') || merged.endsWith('\n')) {
-            merged += t;
-          } else {
-            merged += ' ' + t;
-          }
-        }
-        data.content = [{ type: 'text', text: merged }];
+      // Ping every 15s so Railway doesn't drop the connection
+      const ping = setInterval(() => {
+        res.write(': ping\n\n');
+      }, 15000);
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 90000);
+
+      let data;
+      try {
+        const response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST', headers, body: JSON.stringify(body), signal: controller.signal,
+        });
+        data = await response.json();
+      } finally {
+        clearTimeout(timeout);
+        clearInterval(ping);
       }
+
+      // Flatten text blocks
+      if (data.content && Array.isArray(data.content)) {
+        const textBlocks = data.content.filter(b => b.type === 'text');
+        if (textBlocks.length > 0) {
+          let merged = '';
+          for (const block of textBlocks) {
+            const t = block.text;
+            if (!merged) { merged = t; continue; }
+            if (t.startsWith('\n') || t.startsWith('#') || merged.endsWith('\n')) {
+              merged += t;
+            } else {
+              merged += ' ' + t;
+            }
+          }
+          data.content = [{ type: 'text', text: merged }];
+        }
+      }
+
+      console.log('Pre-meeting block types:', (data.content || []).map(b => b.type));
+
+      // Send the JSON payload as a data event, then close
+      res.write(`data: ${JSON.stringify(data)}\n\n`);
+      res.end();
+      return;
     }
 
+    // All other modes — normal JSON response
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST', headers, body: JSON.stringify(body),
+    });
+    const data = await response.json();
     res.status(response.status).json(data);
+
   } catch (err) {
-    res.status(500).json({ error: { message: err.message } });
+    const isTimeout = err.name === 'AbortError';
+    if (!res.headersSent) {
+      res.status(isTimeout ? 504 : 500).json({
+        error: { message: isTimeout ? 'Web search timed out. Please try again.' : err.message }
+      });
+    }
   }
 });
 
