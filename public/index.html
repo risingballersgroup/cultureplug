@@ -48,6 +48,134 @@
     height: 100vh;
   }
 
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: 240px;
+    background: #0a0a08;
+    border-right: 1px solid #1a1a18;
+    display: flex;
+    flex-direction: column;
+    z-index: 50;
+    transform: translateX(-240px);
+    transition: transform 0.2s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-header {
+    padding: 18px 16px 12px;
+    border-bottom: 1px solid #1a1a18;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .sidebar-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #444;
+  }
+  .sidebar-new {
+    background: none;
+    border: 1px solid #1e1e1b;
+    color: #666;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .sidebar-new:hover { border-color: var(--accent); color: var(--accent); }
+  .sidebar-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+  }
+  .sidebar-group-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #333;
+    padding: 10px 16px 4px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 0;
+    transition: background 0.1s;
+    gap: 8px;
+  }
+  .sidebar-item:hover { background: #111; }
+  .sidebar-item.active { background: #141412; border-left: 2px solid var(--accent); padding-left: 14px; }
+  .sidebar-item-text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    line-height: 1.3;
+  }
+  .sidebar-item.active .sidebar-item-text { color: #c8c4bc; }
+  .sidebar-item-del {
+    background: none;
+    border: none;
+    color: #2a2a28;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0 2px;
+    flex-shrink: 0;
+    transition: color 0.1s;
+    display: none;
+  }
+  .sidebar-item:hover .sidebar-item-del { display: block; }
+  .sidebar-item-del:hover { color: #ff6b6b; }
+  .sidebar-empty {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #2a2a28;
+    text-align: center;
+    padding: 32px 16px;
+    line-height: 1.6;
+  }
+  .sidebar-toggle {
+    position: fixed;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    background: #111;
+    border: 1px solid #1e1e1b;
+    border-left: none;
+    color: #444;
+    cursor: pointer;
+    padding: 10px 5px;
+    border-radius: 0 5px 5px 0;
+    z-index: 51;
+    transition: color 0.15s, background 0.15s;
+    font-size: 11px;
+    line-height: 1;
+  }
+  .sidebar-toggle:hover { color: var(--accent); background: #161614; }
+  .sidebar-toggle.pushed { left: 240px; }
+  /* Shift main content when sidebar open */
+  .app.sidebar-open .main,
+  .app.sidebar-open .input-wrapper,
+  .app.sidebar-open header {
+    margin-left: 240px;
+    transition: margin-left 0.2s ease;
+  }
+
   /* ── HEADER ── */
   header {
     display: flex;
@@ -748,6 +876,18 @@
 
 <div class="app" id="appShell" style="display:none">
 
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">History</span>
+      <button class="sidebar-new" onclick="startNewConversation()">+ New</button>
+    </div>
+    <div class="sidebar-list" id="sidebarList">
+      <div class="sidebar-empty">Your conversations<br>will appear here</div>
+    </div>
+  </div>
+  <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle history">&#8942;</button>
+
   <header>
     <a class="logo" href="#" onclick="goHome(); return false;">
       <span>Certified</span>
@@ -1353,6 +1493,158 @@
 <script>
 let isLoading = false;
 let conversationHistory = [];
+let currentConversationId = null;
+let currentConversationMode = 'general';
+let sidebarOpen = false;
+
+// ── SIDEBAR ──
+function toggleSidebar() {
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
+  document.getElementById('appShell').classList.toggle('sidebar-open', sidebarOpen);
+  document.getElementById('sidebarToggle').classList.toggle('pushed', sidebarOpen);
+}
+
+async function loadSidebar() {
+  try {
+    const res = await fetch('/api/conversations');
+    if (!res.ok) return;
+    const convos = await res.json();
+    renderSidebar(convos);
+  } catch (e) { console.warn('Sidebar load failed:', e.message); }
+}
+
+function renderSidebar(convos) {
+  const list = document.getElementById('sidebarList');
+  if (!convos.length) {
+    list.innerHTML = '<div class="sidebar-empty">Your conversations<br>will appear here</div>';
+    return;
+  }
+
+  // Group by date
+  const groups = { 'Today': [], 'Yesterday': [], 'Last 7 Days': [], 'Older': [] };
+  const now = new Date();
+  convos.forEach(c => {
+    const d = new Date(c.updated_at);
+    const diffDays = Math.floor((now - d) / 86400000);
+    if (diffDays < 1) groups['Today'].push(c);
+    else if (diffDays < 2) groups['Yesterday'].push(c);
+    else if (diffDays < 7) groups['Last 7 Days'].push(c);
+    else groups['Older'].push(c);
+  });
+
+  let html = '';
+  for (const [label, items] of Object.entries(groups)) {
+    if (!items.length) continue;
+    html += `<div class="sidebar-group-label">${label}</div>`;
+    items.forEach(c => {
+      const active = c.id === currentConversationId ? ' active' : '';
+      const title = c.title.length > 32 ? c.title.slice(0, 32) + '…' : c.title;
+      html += `<div class="sidebar-item${active}" onclick="loadConversation(${c.id})" data-id="${c.id}">
+        <span class="sidebar-item-text">${title}</span>
+        <button class="sidebar-item-del" onclick="deleteConversation(event,${c.id})" title="Delete">×</button>
+      </div>`;
+    });
+  }
+  list.innerHTML = html;
+}
+
+async function saveConversation(userText, aiText, mode) {
+  try {
+    if (!currentConversationId) {
+      // New conversation — use first user message as title (truncated)
+      const title = userText.slice(0, 60) + (userText.length > 60 ? '…' : '');
+      const res = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, mode, history: conversationHistory })
+      });
+      const d = await res.json();
+      currentConversationId = d.id;
+    } else {
+      // Update existing
+      await fetch(`/api/conversations/${currentConversationId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ history: conversationHistory, mode })
+      });
+    }
+    loadSidebar();
+  } catch (e) { console.warn('Save conversation failed:', e.message); }
+}
+
+async function loadConversation(id) {
+  try {
+    const res = await fetch(`/api/conversations/${id}`);
+    if (!res.ok) return;
+    const convo = await res.json();
+
+    // Restore state
+    currentConversationId = convo.id;
+    conversationHistory = convo.history || [];
+    currentConversationMode = convo.mode || 'general';
+
+    // Switch to correct mode tab
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    const modeMap = {
+      general: 'General Chat', email: 'Initial Email', pitch: 'Pitch Brief',
+      persona: 'Audience Persona', compare: 'Audience Comparison',
+      calendar: 'Seasonal Calendar', exec: 'Exec Summary',
+      objection: 'Objection Handler', pre_meeting: 'Pre-Meeting Intel'
+    };
+    document.querySelectorAll('.mode-tab').forEach(t => {
+      if (t.textContent.trim() === (modeMap[convo.mode] || 'General Chat')) t.classList.add('active');
+    });
+    currentMode = convo.mode || 'general';
+
+    // Render messages from history
+    const messagesEl = document.getElementById('messages');
+    messagesEl.innerHTML = '';
+    const pairs = [];
+    for (let i = 0; i < conversationHistory.length; i += 2) {
+      if (conversationHistory[i] && conversationHistory[i+1]) {
+        pairs.push({ user: conversationHistory[i].content, ai: conversationHistory[i+1].content });
+      }
+    }
+    pairs.forEach(pair => {
+      addUserMsg(typeof pair.user === 'string' ? pair.user : '[message]');
+      addAIMsg(typeof pair.ai === 'string' ? pair.ai : '[response]', convo.mode || 'general');
+    });
+
+    // Show chat view
+    document.getElementById('landing').style.display = 'none';
+    document.getElementById('chatView').classList.add('visible');
+
+    // Update sidebar active state
+    document.querySelectorAll('.sidebar-item').forEach(el => {
+      el.classList.toggle('active', +el.dataset.id === id);
+    });
+
+    scrollBottom();
+  } catch (e) { console.warn('Load conversation failed:', e.message); }
+}
+
+async function deleteConversation(e, id) {
+  e.stopPropagation();
+  try {
+    await fetch(`/api/conversations/${id}`, { method: 'DELETE' });
+    if (currentConversationId === id) startNewConversation();
+    else loadSidebar();
+  } catch (e) { console.warn('Delete failed:', e.message); }
+}
+
+function startNewConversation() {
+  currentConversationId = null;
+  conversationHistory = [];
+  currentMode = 'general';
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.mode-tab')?.classList.add('active');
+  document.getElementById('messages').innerHTML = '';
+  document.getElementById('chatView').classList.remove('visible');
+  document.getElementById('landing').style.display = '';
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  loadSidebar();
+}
 let attachedFile = null;
 let attachedFileContent = '';
 let imageCompressing = null; // Promise that resolves when image is ready
@@ -2873,6 +3165,8 @@ function goHome() {
   document.getElementById('chatView').classList.remove('visible');
   document.getElementById('messages').innerHTML = '';
   conversationHistory = [];
+  currentConversationId = null;
+  document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').style.height = 'auto';
   removeFile();
@@ -3188,6 +3482,7 @@ async function sendMessage() {
 
       conversationHistory.push({ role: 'user', content: userText || 'Build a pitch brief' });
       conversationHistory.push({ role: 'assistant', content: aiText });
+      saveConversation(userText || 'Build a pitch brief', aiText, modeAtSend);
       addAIMsg(aiText, modeAtSend);
     }
   } catch (err) {
@@ -3219,6 +3514,7 @@ setMode('general', document.querySelector('.mode-tab.active'));
       document.getElementById('userAvatar').textContent = user.name.charAt(0).toUpperCase();
       restoreBookingBtnState();
       loadMondayData();
+      loadSidebar();
       if (user.email === 'eni@risingballers.co.uk') {
         document.getElementById('adminPanelLink').style.display = 'block';
       }
