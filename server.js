@@ -38,6 +38,16 @@ pool.query(`
     mode        TEXT NOT NULL,
     logged_at   TIMESTAMPTZ DEFAULT NOW()
   );
+  CREATE TABLE IF NOT EXISTS conversations (
+    id          SERIAL PRIMARY KEY,
+    user_email  TEXT NOT NULL,
+    title       TEXT NOT NULL,
+    mode        TEXT NOT NULL DEFAULT 'general',
+    history     JSONB NOT NULL DEFAULT '[]',
+    created_at  TIMESTAMPTZ DEFAULT NOW(),
+    updated_at  TIMESTAMPTZ DEFAULT NOW()
+  );
+  CREATE INDEX IF NOT EXISTS conversations_user_email_idx ON conversations (user_email, updated_at DESC);
 `).then(() => console.log('DB tables ready'))
   .catch(err => console.error('DB init error:', err.message));
 
@@ -650,6 +660,76 @@ async function load() {
 load();
 </script></body></html>`);
 });
+
+// ── CONVERSATIONS ──
+// List user's conversations (last 90 days)
+app.get('/api/conversations', requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT id, title, mode, created_at, updated_at
+       FROM conversations
+       WHERE user_email = $1 AND updated_at > NOW() - INTERVAL '90 days'
+       ORDER BY updated_at DESC
+       LIMIT 200`,
+      [req.user.email]
+    );
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Get single conversation with full history
+app.get('/api/conversations/:id', requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT * FROM conversations WHERE id = $1 AND user_email = $2`,
+      [req.params.id, req.user.email]
+    );
+    if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
+    res.json(result.rows[0]);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Create new conversation
+app.post('/api/conversations', requireAuth, async (req, res) => {
+  try {
+    const { title, mode, history } = req.body;
+    const result = await pool.query(
+      `INSERT INTO conversations (user_email, title, mode, history)
+       VALUES ($1, $2, $3, $4) RETURNING id`,
+      [req.user.email, title || 'New conversation', mode || 'general', JSON.stringify(history || [])]
+    );
+    res.json({ id: result.rows[0].id });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Update existing conversation
+app.patch('/api/conversations/:id', requireAuth, async (req, res) => {
+  try {
+    const { title, history, mode } = req.body;
+    await pool.query(
+      `UPDATE conversations SET title = COALESCE($1, title), history = COALESCE($2, history),
+       mode = COALESCE($3, mode), updated_at = NOW()
+       WHERE id = $4 AND user_email = $5`,
+      [title, history ? JSON.stringify(history) : null, mode, req.params.id, req.user.email]
+    );
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Delete conversation
+app.delete('/api/conversations/:id', requireAuth, async (req, res) => {
+  try {
+    await pool.query(
+      `DELETE FROM conversations WHERE id = $1 AND user_email = $2`,
+      [req.params.id, req.user.email]
+    );
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+// Purge conversations older than 90 days (runs on startup)
+pool.query(`DELETE FROM conversations WHERE updated_at < NOW() - INTERVAL '90 days'`)
+  .catch(err => console.error('Conversation purge error:', err.message));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
