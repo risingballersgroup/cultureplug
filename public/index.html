@@ -157,16 +157,22 @@
     background: #111;
     border: 1px solid #1e1e1b;
     border-left: none;
-    color: #444;
+    color: #555;
     cursor: pointer;
-    padding: 10px 5px;
-    border-radius: 0 5px 5px 0;
+    padding: 10px 8px;
+    border-radius: 0 6px 6px 0;
     z-index: 51;
-    transition: color 0.15s, background 0.15s;
-    font-size: 11px;
-    line-height: 1;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    line-height: 1.6;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    white-space: nowrap;
   }
-  .sidebar-toggle:hover { color: var(--accent); background: #161614; }
+  .sidebar-toggle:hover { color: var(--accent); background: #161614; border-color: #2a2a28; }
   .sidebar-toggle.pushed { left: 240px; }
   /* Shift main content when sidebar open */
   .app.sidebar-open .main,
@@ -886,7 +892,7 @@
       <div class="sidebar-empty">Your conversations<br>will appear here</div>
     </div>
   </div>
-  <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="Toggle history">&#8942;</button>
+  <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="View previous searches">Previous Searches</button>
 
   <header>
     <a class="logo" href="#" onclick="goHome(); return false;">
