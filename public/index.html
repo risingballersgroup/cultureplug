@@ -4145,7 +4145,7 @@ function mpRenderPaidRatecard() {
     tr.innerHTML = `
       <td style="font-size:10px;">${typeLabel}</td>
       <td style="text-align:center;">${pltBadge(platform)}</td>
-      <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.budget)}" onchange="MP_PAID_RATECARD['SAB'][${i}].budget=parseFloat(this.value.replace(/,/g,''));" style="width:68px;text-align:center;font-size:10px;"></td>
+      <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${mpCurrency === 'USD' ? fmtN(Math.round(row.budget * GBP_TO_USD)) : fmtN(row.budget)}" onchange="MP_PAID_RATECARD['SAB'][${i}].budget=parseFloat(this.value.replace(/,/g,''));" style="width:68px;text-align:center;font-size:10px;"></td>
       <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" onchange="MP_PAID_RATECARD['SAB'][${i}].reach=parseFloat(this.value.replace(/,/g,''));" style="width:72px;text-align:center;font-size:10px;"></td>
       <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" onchange="MP_PAID_RATECARD['SAB'][${i}].imps=parseFloat(this.value.replace(/,/g,''));" style="width:72px;text-align:center;font-size:10px;"></td>
       <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.views||0)}" onchange="MP_PAID_RATECARD['SAB'][${i}].views=parseFloat(this.value.replace(/,/g,''));" style="width:72px;text-align:center;font-size:10px;"></td>
@@ -4236,7 +4236,7 @@ function mpRenderRatecard() {
       tr.innerHTML = `
         <td style="max-width:110px;">${abbreviateFormat(row.format)}</td>
         <td style="text-align:center;">${pltBadge(row.platform)}</td>
-        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.cost)}" data-raw="${row.cost}" onchange="mpRates['${brand}'][${i}].cost=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:72px;text-align:center;"></td>
+        <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${mpCurrency === 'USD' ? fmtN(Math.round(row.cost * GBP_TO_USD)) : fmtN(row.cost)}" data-raw="${row.cost}" onchange="mpRates['${brand}'][${i}].cost=parseFloat(this.value.replace(/,/g,''))${mpCurrency === 'USD' ? '/GBP_TO_USD' : ''};mpRecalc()" style="width:72px;text-align:center;"></td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.reach)}" data-raw="${row.reach}" onchange="mpRates['${brand}'][${i}].reach=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:76px;text-align:center;"></td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.imps)}" data-raw="${row.imps}" onchange="mpRates['${brand}'][${i}].imps=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:76px;text-align:center;"></td>
         <td style="text-align:center;"><input class="mp-qty-input rc-editable" disabled type="text" value="${fmtN(row.views)}" data-raw="${row.views}" onchange="mpRates['${brand}'][${i}].views=parseFloat(this.value.replace(/,/g,''));mpRecalc()" style="width:76px;text-align:center;"></td>
@@ -4257,9 +4257,9 @@ function mpRenderPlanInputs() {
       tr.innerHTML = `
         <td style="font-size:11px;">${abbreviateFormat(row.format)}</td>
         <td style="text-align:center;">${pltBadge(row.platform)}</td>
-        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">${fmtGBP(row.cost)}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">${fmtCurrency(row.cost)}</td>
         <td><input class="mp-qty-input" type="number" value="0" min="0" id="qty_${brand}_${i}" oninput="mpRecalc()" style="width:34px;"></td>
-        <td id="rowCost_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;">£0</td>
+        <td id="rowCost_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;">${fmtCurrency(0)}</td>
         <td id="rowReach_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
         <td id="rowImps_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
         <td id="rowViews_${brand}_${i}" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);">0</td>
