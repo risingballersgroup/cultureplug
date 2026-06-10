@@ -1220,16 +1220,20 @@
       <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;">
         <h2 style="font-family:'Playfair Display',serif;font-size:20px;color:var(--white);margin:0;white-space:nowrap;">Review & confirm rates</h2>
         <span style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);">Locked by default — unlock to override for a specific deal.</span>
-        <div style="display:flex;align-items:center;gap:12px;margin-left:auto;white-space:nowrap;">
-          <label style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;">
-            <input type="checkbox" id="rcUnlock" onchange="toggleRatecardLock()" style="accent-color:var(--accent);width:13px;height:13px;">
-            Unlock ratecard
-          </label>
-          <div style="display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:6px;padding:4px 2px;background:var(--surface);">
-            <button id="currGBP" onclick="setCurrency('GBP')" style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:4px;border:none;cursor:pointer;background:var(--accent);color:var(--bg);font-weight:700;">£ GBP</button>
-            <button id="currUSD" onclick="setCurrency('USD')" style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:4px;border:none;cursor:pointer;background:transparent;color:var(--muted);">$ USD</button>
-          </div>
+        <label style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;margin-left:auto;white-space:nowrap;">
+          <input type="checkbox" id="rcUnlock" onchange="toggleRatecardLock()" style="accent-color:var(--accent);width:13px;height:13px;">
+          Unlock ratecard
+        </label>
+      </div>
+
+      <!-- Currency toggle -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;width:fit-content;">
+        <span style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);">Currency</span>
+        <div style="display:flex;gap:4px;">
+          <button id="currGBP" onclick="setCurrency('GBP')" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:5px 14px;border-radius:5px;border:none;cursor:pointer;background:var(--accent);color:var(--bg);font-weight:700;transition:all 0.15s;">£ GBP</button>
+          <button id="currUSD" onclick="setCurrency('USD')" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:5px 14px;border-radius:5px;border:1px solid var(--border);cursor:pointer;background:transparent;color:var(--muted);font-weight:700;transition:all 0.15s;">$ USD</button>
         </div>
+        <span id="mpCurrencyRate" style="font-family:'DM Mono',monospace;font-size:9px;color:#444;letter-spacing:0.5px;">Rate: £1 = $1.3377 (10 Jun 2026)</span>
       </div>
 
       <!-- ROW 1: RB + SAB side by side -->
@@ -4073,8 +4077,12 @@ function setCurrency(code) {
   // Update toggle button styles
   document.getElementById('currGBP').style.background = code === 'GBP' ? 'var(--accent)' : 'transparent';
   document.getElementById('currGBP').style.color = code === 'GBP' ? 'var(--bg)' : 'var(--muted)';
+  document.getElementById('currGBP').style.border = code === 'GBP' ? 'none' : '1px solid var(--border)';
   document.getElementById('currUSD').style.background = code === 'USD' ? 'var(--accent)' : 'transparent';
   document.getElementById('currUSD').style.color = code === 'USD' ? 'var(--bg)' : 'var(--muted)';
+  document.getElementById('currUSD').style.border = code === 'USD' ? 'none' : '1px solid var(--border)';
+  const rateNote = document.getElementById('mpCurrencyRate');
+  if (rateNote) rateNote.style.color = code === 'USD' ? '#888' : '#444';
   // Update column headers
   document.querySelectorAll('.mp-cost-header').forEach(el => {
     el.textContent = code === 'USD' ? 'Cost ($)' : 'Cost (£)';
