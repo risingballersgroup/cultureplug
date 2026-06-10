@@ -1220,10 +1220,16 @@
       <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:10px;">
         <h2 style="font-family:'Playfair Display',serif;font-size:20px;color:var(--white);margin:0;white-space:nowrap;">Review & confirm rates</h2>
         <span style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);">Locked by default — unlock to override for a specific deal.</span>
-        <label style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;margin-left:auto;white-space:nowrap;">
-          <input type="checkbox" id="rcUnlock" onchange="toggleRatecardLock()" style="accent-color:var(--accent);width:13px;height:13px;">
-          Unlock ratecard
-        </label>
+        <div style="display:flex;align-items:center;gap:12px;margin-left:auto;white-space:nowrap;">
+          <label style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox" id="rcUnlock" onchange="toggleRatecardLock()" style="accent-color:var(--accent);width:13px;height:13px;">
+            Unlock ratecard
+          </label>
+          <div style="display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:6px;padding:4px 2px;background:var(--surface);">
+            <button id="currGBP" onclick="setCurrency('GBP')" style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:4px;border:none;cursor:pointer;background:var(--accent);color:var(--bg);font-weight:700;">£ GBP</button>
+            <button id="currUSD" onclick="setCurrency('USD')" style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:4px;border:none;cursor:pointer;background:transparent;color:var(--muted);">$ USD</button>
+          </div>
+        </div>
       </div>
 
       <!-- ROW 1: RB + SAB side by side -->
@@ -1231,14 +1237,14 @@
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Rising Ballers — Organic</div>
           <table class="mp-table rc-compact" id="rcTableRB">
-            <colgroup><col style="width:108px"><col style="width:30px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:72px"><col style="width:62px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th style="text-align:center;">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
+            <colgroup><col style="width:108px"><col style="width:30px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:72px"><col style="width:62px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th style="text-align:center;" class="mp-cost-header">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
             <tbody id="rcBodyRB"></tbody>
           </table>
         </div>
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--pink);margin-bottom:5px;">She's A Baller — Organic</div>
           <table class="mp-table rc-compact" id="rcTableSAB">
-            <colgroup><col style="width:108px"><col style="width:30px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:72px"><col style="width:62px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th style="text-align:center;">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
+            <colgroup><col style="width:108px"><col style="width:30px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:72px"><col style="width:62px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th style="text-align:center;" class="mp-cost-header">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
             <tbody id="rcBodySAB"></tbody>
           </table>
         </div>
@@ -1249,7 +1255,7 @@
         <div>
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-bottom:5px;min-height:24px;display:flex;align-items:flex-end;">Rising Ballers USA — Organic</div>
           <table class="mp-table rc-compact" id="rcTableRBUSA">
-            <colgroup><col style="width:108px"><col style="width:30px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:72px"><col style="width:62px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th style="text-align:center;">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
+            <colgroup><col style="width:108px"><col style="width:30px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:72px"><col style="width:62px"></colgroup><thead><tr><th>Format</th><th style="text-align:center;">Plt</th><th style="text-align:center;" class="mp-cost-header">Cost (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th></tr></thead>
             <tbody id="rcBodyRBUSA"></tbody>
           </table>
         </div>
@@ -1257,7 +1263,7 @@
           <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;min-height:24px;display:flex;align-items:flex-end;">Paid Benchmarking — per £1,000 spend <span style="color:var(--muted);font-size:8px;text-transform:none;letter-spacing:0;margin-left:4px;">(up to 3% of budget)</span></div>
           <table class="mp-table rc-compact" id="rcPaidTableSAB">
             <colgroup><col style="width:108px"><col style="width:30px"><col style="width:68px"><col style="width:72px"><col style="width:72px"><col style="width:72px"><col style="width:62px"><col style="width:0px"></colgroup>
-            <thead><tr><th>Type</th><th style="text-align:center;">Plt</th><th style="text-align:center;">Budget (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th><th></th></tr></thead>
+            <thead><tr><th>Type</th><th style="text-align:center;">Plt</th><th style="text-align:center;" class="mp-budget-header">Budget (£)</th><th style="text-align:center;">Reach</th><th style="text-align:center;">Imps</th><th style="text-align:center;">Views</th><th style="text-align:center;">Engs</th><th></th></tr></thead>
             <tbody id="rcPaidBodySAB"></tbody>
           </table>
         </div>
@@ -1284,7 +1290,7 @@
           <input id="mpCampaignName" type="text" placeholder="e.g. WC 2026" class="mp-input" style="font-size:12px;padding:7px 10px;">
         </div>
         <div>
-          <label class="mp-label">Budget (£)</label>
+          <label class="mp-label" id="mpBudgetLabel">Budget (£)</label>
           <input id="mpBudget" type="text" inputmode="numeric" placeholder="e.g. 100,000" class="mp-input" oninput="mpRecalc()" style="font-size:12px;padding:7px 10px;">
         </div>
         <div>
@@ -4049,7 +4055,44 @@ function mpGoStep(n) {
 
 function fmt(n) { return isNaN(n) ? '0' : Math.round(n).toLocaleString('en-GB'); }
 function fmtN(n) { return isNaN(n) ? '0' : Number(n).toLocaleString('en-GB'); }
-function fmtGBP(n) { return '£' + fmt(n); }
+// ── CURRENCY ──
+let mpCurrency = 'GBP';
+const GBP_TO_USD = 1.3377; // Rate as of 10 Jun 2026
+
+function fmtCurrency(n) {
+  if (mpCurrency === 'USD') {
+    return '$' + fmt(Math.round(n * GBP_TO_USD));
+  }
+  return '£' + fmt(n);
+}
+
+function fmtGBP(n) { return fmtCurrency(n); }
+
+function setCurrency(code) {
+  mpCurrency = code;
+  // Update toggle button styles
+  document.getElementById('currGBP').style.background = code === 'GBP' ? 'var(--accent)' : 'transparent';
+  document.getElementById('currGBP').style.color = code === 'GBP' ? 'var(--bg)' : 'var(--muted)';
+  document.getElementById('currUSD').style.background = code === 'USD' ? 'var(--accent)' : 'transparent';
+  document.getElementById('currUSD').style.color = code === 'USD' ? 'var(--bg)' : 'var(--muted)';
+  // Update column headers
+  document.querySelectorAll('.mp-cost-header').forEach(el => {
+    el.textContent = code === 'USD' ? 'Cost ($)' : 'Cost (£)';
+  });
+  document.querySelectorAll('.mp-budget-header').forEach(el => {
+    el.textContent = code === 'USD' ? 'Budget ($)' : 'Budget (£)';
+  });
+  // Update budget label
+  const budgetLabel = document.getElementById('mpBudgetLabel');
+  if (budgetLabel) budgetLabel.textContent = code === 'USD' ? 'Budget ($)' : 'Budget (£)';
+  // Update budget input placeholder
+  const budgetInput = document.getElementById('mpBudget');
+  if (budgetInput) budgetInput.placeholder = code === 'USD' ? 'e.g. 67,000' : 'e.g. 50,000';
+  // Recalculate all displays
+  mpRecalc();
+  mpRenderRatecard();
+  mpRenderPaidRatecard();
+}
 
 function toggleRatecardLock() {
   const unlocked = document.getElementById('rcUnlock').checked;
@@ -4316,7 +4359,7 @@ function mpRecalc() {
     const iEl2 = document.getElementById('mpPaidTotalImpsSAB');
     const vEl2 = document.getElementById('mpPaidTotalViewsSAB');
     const eEl2 = document.getElementById('mpPaidTotalEngsSAB');
-    if (bEl) bEl.textContent = anySpend ? fmtGBP(pBudget) : '£0';
+    if (bEl) bEl.textContent = anySpend ? fmtGBP(pBudget) : fmtCurrency(0);
     if (rEl2) rEl2.textContent = anySpend ? fmt(pReach) : '—';
     if (iEl2) iEl2.textContent = anySpend ? fmt(pImps)  : '—';
     if (vEl2) vEl2.textContent = anySpend ? fmt(pViews) : '—';
