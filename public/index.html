@@ -4271,7 +4271,9 @@ function mpRenderPlanInputs() {
 }
 
 function mpRecalc() {
-  const budget = parseFloat((document.getElementById('mpBudget').value||'').replace(/,/g,'')) || 0;
+  const rawBudget = parseFloat((document.getElementById('mpBudget').value||'').replace(/,/g,'')) || 0;
+  // If USD is selected, user enters USD — convert back to GBP for all internal calculations
+  const budget = mpCurrency === 'USD' ? rawBudget / GBP_TO_USD : rawBudget;
   const orgPct  = parseFloat(document.getElementById('mpOrgPct').value) || 0;
   const ampPct  = parseFloat(document.getElementById('mpAmpPct').value) || 0;
   const prodPct = parseFloat(document.getElementById('mpProdPct').value) || 0;
@@ -4284,9 +4286,9 @@ function mpRecalc() {
     warn.textContent = 'Warning: allocations total ' + totalPct + '% — must not exceed 100%';
   }
 
-  document.getElementById('mpOrgBudgetDisplay').textContent  = fmtGBP(budget * orgPct / 100);
-  document.getElementById('mpAmpBudgetDisplay').textContent  = fmtGBP(budget * ampPct / 100);
-  document.getElementById('mpProdBudgetDisplay').textContent = fmtGBP(budget * prodPct / 100);
+  document.getElementById('mpOrgBudgetDisplay').textContent  = fmtCurrency(budget * orgPct / 100);
+  document.getElementById('mpAmpBudgetDisplay').textContent  = fmtCurrency(budget * ampPct / 100);
+  document.getElementById('mpProdBudgetDisplay').textContent = fmtCurrency(budget * prodPct / 100);
 
   let totalPosts=0, totalTiles=0, totalCost=0, totalReach=0, totalImps=0, totalViews=0, totalEngs=0;
 
@@ -4321,7 +4323,7 @@ function mpRecalc() {
   const addedValue = totalCost - orgBudget;
   const addedPctLive = orgBudget > 0 ? Math.round((addedValue / orgBudget) * 100) : 0;
   document.getElementById('mpSumPosts').textContent = fmt(totalPosts);
-  document.getElementById('mpSumValue').textContent = fmtGBP(totalCost);
+  document.getElementById('mpSumValue').textContent = fmtCurrency(totalCost);
   document.getElementById('mpSumAdded').textContent = addedPctLive + '%';
   document.getElementById('mpSumReach').textContent = fmt(totalReach);
   const impEl = document.getElementById('mpSumImps');
@@ -4346,7 +4348,7 @@ function mpRecalc() {
       if (iEl) iEl.textContent = spend > 0 ? fmt(Math.round(row.imps  * ratio)) : '—';
       if (vEl) vEl.textContent = spend > 0 ? fmt(Math.round((row.views||row.imps) * ratio)) : '—';
       if (eEl) eEl.textContent = spend > 0 ? fmt(Math.round(row.engs  * ratio)) : '—';
-      if (sEl) sEl.textContent = spend > 0 ? fmtGBP(spend) : '—';
+      if (sEl) sEl.textContent = spend > 0 ? fmtCurrency(spend) : '—';
     });
     let pBudget=0, pReach=0, pImps=0, pViews=0, pEngs=0, anySpend=false;
     MP_PAID_RATECARD['SAB'].forEach((row, i) => {
@@ -4378,7 +4380,7 @@ function mpRecalc() {
     const totalCostWithPaid = totalCost + pBudget;
     const addedValueWithPaid = totalCostWithPaid - orgBudget;
     const addedPctWithPaid = orgBudget > 0 ? Math.round((addedValueWithPaid / orgBudget) * 100) : 0;
-    document.getElementById('mpSumValue').textContent = fmtGBP(totalCostWithPaid);
+    document.getElementById('mpSumValue').textContent = fmtCurrency(totalCostWithPaid);
     document.getElementById('mpSumAdded').textContent = addedPctWithPaid + '%';
     document.getElementById('mpSumReach').textContent = fmt(totalReach + pReach);
     const impEl2 = document.getElementById('mpSumImps');
