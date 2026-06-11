@@ -744,10 +744,8 @@ app.get('/api/signals', requireAuth, async (req, res) => {
 
     if (priority && priority !== 'All') {
       query += `&priority=eq.${encodeURIComponent(priority)}`;
-    } else {
-      // Default: only High and Very High
-      query += `&priority=in.(High,Very High)`;
     }
+    // Note: when 'All' is selected, no priority filter applied — returns everything
 
     if (search) {
       query += `&or=(signal.ilike.*${encodeURIComponent(search)}*,author.ilike.*${encodeURIComponent(search)}*,opportunity.ilike.*${encodeURIComponent(search)}*)`;
@@ -758,15 +756,21 @@ app.get('/api/signals', requireAuth, async (req, res) => {
         'apikey': key,
         'Authorization': `Bearer ${key}`,
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       }
     });
 
+    const responseText = await r.text();
+    console.log(`Signals API status: ${r.status}, body: ${responseText.slice(0, 300)}`);
+
     if (!r.ok) {
-      const err = await r.text();
-      return res.status(r.status).json({ error: err });
+      return res.status(r.status).json({ error: `Supabase error ${r.status}: ${responseText.slice(0, 200)}` });
     }
 
-    const data = await r.json();
+    let data;
+    try { data = JSON.parse(responseText); }
+    catch(e) { return res.status(500).json({ error: `Invalid JSON from Supabase: ${responseText.slice(0, 200)}` }); }
+
     res.json(data);
   } catch (err) {
     res.status(500).json({ error: err.message });
