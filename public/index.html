@@ -1227,14 +1227,13 @@
 
     <!-- Header -->
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+      <button onclick="closeSignals()" style="background:none;border:1px solid #444;color:#f0ede6;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='#444';this.style.color='#f0ede6'">← Home</button>
       <div>
         <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Rising Ballers Intelligence</div>
         <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);margin:0;">Signals <span style="color:var(--accent);font-style:italic;">Feed</span></h2>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
-        <!-- Search -->
         <input id="signalsSearch" type="text" placeholder="Search signals or brands..." onkeydown="if(event.key==='Enter')loadSignals()" style="background:var(--surface);border:1px solid var(--border);color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 14px;border-radius:6px;outline:none;width:220px;">
-        <!-- Priority filter -->
         <select id="signalsPriority" onchange="loadSignals()" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:8px 12px;border-radius:6px;outline:none;text-transform:uppercase;">
           <option value="All">All Priorities</option>
           <option value="Very High" selected>Very High</option>
@@ -1242,7 +1241,6 @@
           <option value="Medium">Medium</option>
         </select>
         <button onclick="loadSignals()" style="background:var(--accent);color:var(--bg);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:700;">Refresh</button>
-        <button onclick="closeSignals()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;padding:8px 14px;border-radius:6px;cursor:pointer;">← Home</button>
       </div>
     </div>
 
