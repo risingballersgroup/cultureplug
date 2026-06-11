@@ -1240,6 +1240,13 @@
           <option value="High">High</option>
           <option value="Medium">Medium</option>
         </select>
+        <select id="signalsCRM" onchange="loadSignals()" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:8px 12px;border-radius:6px;outline:none;text-transform:uppercase;">
+          <option value="All">All Brands</option>
+          <option value="crm">CRM Matches Only</option>
+          <option value="existing">Existing Clients</option>
+          <option value="warm">Warm Leads</option>
+          <option value="new">Not in CRM</option>
+        </select>
         <button onclick="loadSignals()" style="background:var(--accent);color:var(--bg);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:700;">Refresh</button>
       </div>
     </div>
@@ -1774,6 +1781,61 @@ async function loadSignalsSidebar() {
 
 let sidebarOpen = false;
 
+// ── MONDAY COMPANIES (for Signal CRM matching) ──
+let mondayCompanies = [];
+
+async function loadMondayCompanies() {
+  try {
+    const res = await fetch('/api/monday/companies');
+    if (!res.ok) return;
+    const d = await res.json();
+    if (d.companies && d.companies.length) {
+      mondayCompanies = d.companies;
+      console.log(`Companies loaded: ${mondayCompanies.length}`);
+    }
+  } catch(e) { console.warn('Companies load failed:', e.message); }
+}
+
+function matchCompany(author) {
+  if (!author || !mondayCompanies.length) return null;
+  const a = author.toLowerCase().trim();
+  // Exact match first
+  let match = mondayCompanies.find(c => c.nameLower === a);
+  if (!match) {
+    // Partial match — company name contained in author or vice versa
+    match = mondayCompanies.find(c =>
+      a.includes(c.nameLower) || c.nameLower.includes(a) ||
+      // Handle common variations e.g. "Nike Football" → "Nike"
+      a.split(' ')[0] === c.nameLower.split(' ')[0]
+    );
+  }
+  return match || null;
+}
+
+function getCRMBadge(company) {
+  if (!company) return '';
+  const group = company.group || '';
+  const brief = company.brief2026 || '';
+
+  let label, color;
+  if (group.toLowerCase().includes('existing')) {
+    label = 'Existing Client';
+    color = '#2dd4bf';
+  } else if (group.toLowerCase().includes('warm')) {
+    label = 'Warm Lead';
+    color = '#c9a84c';
+  } else {
+    label = 'In CRM';
+    color = '#6366f1';
+  }
+
+  const briefTag = brief && brief !== 'No' && brief !== ''
+    ? `<span style="font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1px;padding:2px 5px;border-radius:3px;background:${color}22;color:${color};text-transform:uppercase;margin-left:3px;">${brief}</span>`
+    : '';
+
+  return `<span style="font-family:'DM Mono',monospace;font-size:7px;letter-spacing:1px;padding:2px 6px;border-radius:3px;background:${color}22;color:${color};text-transform:uppercase;border:1px solid ${color}44;">${label}</span>${briefTag}`;
+}
+
 // ── SIGNALS ──
 let signalsOffset = 0;
 let signalsTotal = 0;
@@ -1827,7 +1889,21 @@ async function loadSignals(append = false) {
       return;
     }
 
-    data.forEach(s => feed.appendChild(buildSignalCard(s)));
+    // Apply CRM filter client-side
+    const crmFilter = document.getElementById('signalsCRM')?.value || 'All';
+    let filtered = data;
+    if (crmFilter !== 'All') {
+      filtered = data.filter(s => {
+        const company = matchCompany(s.author);
+        if (crmFilter === 'crm') return !!company;
+        if (crmFilter === 'existing') return company && company.group?.toLowerCase().includes('existing');
+        if (crmFilter === 'warm') return company && company.group?.toLowerCase().includes('warm');
+        if (crmFilter === 'new') return !company;
+        return true;
+      });
+    }
+
+    filtered.forEach(s => feed.appendChild(buildSignalCard(s)));
 
     signalsOffset += data.length;
     const loadMoreBtn = document.getElementById('signalsLoadMore');
@@ -1857,6 +1933,10 @@ function buildSignalCard(s) {
   const opportunity = s.opportunity ? s.opportunity.slice(0, 200) + (s.opportunity.length > 200 ? '…' : '') : '';
   const signalText = s.signal ? s.signal.slice(0, 180) + (s.signal.length > 180 ? '…' : '') : '';
 
+  // CRM match
+  const company = matchCompany(s.author);
+  const crmBadge = getCRMBadge(company);
+
   card.innerHTML = `
     <div class="signal-meta">
       <span class="signal-badge signal-badge-channel">${s.channel || 'Web'}</span>
@@ -1865,12 +1945,16 @@ function buildSignalCard(s) {
       ${engText ? `<span class="signal-badge signal-badge-channel">${engText}</span>` : ''}
       <span class="signal-date">${date}</span>
     </div>
-    ${s.author ? `<div class="signal-author">📍 ${s.author}</div>` : ''}
+    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+      ${s.author ? `<div class="signal-author">📍 ${s.author}</div>` : ''}
+      ${crmBadge}
+    </div>
     <div class="signal-text">${signalText}</div>
     ${opportunity ? `<div class="signal-opportunity">💡 ${opportunity}</div>` : ''}
+    ${company && company.statusNote ? `<div style="font-family:'DM Mono',monospace;font-size:9px;color:#444;margin-top:2px;letter-spacing:0.5px;">CRM: ${company.statusNote.slice(0,80)}</div>` : ''}
     <div class="signal-actions">
-      <button class="signal-action-btn primary" onclick="signalToPitchBrief(${JSON.stringify(s.author||'').replace(/"/g,'&quot;')}, ${JSON.stringify(signalText).replace(/"/g,'&quot;')}, ${JSON.stringify(opportunity).replace(/"/g,'&quot;')})">Pitch Brief</button>
-      <button class="signal-action-btn" onclick="signalToEmail(${JSON.stringify(s.author||'').replace(/"/g,'&quot;')}, ${JSON.stringify(signalText).replace(/"/g,'&quot;')})">Draft Email</button>
+      <button class="signal-action-btn primary" onclick="signalToPitchBrief('${(s.author||'').replace(/'/g,"\\'")}', '${signalText.replace(/'/g,"\\'")}', '${opportunity.replace(/'/g,"\\'")}')">Pitch Brief</button>
+      <button class="signal-action-btn" onclick="signalToEmail('${(s.author||'').replace(/'/g,"\\'")}', '${signalText.replace(/'/g,"\\'")}')">Draft Email</button>
       ${s.url ? `<a href="${s.url}" target="_blank" style="flex:0.5;text-align:center;" class="signal-action-btn">View →</a>` : ''}
     </div>`;
 
@@ -4135,6 +4219,7 @@ setMode('general', document.querySelector('.mode-tab.active'));
       loadMondayData();
       loadSidebar();
       loadSignalsSidebar();
+      loadMondayCompanies();
       if (user.email === 'eni@risingballers.co.uk') {
         document.getElementById('adminPanelLink').style.display = 'block';
       }
