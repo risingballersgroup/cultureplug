@@ -48,7 +48,36 @@
     height: 100vh;
   }
 
-  /* ── SIDEBAR ── */
+  /* ── SIGNALS ── */
+  .signal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.15s;
+  }
+  .signal-card:hover { border-color: #333; }
+  .signal-card.priority-vh { border-left: 3px solid #e879f9; }
+  .signal-card.priority-h  { border-left: 3px solid var(--accent); }
+  .signal-card.priority-m  { border-left: 3px solid #6366f1; }
+  .signal-meta { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .signal-badge { font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1px; text-transform:uppercase; padding:2px 7px; border-radius:3px; }
+  .signal-badge-channel { background:#1a1a18; color:#666; }
+  .signal-badge-vh { background:#e879f922; color:#e879f9; }
+  .signal-badge-h  { background:#c9a84c22; color:#c9a84c; }
+  .signal-badge-m  { background:#6366f122; color:#6366f1; }
+  .signal-author { font-family:'DM Sans',sans-serif; font-size:11px; color:var(--muted); }
+  .signal-date { font-family:'DM Mono',monospace; font-size:9px; color:#444; margin-left:auto; }
+  .signal-text { font-family:'DM Sans',sans-serif; font-size:13px; color:#d8d4cc; line-height:1.5; }
+  .signal-opportunity { font-family:'DM Sans',sans-serif; font-size:11px; color:#888; line-height:1.55; border-top:1px solid #1a1a18; padding-top:8px; }
+  .signal-actions { display:flex; gap:6px; padding-top:4px; border-top:1px solid #1a1a18; }
+  .signal-action-btn { flex:1; background:none; border:1px solid var(--border); color:var(--muted); font-family:'DM Mono',monospace; font-size:8px; letter-spacing:1px; text-transform:uppercase; padding:6px 8px; border-radius:5px; cursor:pointer; transition:border-color 0.15s,color 0.15s; }
+  .signal-action-btn:hover { border-color:var(--accent); color:var(--accent); }
+  .signal-action-btn.primary { background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:700; }
+  .signal-action-btn.primary:hover { opacity:0.85; }
   .sidebar {
     position: fixed;
     top: 0; left: 0; bottom: 0;
@@ -977,6 +1006,7 @@
           <button class="mode-tab" onclick="setMode('objection', this)">Objection Handler</button>
           <button class="mode-tab" onclick="showBulkMode(this)">Bulk Email</button>
           <button class="mode-tab" onclick="showReachCalculator(this)">Reach Calculator</button>
+          <button class="mode-tab" onclick="showSignals(this)">Signals</button>
           <button class="mode-tab" onclick="setMode('pre_meeting', this)">Pre-Meeting Intel</button>
         </div>
       </div>
@@ -1036,6 +1066,46 @@
       </div>
     </div>
   </div>
+
+<!-- ── SIGNALS PANEL ── -->
+<div id="signalsPanel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:200;overflow-y:auto;padding:20px;">
+  <div style="max-width:1100px;margin:0 auto;">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Rising Ballers Intelligence</div>
+        <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);margin:0;">Signals <span style="color:var(--accent);font-style:italic;">Feed</span></h2>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+        <!-- Search -->
+        <input id="signalsSearch" type="text" placeholder="Search signals or brands..." onkeydown="if(event.key==='Enter')loadSignals()" style="background:var(--surface);border:1px solid var(--border);color:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 14px;border-radius:6px;outline:none;width:220px;">
+        <!-- Priority filter -->
+        <select id="signalsPriority" onchange="loadSignals()" style="background:var(--surface);border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;padding:8px 12px;border-radius:6px;outline:none;text-transform:uppercase;">
+          <option value="All">All Priorities</option>
+          <option value="Very High" selected>Very High</option>
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+        </select>
+        <button onclick="loadSignals()" style="background:var(--accent);color:var(--bg);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:700;">Refresh</button>
+        <button onclick="closeSignals()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;padding:8px 14px;border-radius:6px;cursor:pointer;">✕ Close</button>
+      </div>
+    </div>
+
+    <!-- Stats bar -->
+    <div id="signalsStats" style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:16px;"></div>
+
+    <!-- Feed -->
+    <div id="signalsFeed" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;">
+      <div style="color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;padding:40px;text-align:center;grid-column:1/-1;">Loading signals...</div>
+    </div>
+
+    <!-- Load more -->
+    <div style="text-align:center;margin-top:20px;">
+      <button id="signalsLoadMore" onclick="loadMoreSignals()" style="display:none;background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:10px 24px;border-radius:6px;cursor:pointer;">Load More</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── REACH CALCULATOR MODAL ── -->
 <div id="reachCalc" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:200; overflow-y:auto; padding:40px 20px;">
@@ -1512,7 +1582,127 @@ let currentConversationId = null;
 let currentConversationMode = 'general';
 let sidebarOpen = false;
 
-// ── SIDEBAR ──
+// ── SIGNALS ──
+let signalsOffset = 0;
+let signalsTotal = 0;
+const SIGNALS_LIMIT = 30;
+
+function showSignals(btn) {
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('signalsPanel').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  signalsOffset = 0;
+  loadSignals();
+}
+
+function closeSignals() {
+  document.getElementById('signalsPanel').style.display = 'none';
+  document.body.style.overflow = '';
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.mode-tab')?.classList.add('active');
+}
+
+async function loadSignals(append = false) {
+  if (!append) signalsOffset = 0;
+
+  const priority = document.getElementById('signalsPriority').value;
+  const search = document.getElementById('signalsSearch').value.trim();
+
+  const params = new URLSearchParams({
+    limit: SIGNALS_LIMIT,
+    offset: signalsOffset,
+    priority,
+    ...(search ? { search } : {})
+  });
+
+  const feed = document.getElementById('signalsFeed');
+  if (!append) feed.innerHTML = '<div style="color:var(--muted);font-family:\'DM Mono\',monospace;font-size:11px;padding:40px;text-align:center;grid-column:1/-1;">Loading signals...</div>';
+
+  try {
+    const res = await fetch(`/api/signals?${params}`);
+    const data = await res.json();
+
+    if (data.error) {
+      feed.innerHTML = `<div style="color:#ff6b6b;font-family:'DM Mono',monospace;font-size:11px;padding:40px;text-align:center;grid-column:1/-1;">⚠ ${data.error}</div>`;
+      return;
+    }
+
+    if (!append) feed.innerHTML = '';
+
+    if (!data.length && !append) {
+      feed.innerHTML = '<div style="color:var(--muted);font-family:\'DM Mono\',monospace;font-size:11px;padding:40px;text-align:center;grid-column:1/-1;">No signals found</div>';
+      return;
+    }
+
+    data.forEach(s => feed.appendChild(buildSignalCard(s)));
+
+    signalsOffset += data.length;
+    const loadMoreBtn = document.getElementById('signalsLoadMore');
+    loadMoreBtn.style.display = data.length === SIGNALS_LIMIT ? 'inline-block' : 'none';
+
+    // Update stats
+    const statsEl = document.getElementById('signalsStats');
+    if (statsEl) statsEl.textContent = `Showing ${signalsOffset} signals · Filtered by: ${priority === 'All' ? 'All priorities' : priority} ${search ? '· Search: "' + search + '"' : ''}`;
+
+  } catch (err) {
+    feed.innerHTML = `<div style="color:#ff6b6b;font-family:'DM Mono',monospace;font-size:11px;padding:40px;text-align:center;grid-column:1/-1;">Connection error — check SIGNALS_SUPABASE_URL and SIGNALS_SUPABASE_KEY in Railway</div>`;
+  }
+}
+
+function loadMoreSignals() {
+  loadSignals(true);
+}
+
+function buildSignalCard(s) {
+  const card = document.createElement('div');
+  const priorityClass = s.priority === 'Very High' ? 'priority-vh' : s.priority === 'High' ? 'priority-h' : 'priority-m';
+  const priorityBadgeClass = s.priority === 'Very High' ? 'signal-badge-vh' : s.priority === 'High' ? 'signal-badge-h' : 'signal-badge-m';
+  card.className = `signal-card ${priorityClass}`;
+
+  const date = s.scrape_date ? new Date(s.scrape_date).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '';
+  const engText = s.views ? `${fmtN(s.views)} views` : s.likes ? `${fmtN(s.likes)} likes` : '';
+  const opportunity = s.opportunity ? s.opportunity.slice(0, 200) + (s.opportunity.length > 200 ? '…' : '') : '';
+  const signalText = s.signal ? s.signal.slice(0, 180) + (s.signal.length > 180 ? '…' : '') : '';
+
+  card.innerHTML = `
+    <div class="signal-meta">
+      <span class="signal-badge signal-badge-channel">${s.channel || 'Web'}</span>
+      <span class="signal-badge ${priorityBadgeClass}">${s.priority}</span>
+      ${s.category ? `<span class="signal-badge signal-badge-channel">${s.category}</span>` : ''}
+      ${engText ? `<span class="signal-badge signal-badge-channel">${engText}</span>` : ''}
+      <span class="signal-date">${date}</span>
+    </div>
+    ${s.author ? `<div class="signal-author">📍 ${s.author}</div>` : ''}
+    <div class="signal-text">${signalText}</div>
+    ${opportunity ? `<div class="signal-opportunity">💡 ${opportunity}</div>` : ''}
+    <div class="signal-actions">
+      <button class="signal-action-btn primary" onclick="signalToPitchBrief(${JSON.stringify(s.author||'').replace(/"/g,'&quot;')}, ${JSON.stringify(signalText).replace(/"/g,'&quot;')}, ${JSON.stringify(opportunity).replace(/"/g,'&quot;')})">Pitch Brief</button>
+      <button class="signal-action-btn" onclick="signalToEmail(${JSON.stringify(s.author||'').replace(/"/g,'&quot;')}, ${JSON.stringify(signalText).replace(/"/g,'&quot;')})">Draft Email</button>
+      ${s.url ? `<a href="${s.url}" target="_blank" style="flex:0.5;text-align:center;" class="signal-action-btn">View →</a>` : ''}
+    </div>`;
+
+  return card;
+}
+
+function signalToPitchBrief(author, signalText, opportunity) {
+  closeSignals();
+  setMode('pitch', document.querySelector('.mode-tab'));
+  document.querySelector('.mode-tab[onclick*="pitch"]')?.classList.add('active');
+  const prompt = `Create a pitch brief for ${author || 'this brand'}.\n\nSignal: ${signalText}\n\nOpportunity: ${opportunity}`;
+  document.getElementById('inputBox').value = prompt;
+  document.getElementById('inputBox').dispatchEvent(new Event('input'));
+  showChat();
+}
+
+function signalToEmail(author, signalText) {
+  closeSignals();
+  setMode('email', document.querySelector('.mode-tab[onclick*="email"]'));
+  const prompt = `Draft an outreach email to ${author || 'the brand'} referencing this signal: ${signalText}`;
+  document.getElementById('inputBox').value = prompt;
+  document.getElementById('inputBox').dispatchEvent(new Event('input'));
+  showChat();
+}
 function toggleSidebar() {
   sidebarOpen = !sidebarOpen;
   document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
