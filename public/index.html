@@ -1843,9 +1843,11 @@ const SIGNALS_LIMIT = 30;
 
 function showSignals(btn) {
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  if (btn && btn.classList && btn.classList.contains('mode-tab')) btn.classList.add('active');
   document.getElementById('signalsPanel').style.display = 'block';
   document.body.style.overflow = 'hidden';
+  const sb = document.getElementById('signalsSidebar');
+  if (sb) sb.style.display = 'none';
   signalsOffset = 0;
   loadSignals();
 }
@@ -1853,6 +1855,8 @@ function showSignals(btn) {
 function closeSignals() {
   document.getElementById('signalsPanel').style.display = 'none';
   document.body.style.overflow = '';
+  const sb = document.getElementById('signalsSidebar');
+  if (sb) sb.style.display = '';
   document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
   document.querySelector('.mode-tab')?.classList.add('active');
 }
@@ -1863,8 +1867,11 @@ async function loadSignals(append = false) {
   const priority = document.getElementById('signalsPriority').value;
   const search = document.getElementById('signalsSearch').value.trim();
 
+  const crmFilter = document.getElementById('signalsCRM')?.value || 'All';
+  const fetchLimit = crmFilter !== 'All' ? 200 : SIGNALS_LIMIT;
+
   const params = new URLSearchParams({
-    limit: SIGNALS_LIMIT,
+    limit: fetchLimit,
     offset: signalsOffset,
     priority,
     ...(search ? { search } : {})
@@ -1890,7 +1897,6 @@ async function loadSignals(append = false) {
     }
 
     // Apply CRM filter client-side
-    const crmFilter = document.getElementById('signalsCRM')?.value || 'All';
     let filtered = data;
     if (crmFilter !== 'All') {
       filtered = data.filter(s => {
