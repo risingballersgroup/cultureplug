@@ -351,6 +351,11 @@ pool.query(`
     data      JSONB NOT NULL,
     synced_at TIMESTAMPTZ DEFAULT NOW()
   );
+  CREATE TABLE IF NOT EXISTS monday_companies (
+    id        SERIAL PRIMARY KEY,
+    data      JSONB NOT NULL,
+    synced_at TIMESTAMPTZ DEFAULT NOW()
+  );
 `).catch(err => console.error('monday_cache init error:', err.message));
 
 // Per-board column schemas — IDs differ between the 2026 and 2024/2025 boards
@@ -491,15 +496,67 @@ function mapDeals(items, board) {
   }).filter(d => d.brand);
 }
 
+const COMPANIES_BOARD_ID = '1353139720';
+
+async function syncCompanies(apiKey) {
+  // Fetch with group info to get Existing/Warm/Cold classification
+  const gql = `{
+    boards(ids: ${COMPANIES_BOARD_ID}) {
+      groups { id title }
+      items_page(limit: 500) {
+        items {
+          name
+          group { id title }
+          column_values(ids: ["status5","status","text_mm2cxdcd","color_mkwewzf1","color_mm29fhhh","multiple_person_mm1vvbf3"]) {
+            id text
+          }
+        }
+      }
+    }
+  }`;
+
+  const r = await fetch('https://api.monday.com/v2', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': apiKey, 'API-Version': '2024-01' },
+    body: JSON.stringify({ query: gql })
+  });
+  const d = await r.json();
+  if (d.errors) throw new Error(d.errors[0].message);
+
+  const items = d.data.boards[0].items_page.items;
+
+  const companies = items.map(item => {
+    const col = (id) => (item.column_values.find(c => c.id === id) || {}).text || '';
+    return {
+      name: item.name.trim(),
+      group: item.group?.title || '',   // "Existing Clients", "Warm Leads", "Cold"
+      priority: col('status5'),
+      brief2026: col('status'),
+      statusNote: col('text_mm2cxdcd'),
+      spend: col('color_mkwewzf1'),
+      relationship: col('color_mm29fhhh'),
+      owner: col('multiple_person_mm1vvbf3'),
+      nameLower: item.name.trim().toLowerCase(),
+    };
+  });
+
+  await pool.query('DELETE FROM monday_companies');
+  await pool.query('INSERT INTO monday_companies (data) VALUES ($1)', [JSON.stringify({ companies, syncedAt: new Date().toISOString() })]);
+  console.log(`Companies sync: ${companies.length} companies cached`);
+  return companies;
+}
+
+// Sync Companies as part of Monday sync endpoint
 app.post('/api/monday/sync', requireAuth, async (req, res) => {
   const apiKey = process.env.MONDAY_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'MONDAY_API_KEY not set in Railway env vars' });
 
   try {
-    // Fetch all three boards in parallel
-    const boardResults = await Promise.all(
-      MONDAY_BOARDS.map(b => fetchBoardItems(apiKey, b).then(items => mapDeals(items, b)))
-    );
+    // Fetch all three pipeline boards + Companies in parallel
+    const [boardResults, companies] = await Promise.all([
+      Promise.all(MONDAY_BOARDS.map(b => fetchBoardItems(apiKey, b).then(items => mapDeals(items, b)))),
+      syncCompanies(apiKey)
+    ]);
 
     const deals = boardResults.flat();
     const counts = MONDAY_BOARDS.map((b, i) => `${b.label}: ${boardResults[i].length}`);
@@ -508,7 +565,7 @@ app.post('/api/monday/sync', requireAuth, async (req, res) => {
     await pool.query('DELETE FROM monday_cache');
     await pool.query('INSERT INTO monday_cache (data) VALUES ($1)', [JSON.stringify({ deals, syncedAt: new Date().toISOString() })]);
 
-    res.json({ ok: true, count: deals.length, breakdown: counts, syncedAt: new Date().toISOString() });
+    res.json({ ok: true, count: deals.length, companies: companies.length, breakdown: counts, syncedAt: new Date().toISOString() });
   } catch (err) {
     console.error('Monday sync error:', err.message);
     res.status(500).json({ error: err.message });
@@ -519,6 +576,16 @@ app.get('/api/monday/data', requireAuth, async (req, res) => {
   try {
     const result = await pool.query('SELECT data, synced_at FROM monday_cache ORDER BY synced_at DESC LIMIT 1');
     if (!result.rows.length) return res.json({ deals: [], syncedAt: null });
+    res.json({ ...result.rows[0].data, syncedAt: result.rows[0].synced_at });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/api/monday/companies', requireAuth, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT data, synced_at FROM monday_companies ORDER BY synced_at DESC LIMIT 1');
+    if (!result.rows.length) return res.json({ companies: [], syncedAt: null });
     res.json({ ...result.rows[0].data, syncedAt: result.rows[0].synced_at });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -797,9 +864,10 @@ async function backgroundMondaySync() {
     }
 
     console.log('Monday background sync starting...');
-    const boardResults = await Promise.all(
-      MONDAY_BOARDS.map(b => fetchBoardItems(apiKey, b).then(items => mapDeals(items, b)))
-    );
+    const [boardResults] = await Promise.all([
+      Promise.all(MONDAY_BOARDS.map(b => fetchBoardItems(apiKey, b).then(items => mapDeals(items, b)))),
+      syncCompanies(apiKey)
+    ]);
     const deals = boardResults.flat();
     await pool.query('DELETE FROM monday_cache');
     await pool.query('INSERT INTO monday_cache (data) VALUES ($1)', [JSON.stringify({ deals, syncedAt: new Date().toISOString() })]);
