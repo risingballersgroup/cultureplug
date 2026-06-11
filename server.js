@@ -731,6 +731,48 @@ app.delete('/api/conversations/:id', requireAuth, async (req, res) => {
 pool.query(`DELETE FROM conversations WHERE updated_at < NOW() - INTERVAL '90 days'`)
   .catch(err => console.error('Conversation purge error:', err.message));
 
+// ── SIGNALS (Supabase proxy) ──
+app.get('/api/signals', requireAuth, async (req, res) => {
+  const url = process.env.SIGNALS_SUPABASE_URL;
+  const key = process.env.SIGNALS_SUPABASE_KEY;
+  if (!url || !key) return res.status(500).json({ error: 'Signals not configured — add SIGNALS_SUPABASE_URL and SIGNALS_SUPABASE_KEY to Railway env vars' });
+
+  try {
+    const { priority, search, limit = 50, offset = 0 } = req.query;
+
+    let query = `${url}/rest/v1/signals?select=id,scrape_date,channel,signal,insight,opportunity,priority,author,category,url,likes,comments,views,is_favorite,tags&order=scrape_date.desc&limit=${limit}&offset=${offset}`;
+
+    if (priority && priority !== 'All') {
+      query += `&priority=eq.${encodeURIComponent(priority)}`;
+    } else {
+      // Default: only High and Very High
+      query += `&priority=in.(High,Very High)`;
+    }
+
+    if (search) {
+      query += `&or=(signal.ilike.*${encodeURIComponent(search)}*,author.ilike.*${encodeURIComponent(search)}*,opportunity.ilike.*${encodeURIComponent(search)}*)`;
+    }
+
+    const r = await fetch(query, {
+      headers: {
+        'apikey': key,
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!r.ok) {
+      const err = await r.text();
+      return res.status(r.status).json({ error: err });
+    }
+
+    const data = await r.json();
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── MONDAY BACKGROUND SYNC ──
