@@ -54,33 +54,35 @@
     display: flex;
     width: 100%;
     max-width: 1080px;
-    gap: 0;
     align-items: stretch;
-    overflow: hidden;
+    position: relative;
   }
   .landing-left {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0 32px 100px 48px;
+    padding: 0 48px 100px;
     gap: 20px;
-    min-width: 0;
   }
   .landing-right {
-    width: 300px;
-    flex-shrink: 0;
+    position: fixed;
+    top: 56px; /* below header */
+    right: 0;
+    bottom: 60px; /* above input bar */
+    width: 260px;
     border-left: 1px solid var(--border);
+    background: #0a0a08;
     display: flex;
     flex-direction: column;
-    padding: 24px 0 100px;
+    z-index: 10;
     overflow: hidden;
   }
   .signals-sidebar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px 12px;
+    padding: 12px 14px 10px;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
   }
@@ -101,12 +103,12 @@
   .signals-sidebar-list {
     flex: 1;
     overflow-y: auto;
-    padding: 8px 0;
+    padding: 4px 0;
     scrollbar-width: thin;
     scrollbar-color: #1e1e1b transparent;
   }
   .signals-sidebar-item {
-    padding: 10px 16px;
+    padding: 9px 14px;
     border-bottom: 1px solid #0f0f0d;
     cursor: pointer;
     transition: background 0.1s;
@@ -116,7 +118,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
   }
   .signals-sidebar-badge {
     font-family: 'DM Mono', monospace;
@@ -125,6 +127,7 @@
     text-transform: uppercase;
     padding: 2px 5px;
     border-radius: 3px;
+    flex-shrink: 0;
   }
   .signals-sidebar-badge-vh { background: #e879f922; color: #e879f9; }
   .signals-sidebar-badge-h  { background: #c9a84c22; color: #c9a84c; }
@@ -146,12 +149,12 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
   .signals-sidebar-opportunity {
     font-family: 'DM Sans', sans-serif;
     font-size: 10px;
-    color: #555;
+    color: #444;
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -159,7 +162,7 @@
     overflow: hidden;
   }
   .signals-sidebar-footer {
-    padding: 10px 16px 0;
+    padding: 10px 14px;
     flex-shrink: 0;
     border-top: 1px solid var(--border);
   }
@@ -179,9 +182,9 @@
   }
   .signals-sidebar-view-all:hover { border-color: #e879f9; color: #e879f9; }
 
-  @media (max-width: 900px) {
+  /* Hide on narrow screens so it doesn't overlap content */
+  @media (max-width: 1200px) {
     .landing-right { display: none; }
-    .landing-left { padding: 0 24px 100px; }
   }
   .signal-card {
     background: var(--surface);
@@ -1124,8 +1127,8 @@
   <div class="main" id="main">
 
     <div class="landing-split" id="landing">
-      <!-- Left: existing content -->
-      <div class="landing-left">
+      <!-- Left: original layout unchanged -->
+      <div class="landing">
         <div class="landing-eyebrow">Rising Ballers × She's A Baller — Internal</div>
         <h1 class="landing-headline">What do you need to know<br><em>before you pitch?</em></h1>
         <p class="landing-sub">Audience data · pitch briefs · content strategy — grounded in your first-party research</p>
@@ -3781,6 +3784,8 @@ function goHome() {
   conversationHistory = [];
   currentConversationId = null;
   document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+  const sb = document.getElementById('signalsSidebar');
+  if (sb) sb.style.display = '';
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').style.height = 'auto';
   removeFile();
@@ -3790,6 +3795,8 @@ function goHome() {
 function showChat() {
   document.getElementById('landing').style.display = 'none';
   document.getElementById('chatView').classList.add('visible');
+  const sb = document.getElementById('signalsSidebar');
+  if (sb) sb.style.display = 'none';
 }
 
 function scrollBottom() {
