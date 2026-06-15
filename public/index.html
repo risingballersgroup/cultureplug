@@ -1953,12 +1953,10 @@ function buildSignalCard(s) {
     <div class="signal-meta">
       <span class="signal-badge signal-badge-channel">${s.channel || 'Web'}</span>
       <span class="signal-badge ${priorityBadgeClass}">${s.priority}</span>
-      ${s.category ? `<span class="signal-badge signal-badge-channel">${s.category}</span>` : ''}
-      ${engText ? `<span class="signal-badge signal-badge-channel">${engText}</span>` : ''}
+      ${s.author ? `<span style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#f0ede6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;">${s.author}</span>` : ''}
       <span class="signal-date">${date}</span>
     </div>
     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-      ${s.author ? `<div class="signal-author">📍 ${s.author}</div>` : ''}
       ${crmBadge}
     </div>
     <div class="signal-text">${signalText}</div>
