@@ -3838,7 +3838,25 @@ function handleFile(event) {
       reader.readAsDataURL(file);
     });
   } else if (isPDF || isWord) {
-    attachedFileContent = `[${isPDF ? 'PDF' : 'Word doc'} uploaded: ${file.name}]`;
+    // Extract text server-side
+    attachedFileContent = `[Extracting text from ${file.name}...]`;
+    const formData = new FormData();
+    formData.append('file', file);
+    fetch('/api/extract-text', { method: 'POST', body: formData })
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) {
+          attachedFileContent = '';
+          alert(`Could not read file: ${d.error}`);
+        } else {
+          attachedFileContent = `[Brief: ${file.name}]\n\n${d.text}`;
+          document.getElementById('fileChipName').textContent = `${file.name} (text extracted)`;
+        }
+      })
+      .catch(() => {
+        attachedFileContent = '';
+        alert('Could not extract text from file. Please paste the brief text directly.');
+      });
   } else {
     reader.onload = e => { attachedFileContent = e.target.result; };
     reader.readAsText(file);
