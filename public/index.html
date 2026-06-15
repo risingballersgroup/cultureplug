@@ -4139,7 +4139,7 @@ async function sendMessage() {
 
   const isImageFile = attachedFile && attachedFile.type.startsWith('image/');
   const fileCtx = attachedFile && !isImageFile
-    ? `Attached file: "${attachedFile.name}"${attachedFileContent && !attachedFileContent.startsWith('[') ? '\n\n' + attachedFileContent.slice(0, 3000) : ''}`
+    ? `Attached file: "${attachedFile.name}"${attachedFileContent ? '\n\n' + attachedFileContent.slice(0, 12000) : ''}`
     : '';
   const imageData = isImageFile ? attachedFileContent : null;
   const modeAtSend = currentMode;
