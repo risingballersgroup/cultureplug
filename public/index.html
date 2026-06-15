@@ -3838,8 +3838,10 @@ function handleFile(event) {
       reader.readAsDataURL(file);
     });
   } else if (isPDF || isWord) {
-    // Extract text server-side
-    attachedFileContent = `[Extracting text from ${file.name}...]`;
+    // Extract text server-side — track as promise so sendMessage waits
+    let resolveExtraction;
+    imageCompressing = new Promise(resolve => { resolveExtraction = resolve; });
+    attachedFileContent = '';
     const formData = new FormData();
     formData.append('file', file);
     fetch('/api/extract-text', { method: 'POST', body: formData })
@@ -3850,12 +3852,14 @@ function handleFile(event) {
           alert(`Could not read file: ${d.error}`);
         } else {
           attachedFileContent = `[Brief: ${file.name}]\n\n${d.text}`;
-          document.getElementById('fileChipName').textContent = `${file.name} (text extracted)`;
+          document.getElementById('fileChipName').textContent = `${file.name} ✓`;
         }
+        resolveExtraction();
       })
       .catch(() => {
         attachedFileContent = '';
         alert('Could not extract text from file. Please paste the brief text directly.');
+        resolveExtraction();
       });
   } else {
     reader.onload = e => { attachedFileContent = e.target.result; };
@@ -3863,7 +3867,9 @@ function handleFile(event) {
   }
 
   const inputBox = document.getElementById('inputBox');
-  if (currentMode === 'brief_upload') {
+  if (isWord || isPDF) {
+    document.getElementById('fileChipName').textContent = `${file.name} — extracting...`;
+  }
     inputBox.value = 'Analyse this brief against our first-party data and identify the strongest territories and audience fit.';
   } else if (!inputBox.value.trim()) {
     if (isImage) inputBox.value = 'What can you see in this image?';
