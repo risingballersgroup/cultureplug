@@ -1934,6 +1934,23 @@ function loadMoreSignals() {
   loadSignals(true);
 }
 
+function getSignalEntity(s) {
+  const generic = ['news article', 'article', 'news', 'press release', 'web', ''];
+  const author = (s.author || '').trim();
+  if (!generic.includes(author.toLowerCase())) return author;
+
+  // Try to extract brand/entity from signal headline
+  // Look for known patterns: "X partnership", "X deal", "X sponsorship", "X signs"
+  const text = s.signal || '';
+  // Try the first capitalised proper noun sequence before common words
+  const match = text.match(/^([A-Z][a-zA-Z&\s'\.]+?)(?:'s| partnership| deal| sponsorship| sign| launch| appoint| announce| reveal| report|–|-|,)/);
+  if (match) return match[1].trim().slice(0, 40);
+  // Fallback: first two capitalised words
+  const words = text.match(/\b[A-Z][a-zA-Z]+(?:\s[A-Z][a-zA-Z]+)?\b/);
+  if (words) return words[0].slice(0, 40);
+  return author || s.channel || 'Unknown';
+}
+
 function buildSignalCard(s) {
   const card = document.createElement('div');
   const priorityClass = s.priority === 'Very High' ? 'priority-vh' : s.priority === 'High' ? 'priority-h' : 'priority-m';
@@ -1948,12 +1965,13 @@ function buildSignalCard(s) {
   // CRM match
   const company = matchCompany(s.author);
   const crmBadge = getCRMBadge(company);
+  const entity = getSignalEntity(s);
 
   card.innerHTML = `
     <div class="signal-meta">
       <span class="signal-badge signal-badge-channel">${s.channel || 'Web'}</span>
       <span class="signal-badge ${priorityBadgeClass}">${s.priority}</span>
-      ${s.author ? `<span style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#f0ede6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;">${s.author}</span>` : ''}
+      ${entity ? `<span style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;color:#f0ede6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;">${entity}</span>` : ''}
       <span class="signal-date">${date}</span>
     </div>
     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
@@ -3811,22 +3829,13 @@ function handleFile(event) {
   const files = Array.from(event.target.files).slice(0, 2);
   if (!files.length) return;
 
-  files.forEach((file, idx) => {
-    const isFirst = idx === 0 && !attachedFile || (idx === 0 && !attachedFile2) ? !attachedFile : false;
-    // Fill slot 0 first, then slot 1
-    const slot = (!attachedFile) ? 0 : (!attachedFile2 ? 1 : 0);
-    processFileIntoSlot(file, slot === 0 && idx === 0 ? 0 : 1);
-  });
-
-  // If two files selected at once, assign 0 and 1
   if (files.length === 2) {
     processFileIntoSlot(files[0], 0);
     processFileIntoSlot(files[1], 1);
-    return;
+  } else {
+    const slot = !attachedFile ? 0 : 1;
+    processFileIntoSlot(files[0], slot);
   }
-  // Single file — fill first empty slot
-  const slot = !attachedFile ? 0 : 1;
-  processFileIntoSlot(files[0], slot);
 
   event.target.value = '';
 }
