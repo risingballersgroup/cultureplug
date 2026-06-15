@@ -3,8 +3,11 @@ const fetch = require('node-fetch');
 const path = require('path');
 const crypto = require('crypto');
 const { Pool } = require('pg');
+const multer = require('multer');
+const mammoth = require('mammoth');
 
 const app = express();
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 20 * 1024 * 1024 } });
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -223,6 +226,49 @@ app.get('/api/dbcheck', async (req, res) => {
     res.json({ ok: true, time: result.rows[0].time, sessions: result.rows[0].session_count });
   } catch (err) {
     res.json({ ok: false, error: err.message });
+  }
+});
+
+// ── FILE TEXT EXTRACTION ──
+app.post('/api/extract-text', requireAuth, upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+
+    const { originalname, buffer, mimetype } = req.file;
+    const isDocx = originalname.match(/\.docx?$/i);
+    const isPDF = mimetype === 'application/pdf' || originalname.match(/\.pdf$/i);
+    const isTxt = originalname.match(/\.txt$/i);
+
+    let text = '';
+
+    if (isDocx) {
+      const result = await mammoth.extractRawText({ buffer });
+      text = result.value;
+    } else if (isPDF) {
+      // Use pdf-parse if available, otherwise fall back to basic extraction
+      try {
+        const pdfParse = require('pdf-parse');
+        const data = await pdfParse(buffer);
+        text = data.text;
+      } catch(e) {
+        // pdf-parse not available — return error so frontend can handle
+        return res.status(422).json({ error: 'PDF parsing unavailable — please paste the brief text directly or convert to DOCX' });
+      }
+    } else if (isTxt) {
+      text = buffer.toString('utf8');
+    } else {
+      return res.status(400).json({ error: 'Unsupported file type' });
+    }
+
+    // Trim and limit to avoid oversized prompts
+    text = text.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+    if (text.length > 15000) text = text.slice(0, 15000) + '\n\n[Brief truncated at 15,000 characters]';
+
+    console.log(`Extracted ${text.length} chars from ${originalname}`);
+    res.json({ text, filename: originalname });
+  } catch (err) {
+    console.error('File extraction error:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 
