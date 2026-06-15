@@ -1195,12 +1195,18 @@
       </div>
       <div class="file-chip" id="fileChip">
         <span class="file-chip-name" id="fileChipName"></span>
-        <button class="file-chip-remove" onclick="removeFile()" title="Remove file">
+        <button class="file-chip-remove" onclick="removeFile(0)" title="Remove file">
+          <svg viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="file-chip" id="fileChip2" style="display:none;">
+        <span class="file-chip-name" id="fileChipName2"></span>
+        <button class="file-chip-remove" onclick="removeFile(1)" title="Remove file">
           <svg viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
       </div>
       <div style="position:relative">
-        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp,.gif" style="display:none" onchange="handleFile(event)">
+        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.webp,.gif" style="display:none" onchange="handleFile(event)" multiple>
         <button class="upload-btn" id="uploadBtn" onclick="document.getElementById('fileInput').click()" title="Upload a file — PDF, Word doc, or image">
           <svg viewBox="0 0 16 16" fill="none">
             <path d="M2 10v3a1 1 0 001 1h10a1 1 0 001-1v-3M8 2v8M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2134,6 +2140,8 @@ function startNewConversation() {
 }
 let attachedFile = null;
 let attachedFileContent = '';
+let attachedFile2 = null;
+let attachedFileContent2 = '';
 let imageCompressing = null; // Promise that resolves when image is ready
 let currentMode = 'general';
 let activeBrief = null; // { brand, context } — persists across messages
@@ -3802,11 +3810,39 @@ function usePill(btn) {
 }
 
 function handleFile(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  attachedFile = file;
-  const chip = document.getElementById('fileChip');
-  document.getElementById('fileChipName').textContent = file.name;
+  const files = Array.from(event.target.files).slice(0, 2);
+  if (!files.length) return;
+
+  files.forEach((file, idx) => {
+    const isFirst = idx === 0 && !attachedFile || (idx === 0 && !attachedFile2) ? !attachedFile : false;
+    // Fill slot 0 first, then slot 1
+    const slot = (!attachedFile) ? 0 : (!attachedFile2 ? 1 : 0);
+    processFileIntoSlot(file, slot === 0 && idx === 0 ? 0 : 1);
+  });
+
+  // If two files selected at once, assign 0 and 1
+  if (files.length === 2) {
+    processFileIntoSlot(files[0], 0);
+    processFileIntoSlot(files[1], 1);
+    return;
+  }
+  // Single file — fill first empty slot
+  const slot = !attachedFile ? 0 : 1;
+  processFileIntoSlot(files[0], slot);
+
+  event.target.value = '';
+}
+
+function processFileIntoSlot(file, slot) {
+  const chipId = slot === 0 ? 'fileChip' : 'fileChip2';
+  const nameId = slot === 0 ? 'fileChipName' : 'fileChipName2';
+  const chip = document.getElementById(chipId);
+
+  if (slot === 0) { attachedFile = file; }
+  else { attachedFile2 = file; }
+
+  document.getElementById(nameId).textContent = file.name;
+  chip.style.display = '';
   chip.classList.add('visible');
   document.getElementById('uploadBtn').classList.add('has-file');
 
@@ -3816,7 +3852,6 @@ function handleFile(event) {
   const reader = new FileReader();
 
   if (isImage) {
-    // Compress image via canvas — track as promise so sendMessage can wait
     imageCompressing = new Promise(resolve => {
       reader.onload = e => {
         const img = new Image();
@@ -3830,7 +3865,9 @@ function handleFile(event) {
           }
           canvas.width = w; canvas.height = h;
           canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          attachedFileContent = canvas.toDataURL('image/jpeg', 0.75);
+          const content = canvas.toDataURL('image/jpeg', 0.75);
+          if (slot === 0) attachedFileContent = content;
+          else attachedFileContent2 = content;
           resolve();
         };
         img.src = e.target.result;
@@ -3838,56 +3875,85 @@ function handleFile(event) {
       reader.readAsDataURL(file);
     });
   } else if (isPDF || isWord) {
-    // Extract text server-side — track as promise so sendMessage waits
+    document.getElementById(nameId).textContent = `${file.name} — extracting...`;
     let resolveExtraction;
     imageCompressing = new Promise(resolve => { resolveExtraction = resolve; });
-    attachedFileContent = '';
     const formData = new FormData();
     formData.append('file', file);
     fetch('/api/extract-text', { method: 'POST', body: formData })
       .then(r => r.json())
       .then(d => {
         if (d.error) {
-          attachedFileContent = '';
-          alert(`Could not read file: ${d.error}`);
+          if (slot === 0) attachedFileContent = ''; else attachedFileContent2 = '';
+          alert(`Could not read ${file.name}: ${d.error}`);
         } else {
-          attachedFileContent = `[Brief: ${file.name}]\n\n${d.text}`;
-          document.getElementById('fileChipName').textContent = `${file.name} ✓`;
+          const content = `[Document: ${file.name}]\n\n${d.text}`;
+          if (slot === 0) attachedFileContent = content;
+          else attachedFileContent2 = content;
+          document.getElementById(nameId).textContent = `${file.name} ✓`;
         }
         resolveExtraction();
       })
       .catch(() => {
-        attachedFileContent = '';
-        alert('Could not extract text from file. Please paste the brief text directly.');
+        if (slot === 0) attachedFileContent = ''; else attachedFileContent2 = '';
+        alert(`Could not extract text from ${file.name}.`);
         resolveExtraction();
       });
   } else {
-    reader.onload = e => { attachedFileContent = e.target.result; };
+    reader.onload = e => {
+      if (slot === 0) attachedFileContent = e.target.result;
+      else attachedFileContent2 = e.target.result;
+    };
     reader.readAsText(file);
   }
 
   const inputBox = document.getElementById('inputBox');
-  if (isWord || isPDF) {
-    document.getElementById('fileChipName').textContent = `${file.name} — extracting...`;
-  }
-  if (currentMode === 'brief_upload') {
-    inputBox.value = 'Analyse this brief against our first-party data and identify the strongest territories and audience fit.';
-  } else if (!inputBox.value.trim()) {
-    if (isImage) inputBox.value = 'What can you see in this image?';
-    else inputBox.value = 'Build a pitch brief based on the uploaded brief';
+  if (slot === 0) {
+    if (currentMode === 'brief_upload') {
+      inputBox.value = 'Analyse these documents against our first-party data and identify the strongest territories and audience fit.';
+    } else if (!inputBox.value.trim()) {
+      if (isImage) inputBox.value = 'What can you see in this image?';
+      else inputBox.value = 'Analyse this document against our first-party data.';
+    }
+  } else {
+    // Second file — update prompt to mention both
+    if (inputBox.value && !inputBox.value.includes('both')) {
+      inputBox.value = 'Analyse both documents against our first-party data and identify the strongest territories and audience fit.';
+    }
   }
   autoResize(inputBox);
   inputBox.focus();
-  event.target.value = '';
 }
 
-function removeFile() {
-  attachedFile = null;
-  attachedFileContent = '';
-  imageCompressing = null;
-  document.getElementById('fileChip').classList.remove('visible');
-  document.getElementById('fileChipName').textContent = '';
-  document.getElementById('uploadBtn').classList.remove('has-file');
+function removeFile(slot) {
+  if (slot === undefined) slot = 0;
+  if (slot === 0) {
+    attachedFile = null;
+    attachedFileContent = '';
+    const chip = document.getElementById('fileChip');
+    chip.classList.remove('visible');
+    document.getElementById('fileChipName').textContent = '';
+    // Shift file 2 to slot 0 if it exists
+    if (attachedFile2) {
+      attachedFile = attachedFile2;
+      attachedFileContent = attachedFileContent2;
+      document.getElementById('fileChipName').textContent = document.getElementById('fileChipName2').textContent;
+      chip.classList.add('visible');
+      attachedFile2 = null;
+      attachedFileContent2 = '';
+      document.getElementById('fileChip2').style.display = 'none';
+      document.getElementById('fileChipName2').textContent = '';
+    }
+  } else {
+    attachedFile2 = null;
+    attachedFileContent2 = '';
+    document.getElementById('fileChip2').style.display = 'none';
+    document.getElementById('fileChipName2').textContent = '';
+  }
+  if (!attachedFile && !attachedFile2) {
+    imageCompressing = null;
+    document.getElementById('uploadBtn').classList.remove('has-file');
+  }
 }
 
 function goHome() {
@@ -3901,7 +3967,8 @@ function goHome() {
   if (sb) sb.style.display = '';
   document.getElementById('inputBox').value = '';
   document.getElementById('inputBox').style.height = 'auto';
-  removeFile();
+  removeFile(0);
+  removeFile(1);
   clearActiveBrief();
 }
 
@@ -4130,20 +4197,30 @@ async function sendMessage() {
   isLoading = true;
   sendBtn.disabled = true;
 
-  const displayText = attachedFile
-    ? `${userText}${userText ? '\n' : ''}📎 ${attachedFile.name}`
+  const displayText = [attachedFile?.name, attachedFile2?.name].filter(Boolean).length
+    ? `${userText}${userText ? '\n' : ''}${[attachedFile?.name, attachedFile2?.name].filter(Boolean).map(n => `📎 ${n}`).join('\n')}`
     : userText;
 
   inputBox.value = '';
   inputBox.style.height = 'auto';
 
   const isImageFile = attachedFile && attachedFile.type.startsWith('image/');
-  const fileCtx = attachedFile && !isImageFile
-    ? `Attached file: "${attachedFile.name}"${attachedFileContent ? '\n\n' + attachedFileContent.slice(0, 12000) : ''}`
-    : '';
+  const isImageFile2 = attachedFile2 && attachedFile2.type.startsWith('image/');
+
+  // Build combined file context
+  let fileCtxParts = [];
+  if (attachedFile && !isImageFile && attachedFileContent) {
+    fileCtxParts.push(attachedFileContent.slice(0, 10000));
+  }
+  if (attachedFile2 && !isImageFile2 && attachedFileContent2) {
+    fileCtxParts.push(attachedFileContent2.slice(0, 10000));
+  }
+  const fileCtx = fileCtxParts.length ? fileCtxParts.join('\n\n---\n\n') : '';
   const imageData = isImageFile ? attachedFileContent : null;
+
   const modeAtSend = currentMode;
-  removeFile();
+  removeFile(0);
+  removeFile(1);
 
   addUserMsg(displayText);
   addTyping();
