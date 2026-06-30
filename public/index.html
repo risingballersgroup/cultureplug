@@ -1767,8 +1767,7 @@ async function loadSignalsSidebar() {
           <span class="signals-sidebar-badge ${badgeClass}">${s.priority}</span>
           <span class="signals-sidebar-author">${s.author || s.channel || ''}</span>
         </div>
-        <div class="signals-sidebar-text">${text}</div>
-        ${opp ? `<div class="signals-sidebar-opportunity">💡 ${opp}</div>` : ''}`;
+        <div class="signals-sidebar-text">${text}</div>`;
       el.onclick = () => {
         showSignals();
         if (s.author) {
@@ -1978,7 +1977,6 @@ function buildSignalCard(s) {
       ${crmBadge}
     </div>
     <div class="signal-text">${signalText}</div>
-    ${opportunity ? `<div class="signal-opportunity">💡 ${opportunity}</div>` : ''}
     ${company && company.statusNote ? `<div style="font-family:'DM Mono',monospace;font-size:9px;color:#444;margin-top:2px;letter-spacing:0.5px;">CRM: ${company.statusNote.slice(0,80)}</div>` : ''}
     <div class="signal-actions">
       <button class="signal-action-btn primary" onclick="signalToPitchBrief('${(s.author||'').replace(/'/g,"\\'")}', '${signalText.replace(/'/g,"\\'")}', '${opportunity.replace(/'/g,"\\'")}')">Pitch Brief</button>
