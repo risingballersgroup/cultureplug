@@ -1756,7 +1756,7 @@ async function loadSignalsSidebar() {
       return;
     }
     list.innerHTML = '';
-    data.slice(0, 8).forEach(s => {
+    dedupeSignals(data).slice(0, 8).forEach(s => {
       const el = document.createElement('div');
       el.className = 'signals-sidebar-item';
       const badgeClass = s.priority === 'Very High' ? 'signals-sidebar-badge-vh' : 'signals-sidebar-badge-h';
@@ -1901,10 +1901,13 @@ async function loadSignals(append = false) {
       return;
     }
 
+    // Deduplicate near-identical signals (same story syndicated across outlets)
+    const deduped = dedupeSignals(data);
+
     // Apply CRM filter client-side
-    let filtered = data;
+    let filtered = deduped;
     if (crmFilter !== 'All') {
-      filtered = data.filter(s => {
+      filtered = deduped.filter(s => {
         const company = matchCompany(s.author);
         if (crmFilter === 'crm') return !!company;
         if (crmFilter === 'existing') return company && company.group?.toLowerCase().includes('existing');
@@ -1948,6 +1951,48 @@ function getSignalEntity(s) {
   const words = text.match(/\b[A-Z][a-zA-Z]+(?:\s[A-Z][a-zA-Z]+)?\b/);
   if (words) return words[0].slice(0, 40);
   return author || s.channel || 'Unknown';
+}
+
+function normalizeForDedup(text) {
+  if (!text) return '';
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')        // strip punctuation
+    .replace(/\s*[-–—]\s*[a-z0-9\s.]+$/i, '') // strip trailing " - Source Name"
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function dedupeSignals(signals) {
+  const seen = [];
+  const result = [];
+
+  for (const s of signals) {
+    const norm = normalizeForDedup(s.signal);
+    if (!norm) { result.push(s); continue; }
+
+    // Check against already-kept signals for near-duplicates
+    const isDupe = seen.some(prevNorm => {
+      if (prevNorm === norm) return true;
+      // Compare first 60 chars — catches same story, different source suffix
+      const a = norm.slice(0, 60);
+      const b = prevNorm.slice(0, 60);
+      if (a === b) return true;
+      // Word overlap ratio for near-identical headlines
+      const wordsA = new Set(a.split(' '));
+      const wordsB = new Set(b.split(' '));
+      const overlap = [...wordsA].filter(w => wordsB.has(w)).length;
+      const minLen = Math.min(wordsA.size, wordsB.size);
+      return minLen > 4 && overlap / minLen > 0.85;
+    });
+
+    if (!isDupe) {
+      seen.push(norm);
+      result.push(s);
+    }
+  }
+
+  return result;
 }
 
 function buildSignalCard(s) {
