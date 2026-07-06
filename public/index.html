@@ -1436,7 +1436,7 @@
       <div style="width:24px;height:1px;background:var(--border);"></div>
       <div class="mp-step-pill" id="mpPill3" onclick="mpGoStep(3)">3 Client View</div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
-          <button onclick="mpShowPlans()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:6px;cursor:pointer;">My Plans</button>
+          <button onclick="mpShowPlans()" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:6px;cursor:pointer;">All Plans</button>
           <button onclick="mpSavePlan()" style="background:none;border:1px solid var(--accent);color:var(--accent);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 14px;border-radius:6px;cursor:pointer;" id="mpSaveBtn">Save Plan</button>
         </div>
     </div>
@@ -1843,6 +1843,7 @@ function getCRMBadge(company) {
 
 // ── SIGNALS ──
 let signalsOffset = 0;
+let signalsSeenCores = []; // tracks dedup cores across Load More pages
 let signalsTotal = 0;
 const SIGNALS_LIMIT = 30;
 
@@ -1901,8 +1902,9 @@ async function loadSignals(append = false) {
       return;
     }
 
-    // Deduplicate near-identical signals (same story syndicated across outlets)
-    const deduped = dedupeSignals(data);
+    // Deduplicate near-identical signals (same story syndicated across outlets) — persists across Load More
+    if (!append) signalsSeenCores = [];
+    const deduped = dedupeSignals(data, signalsSeenCores);
 
     // Apply CRM filter client-side
     let filtered = deduped;
@@ -1957,37 +1959,36 @@ function normalizeForDedup(text) {
   if (!text) return '';
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, '')        // strip punctuation
-    .replace(/\s*[-–—]\s*[a-z0-9\s.]+$/i, '') // strip trailing " - Source Name"
+    .normalize('NFKD').replace(/[\u0300-\u036f]/g, '') // strip accents
+    .replace(/[''`´]/g, "'")
+    .replace(/[""]/g, '"')
+    .replace(/[-–—]/g, ' ')             // unify all dash types to space
+    .replace(/[^a-z0-9\s]/g, '')        // strip remaining punctuation
+    .replace(/\b(latest|update|breaking|exclusive)\b/g, '') // strip noise prefixes
     .replace(/\s+/g, ' ')
     .trim();
 }
 
-function dedupeSignals(signals) {
-  const seen = [];
+function dedupeSignals(signals, persistentSeen) {
+  const kept = persistentSeen || []; // { core, words }
   const result = [];
 
   for (const s of signals) {
-    const norm = normalizeForDedup(s.signal);
-    if (!norm) { result.push(s); continue; }
+    const fullNorm = normalizeForDedup(s.signal);
+    if (!fullNorm) { result.push(s); continue; }
 
-    // Check against already-kept signals for near-duplicates
-    const isDupe = seen.some(prevNorm => {
-      if (prevNorm === norm) return true;
-      // Compare first 60 chars — catches same story, different source suffix
-      const a = norm.slice(0, 60);
-      const b = prevNorm.slice(0, 60);
-      if (a === b) return true;
-      // Word overlap ratio for near-identical headlines
-      const wordsA = new Set(a.split(' '));
-      const wordsB = new Set(b.split(' '));
-      const overlap = [...wordsA].filter(w => wordsB.has(w)).length;
-      const minLen = Math.min(wordsA.size, wordsB.size);
-      return minLen > 4 && overlap / minLen > 0.85;
+    const core = fullNorm.split(' ').slice(0, 14).join(' ');
+    const words = new Set(core.split(' ').filter(w => w.length > 2));
+
+    const isDupe = kept.some(k => {
+      if (k.core === core) return true;
+      const overlap = [...words].filter(w => k.words.has(w)).length;
+      const minLen = Math.min(words.size, k.words.size);
+      return minLen >= 4 && overlap / minLen >= 0.7;
     });
 
     if (!isDupe) {
-      seen.push(norm);
+      kept.push({ core, words });
       result.push(s);
     }
   }
@@ -6264,28 +6265,71 @@ async function mpSavePlan() {
   }
 }
 
+let mpPlansFilter = 'all'; // 'all' | 'mine'
+
 async function mpShowPlans() {
   const panel = document.getElementById('mpPlansPanel');
   const list  = document.getElementById('mpPlansList');
   panel.style.display = 'block';
+
+  // Inject filter toggle into panel header if not already there
+  let header = document.getElementById('mpPlansHeader');
+  if (!header) {
+    const panelEl = panel;
+    header = document.createElement('div');
+    header.id = 'mpPlansHeader';
+    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;';
+    header.innerHTML = `
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);">All Plans</div>
+      <div style="display:flex;gap:4px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:3px;">
+        <button id="mpFilterAll" onclick="mpSetPlansFilter('all')" style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:4px;border:none;cursor:pointer;background:var(--accent);color:var(--bg);font-weight:700;">All</button>
+        <button id="mpFilterMine" onclick="mpSetPlansFilter('mine')" style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:4px;border:none;cursor:pointer;background:transparent;color:var(--muted);">Mine</button>
+      </div>`;
+    panelEl.insertBefore(header, panelEl.firstChild);
+  }
+
+  await mpFetchAndRenderPlans();
+}
+
+function mpSetPlansFilter(f) {
+  mpPlansFilter = f;
+  document.getElementById('mpFilterAll').style.background = f === 'all' ? 'var(--accent)' : 'transparent';
+  document.getElementById('mpFilterAll').style.color = f === 'all' ? 'var(--bg)' : 'var(--muted)';
+  document.getElementById('mpFilterMine').style.background = f === 'mine' ? 'var(--accent)' : 'transparent';
+  document.getElementById('mpFilterMine').style.color = f === 'mine' ? 'var(--bg)' : 'var(--muted)';
+  mpFetchAndRenderPlans();
+}
+
+async function mpFetchAndRenderPlans() {
+  const list = document.getElementById('mpPlansList');
   list.innerHTML = '<span style="color:var(--muted)">Loading...</span>';
   try {
-    const res = await fetch('/api/plans');
+    const url = '/api/plans' + (mpPlansFilter === 'mine' ? '?mine=true' : '');
+    const res = await fetch(url);
     const plans = await res.json();
     if (!plans.length) {
-      list.innerHTML = '<span style="color:var(--muted)">No saved plans yet.</span>';
+      list.innerHTML = `<span style="color:var(--muted)">${mpPlansFilter === 'mine' ? 'You have no saved plans yet.' : 'No plans saved yet.'}</span>`;
       return;
     }
+    const myEmail = currentUser?.email || '';
     list.innerHTML = plans.map(p => {
-      const date = new Date(p.updated_at).toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
-      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
-        <div>
-          <div style="color:var(--white);font-weight:500;">${p.name}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Saved ${date}</div>
+      const date = new Date(p.updated_at).toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
+      const owner = p.user_name || p.user_email || 'Unknown';
+      const isOwner = p.user_email === myEmail;
+      const ownerLabel = isOwner
+        ? `<span style="color:var(--accent);font-size:10px;">You</span>`
+        : `<span style="color:var(--muted);font-size:10px;">${owner.split(' ')[0]}</span>`;
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);gap:8px;">
+        <div style="min-width:0;flex:1;">
+          <div style="color:var(--white);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;display:flex;gap:8px;align-items:center;">
+            <span>Updated ${date}</span>
+            ${ownerLabel}
+          </div>
         </div>
-        <div style="display:flex;gap:8px;">
+        <div style="display:flex;gap:6px;flex-shrink:0;">
           <button onclick="mpLoadPlan(${p.id})" style="background:var(--accent);color:var(--bg);border:none;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:5px;cursor:pointer;">Load</button>
-          <button onclick="mpDeletePlan(${p.id},this)" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:5px;cursor:pointer;">Delete</button>
+          ${isOwner ? `<button onclick="mpDeletePlan(${p.id},this)" style="background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 12px;border-radius:5px;cursor:pointer;">Delete</button>` : ''}
         </div>
       </div>`;
     }).join('');
@@ -6318,8 +6362,9 @@ async function mpLoadPlan(id) {
 async function mpDeletePlan(id, btn) {
   if (!confirm('Delete this plan?')) return;
   try {
-    await fetch('/api/plans/'+id, { method: 'DELETE' });
-    mpShowPlans(); // refresh list
+    const res = await fetch('/api/plans/'+id, { method: 'DELETE' });
+    if (res.status === 403) { alert('You can only delete your own plans.'); return; }
+    mpFetchAndRenderPlans();
   } catch (err) {
     alert('Delete failed: ' + err.message);
   }
