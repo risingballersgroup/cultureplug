@@ -24,6 +24,7 @@ pool.query(`
   CREATE TABLE IF NOT EXISTS media_plans (
     id          SERIAL PRIMARY KEY,
     user_email  TEXT NOT NULL,
+    user_name   TEXT,
     name        TEXT NOT NULL,
     data        JSONB NOT NULL,
     created_at  TIMESTAMPTZ DEFAULT NOW(),
@@ -331,14 +332,17 @@ app.post('/api/chat', requireAuth, async (req, res) => {
 // ── MEDIA PLANS ──
 app.get('/api/plans', requireAuth, async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT id, name, created_at, updated_at FROM media_plans WHERE user_email = $1 ORDER BY updated_at DESC',
-      [req.user.email]
-    );
+    const mine = req.query.mine === 'true';
+    const result = mine
+      ? await pool.query(
+          'SELECT id, name, user_email, user_name, created_at, updated_at FROM media_plans WHERE user_email = $1 ORDER BY updated_at DESC',
+          [req.user.email]
+        )
+      : await pool.query(
+          'SELECT id, name, user_email, user_name, created_at, updated_at FROM media_plans ORDER BY updated_at DESC LIMIT 200'
+        );
     res.json(result.rows);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/plans', requireAuth, async (req, res) => {
@@ -350,46 +354,41 @@ app.post('/api/plans', requireAuth, async (req, res) => {
         'UPDATE media_plans SET name = $1, data = $2, updated_at = NOW() WHERE id = $3 AND user_email = $4 RETURNING id, name, updated_at',
         [name, JSON.stringify(data), id, req.user.email]
       );
-      if (result.rows.length === 0) return res.status(404).json({ error: 'Plan not found' });
+      if (result.rows.length === 0) return res.status(404).json({ error: 'Plan not found or not yours' });
       res.json(result.rows[0]);
     } else {
       const result = await pool.query(
-        'INSERT INTO media_plans (user_email, name, data) VALUES ($1, $2, $3) RETURNING id, name, created_at',
-        [req.user.email, name, JSON.stringify(data)]
+        'INSERT INTO media_plans (user_email, user_name, name, data) VALUES ($1, $2, $3, $4) RETURNING id, name, created_at',
+        [req.user.email, req.user.name || req.user.email, name, JSON.stringify(data)]
       );
       res.json(result.rows[0]);
     }
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/plans/:id', requireAuth, async (req, res) => {
   try {
-    const result = await pool.query(
-      'SELECT * FROM media_plans WHERE id = $1 AND user_email = $2',
-      [req.params.id, req.user.email]
-    );
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Plan not found' });
+    // All plans are readable by all authenticated users
+    const result = await pool.query('SELECT * FROM media_plans WHERE id = $1', [req.params.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Plan not found' });
     res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.delete('/api/plans/:id', requireAuth, async (req, res) => {
   try {
-    await pool.query(
-      'DELETE FROM media_plans WHERE id = $1 AND user_email = $2',
+    // Only owner can delete
+    const result = await pool.query(
+      'DELETE FROM media_plans WHERE id = $1 AND user_email = $2 RETURNING id',
       [req.params.id, req.user.email]
     );
+    if (!result.rows.length) return res.status(403).json({ error: 'Not your plan' });
     res.json({ ok: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// ── MONDAY CRM SYNC ──
+pool.query(`ALTER TABLE media_plans ADD COLUMN IF NOT EXISTS user_name TEXT`).catch(() => {});
+
 
 pool.query(`
   CREATE TABLE IF NOT EXISTS monday_cache (
