@@ -660,14 +660,17 @@ app.get('/api/admin/usage', requireAdmin, async (req, res) => {
 });
 
 app.get('/admin', requireAdmin, (req, res) => {
-  res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Culture Plug — Admin</title>
+  res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Culture Plug — Certified Collective Admin</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#0e0e0c;color:#f0ede6;font-family:'DM Sans',sans-serif;min-height:100vh;padding:32px 40px}
-h1{font-size:13px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:#c9a84c;margin-bottom:4px}
+body{background:#0e0e0c;color:#EAE7DD;font-family:'DM Sans',sans-serif;min-height:100vh;padding:32px 40px}
+.brandmark{height:30px;width:auto;display:block;margin-bottom:16px}
+h1{font-size:13px;font-family:'DM Mono',monospace;letter-spacing:2px;text-transform:uppercase;color:#EAE7DD;margin-bottom:4px}
 .subtitle{font-size:12px;color:#555;font-family:'DM Mono',monospace;margin-bottom:32px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:32px}
 .stat{background:#111;border:1px solid #1e1e1b;border-radius:8px;padding:16px}
@@ -692,6 +695,7 @@ td:first-child{color:#f0ede6}
 .chart-bar span{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:9px;font-family:'DM Mono',monospace;color:#888;white-space:nowrap;padding-bottom:2px}
 .chart-bar:hover span{display:block}
 </style></head><body>
+<img src="/brand/certified-logotype.svg" alt="Certified Collective" class="brandmark">
 <h1>Culture Plug</h1>
 <div class="subtitle">Usage Analytics — Admin Only</div>
 <div id="root"><div class="loading">Loading...</div></div>

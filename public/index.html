@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Culture Plug — Rising Ballers</title>
+<title>Culture Plug — Certified Collective</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/favicon.png">
@@ -14,9 +14,10 @@
     --bg: #0e0e0c;
     --surface: #161614;
     --border: #272723;
-    --accent: #00FFAA;
+    --accent: #00FFAA;      /* interactive only — buttons, links, active states */
+    --cream: #EAE7DD;       /* Certified Collective brand cream — identity & chrome */
     --gold: #c9a84c;
-    --white: #f0ede6;
+    --white: #EAE7DD;
     --muted: #8a8880;
     --muted2: #2e2d29;
     --pink: #ffb3c6;
@@ -370,6 +371,7 @@
     cursor: pointer;
   }
   .logo:hover { opacity: 0.75; }
+  .logo-lockup { height: 32px; width: auto; display: block; flex-shrink: 0; }
   .logo-rule { width: 1px; height: 16px; background: var(--border); }
   .logo-sub {
     font-family: 'DM Mono', monospace;
@@ -825,10 +827,14 @@
     position: relative; overflow: hidden;
     padding-bottom: 60px;
   }
+  .login-logo {
+    width: 208px; height: auto; display: block;
+    margin-bottom: 26px;
+  }
   .login-eyebrow {
     font-family: 'DM Mono', monospace; font-size: 11px;
     letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--accent); margin-bottom: 28px;
+    color: var(--cream); opacity: 0.65; margin-bottom: 28px;
   }
   .login-headline {
     font-family: 'Playfair Display', serif;
@@ -1027,6 +1033,7 @@
 <!-- ── LOGIN GATE ── -->
 <div id="loginGate" style="display:none">
   <div class="login-wrap">
+    <img src="/brand/certified-logotype.svg" alt="Certified Collective" class="login-logo">
     <p class="login-eyebrow">Rising Ballers &times; She's A Baller &mdash; Internal</p>
     <h1 class="login-headline">What do you need to know<br><em>before you pitch?</em></h1>
     <p class="login-sub">Audience intelligence, data-backed pitch tools, and commercial insights — for Certified employees only.</p>
@@ -1061,8 +1068,8 @@
   <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()" title="View previous searches">Previous Searches</button>
 
   <header>
-    <a class="logo" href="#" onclick="goHome(); return false;">
-      <span>Certified</span>
+    <a class="logo" href="#" onclick="goHome(); return false;" title="Certified Collective">
+      <img src="/brand/certified-logotype.svg" alt="Certified Collective" class="logo-lockup">
       <div class="logo-rule"></div>
       <span class="logo-sub">Culture Plug</span>
     </a>
@@ -1235,7 +1242,7 @@
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);">
       <button onclick="closeSignals()" style="background:none;border:1px solid #444;color:#f0ede6;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:8px 14px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='#444';this.style.color='#f0ede6'">← Home</button>
       <div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Rising Ballers Intelligence</div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Certified Collective Intelligence</div>
         <h2 style="font-family:'Playfair Display',serif;font-size:24px;color:var(--white);margin:0;">Signals <span style="color:var(--accent);font-style:italic;">Feed</span></h2>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
@@ -5282,8 +5289,11 @@ function exportPreMeetingPDF() {
 
   const header = `<div class="doc-header">
     <div class="header-left">
-      <div class="doc-eyebrow">Rising Ballers × She's A Baller — Internal</div>
-      <div class="doc-title">Pre-Meeting Intel — <span class="doc-brand">${brandName}</span></div>
+      <img class="doc-stamp" src="${location.origin}/brand/certified-stamp.svg" alt="Certified Collective">
+      <div class="header-left-text">
+        <div class="doc-eyebrow">Rising Ballers × She's A Baller — Internal</div>
+        <div class="doc-title">Pre-Meeting Intel — <span class="doc-brand">${brandName}</span></div>
+      </div>
     </div>
     <div class="header-right">
       <div class="doc-date">${dateStr}</div>
@@ -5292,7 +5302,7 @@ function exportPreMeetingPDF() {
   </div>`;
 
   const footer = (n, total) => `<div class="doc-footer">
-    <span>Rising Ballers Group</span>
+    <span>Certified Collective</span>
     <span>Internal Use Only</span>
     <span>${n} / ${total}</span>
   </div>`;
@@ -5329,9 +5339,12 @@ function exportPreMeetingPDF() {
       align-items: flex-end;
       padding-bottom: 9px;
       margin-bottom: 14px;
-      border-bottom: 1.5px solid #c9a84c;
+      border-bottom: 1.5px solid #EAE7DD;
       flex-shrink: 0;
     }
+    .header-left { display:flex; align-items:flex-end; gap:10px; min-width:0; }
+    .doc-stamp { width:34px; height:34px; flex-shrink:0; margin-bottom:1px; }
+    .header-left-text { min-width:0; }
     .doc-eyebrow { font-family:'DM Mono',monospace; font-size:7.5px; letter-spacing:2px; text-transform:uppercase; color:#555; margin-bottom:4px; }
     .doc-title { font-family:'Playfair Display',serif; font-size:21px; color:#f0ede6; line-height:1.15; }
     .doc-brand { color:#c9a84c; font-style:italic; }
@@ -5413,7 +5426,7 @@ function emailPreMeetingIntel() {
     .trim();
 
   const header = `PRE-MEETING INTEL — ${brandName.toUpperCase()}\nRising Ballers × She's A Baller — Internal\nGenerated: ${dateStr}\n${'─'.repeat(50)}\n\n`;
-  const footer = `\n\n${'─'.repeat(50)}\nRising Ballers Group — Internal Use Only\nGenerated by Culture Plug`;
+  const footer = `\n\n${'─'.repeat(50)}\nCertified Collective — Internal Use Only\nGenerated by Culture Plug`;
 
   const body = encodeURIComponent(header + plain + footer);
 

@@ -2,6 +2,8 @@
 
 Internal intelligence and media planning tool for **Rising Ballers × She's A Baller**.
 
+Branded as **Certified Collective** — the holdco. Rising Ballers and She's A Baller remain the channel brands the tool reports on.
+
 **Live:** [cultureplug-production.up.railway.app](https://cultureplug-production.up.railway.app)
 **Auth:** Microsoft O365 — restricted to `@risingballers.co.uk`
 **Admin:** [/admin](https://cultureplug-production.up.railway.app/admin) — `eni@risingballers.co.uk` only
@@ -150,6 +152,32 @@ The AI system prompt includes Rising Ballers' proprietary first-party research:
 
 ---
 
+## Branding
+
+Certified Collective is the holdco identity. Marks live in `public/brand/`, converted from the supplied Illustrator/PDF masters to optimised SVG so they stay sharp at any size.
+
+| Mark | Used in |
+|---|---|
+| Logotype | Header lockup (32px), login screen (208px), admin page |
+| Icon | Favicon (`.svg` / `.png` / `.ico`) |
+| Stamp | Pre-Meeting Intel PDF export header |
+
+### Palette
+
+| Token | Value | Use |
+|---|---|---|
+| `--cream` | `#EAE7DD` | Brand cream — identity and chrome |
+| `--white` | `#EAE7DD` | Body text (matches brand cream exactly) |
+| `--accent` | `#00FFAA` | Interactive only — buttons, links, active states |
+| `--gold` | `#c9a84c` | Rising Ballers channel marker |
+| `--pink` | `#ffb3c6` | She's A Baller channel marker |
+
+Gold and pink are **channel wayfinding, not brand colours** — they distinguish RB from SAB across the ratecard, media plan and PDF exports. Leave them alone.
+
+Brand assets are served by `express.static`, which sits *outside* `requireAuth` — this is what lets the login screen load the logotype before sign-in. If auth middleware is ever reordered, the login logo breaks.
+
+---
+
 ## Deployment
 
 Push to `main` on GitHub → Railway auto-deploys.
@@ -187,7 +215,13 @@ Dependencies: `express`, `node-fetch`, `pg`
     ├── index.html     # Full SPA (4,600+ lines) — all UI, styles, AI modes
     ├── favicon.ico
     ├── favicon.svg
-    └── favicon.png
+    ├── favicon.png
+    └── brand/         # Certified Collective marks (vector, cream + black)
+        ├── certified-logotype.svg   # header, login, admin
+        ├── certified-icon.svg       # globe-in-C mark
+        ├── certified-stamp.svg      # PDF export header
+        ├── *-black.svg              # light-background variants
+        └── *.png                    # supplied cream masters
 ```
 
 ---
@@ -203,4 +237,4 @@ If login loops without authenticating, check the redirect URI is listed and the 
 
 ---
 
-*Built by Rising Ballers Group. Internal use only.*
+*Built by Certified Collective. Internal use only.*
