@@ -662,8 +662,8 @@ app.get('/api/admin/usage', requireAdmin, async (req, res) => {
 app.get('/admin', requireAdmin, (req, res) => {
   res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Culture Plug — Certified Collective Admin</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+<link rel="icon" type="image/x-icon" href="/favicon.ico?v=2">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
